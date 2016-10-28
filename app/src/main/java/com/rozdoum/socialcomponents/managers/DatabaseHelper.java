@@ -3,11 +3,17 @@ package com.rozdoum.socialcomponents.managers;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,15 +47,44 @@ public class DatabaseHelper {
 
     public void createOrUpdatePost(Post post) {
         try {
-            DatabaseReference databaseReference = database.getReference("posts");
-            String placeHistoryId = databaseReference.child("post").push().getKey();
-            Map<String, Object> messageValues = post.toMap();
+            DatabaseReference databaseReference = database.getReference();
+            String postId = databaseReference.child("posts").push().getKey();
+            Map<String, Object> postValues = post.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/post/" + placeHistoryId, messageValues);
+            childUpdates.put("/posts/" + postId, postValues);
 
             databaseReference.updateChildren(childUpdates);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
+    }
+
+    public void getPostList(final OnDataChangedListener<Post> onDataChangedListener) {
+        DatabaseReference databaseReference = database.getReference("posts");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> objectMap = (HashMap<String, Object>)
+                        dataSnapshot.getValue();
+                List<Post> list = new ArrayList<Post>();
+                for (Object obj : objectMap.values()) {
+                    if (obj instanceof Map) {
+                        Map<String, Object> mapObj = (Map<String, Object>) obj;
+                        Post post = new Post();
+                        post.setTitle((String) mapObj.get("title"));
+                        post.setDescription((String) mapObj.get("description"));
+                        post.setCreatedDate((long) mapObj.get("createdDate"));
+                        list.add(post);
+                    }
+                }
+
+                onDataChangedListener.onListChanged(list);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

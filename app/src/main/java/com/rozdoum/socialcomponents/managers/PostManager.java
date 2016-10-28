@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.rozdoum.socialcomponents.ApplicationHelper;
+import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
 import java.util.List;
@@ -39,8 +40,7 @@ public class PostManager {
         }
     }
 
-    //TODO: in progress
-//    public List<Post> getPosts() {
-//
-//    }
+    public void getPosts(OnDataChangedListener<Post> onDataChangedListener) {
+        ApplicationHelper.getDatabaseHelper().getPostList(onDataChangedListener);
+    }
 }
