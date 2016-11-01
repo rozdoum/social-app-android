@@ -2,12 +2,10 @@ package com.rozdoum.socialcomponents.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -22,6 +20,7 @@ import com.kbeanie.imagechooser.api.ChosenImages;
 import com.kbeanie.imagechooser.api.ImageChooserListener;
 import com.kbeanie.imagechooser.api.ImageChooserManager;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.dialogs.ChoseWayLoadImageDialog;
 import com.rozdoum.socialcomponents.enums.TakePictureMenu;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
@@ -33,7 +32,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
-public class CreatePostActivity extends AppCompatActivity implements OnPostCreatedListener {
+public class CreatePostActivity extends AppCompatActivity implements OnPostCreatedListener, ChoseWayLoadImageDialog.OnChooseWayLoadImageListener {
 
     private static final String TAG = CreatePostActivity.class.getSimpleName();
 
@@ -73,18 +72,21 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showLoadImageChooser();
+                ChoseWayLoadImageDialog chooserDialog = new ChoseWayLoadImageDialog();
+                chooserDialog.show(getFragmentManager(), TAG);
             }
         });
 
-        buttonCreatePost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showProgress(R.string.message_creating_post);
-                hideKeyboard();
-                PostManager.getInstance(CreatePostActivity.this).createPostWithImage(filePath, CreatePostActivity.this, createPost());
-            }
-        });
+        if (buttonCreatePost != null) {
+            buttonCreatePost.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showProgress(R.string.message_creating_post);
+                    hideKeyboard();
+                    PostManager.getInstance(CreatePostActivity.this).createPostWithImage(filePath, CreatePostActivity.this, createPost());
+                }
+            });
+        }
     }
 
     private Post createPost() {
@@ -105,27 +107,6 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         post.setDescription(description);
 
         return post;
-    }
-
-    private void showLoadImageChooser() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setItems(TakePictureMenu.getTitles(this), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                TakePictureMenu choice = TakePictureMenu.values()[i];
-                switch (choice) {
-                    case TAKE_PHOTO:
-                        takePicture();
-                        break;
-                    case CHOOSE_PHOTO:
-                        chooseImage();
-                        break;
-                }
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     private void chooseImage() {
@@ -296,6 +277,10 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
             if (savedInstanceState.containsKey(SAVED_STATE_FILE_PATH)) {
                 filePath = savedInstanceState.getString(SAVED_STATE_FILE_PATH);
             }
+
+            if (savedInstanceState.containsKey(SAVED_STATE_ACTIVITY_RESULT_OVER)) {
+                isActivityResultOver = savedInstanceState.getBoolean(SAVED_STATE_ACTIVITY_RESULT_OVER);
+            }
         }
 
         if (isActivityResultOver) {
@@ -361,5 +346,18 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         }
 
         snackbar.show();
+    }
+
+
+    @Override
+    public void onChooseWayLoadImage(TakePictureMenu choice) {
+        switch (choice) {
+            case TAKE_PHOTO:
+                takePicture();
+                break;
+            case CHOOSE_PHOTO:
+                chooseImage();
+                break;
+        }
     }
 }
