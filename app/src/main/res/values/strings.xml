@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">SocialComponents</string>
+    <string name="label_create_post_activity">Create post</string>
+
+    <string name="text_take_photo">Take photo</string>
+    <string name="text_pick_photo">Pick from Gallery</string>
+    <string name="button_title_cancel">Cancel</string>
+
+    <string name="hint_title">Title</string>
+    <string name="hint_description">Description</string>
+    <string name="button_create_post">Create post</string>
+
+    <string name="message_post_was_created">Post was created</string>
+    <string name="error_fail_create_post">Fail to create post</string>
+    <string name="error_fail_load_image">Fail to load image</string>
+    <string name="error_incorrect_file_type">Incorrect file type</string>
+    <string name="error_bigger_file">File size is bigger than 10Mb</string>
+    <string name="message_creating_post">Creating post ..</string>
+
 </resources>

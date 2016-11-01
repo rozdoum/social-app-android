@@ -15,6 +15,7 @@ public class Post {
     private String title;
     private String description;
     private long createdDate;
+    private String imagePath;
 
     public String getTitle() {
         return title;
@@ -32,6 +33,14 @@ public class Post {
         this.description = description;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
     public long getCreatedDate() {
         return createdDate;
     }
@@ -46,6 +55,7 @@ public class Post {
         result.put("title", title);
         result.put("description", description);
         result.put("createdDate", createdDate);
+        result.put("imagePath", imagePath);
         result.put("createdDateText", FormatterUtil.getFirebaseDateFormat().format(new Date(createdDate)));
 
         return result;

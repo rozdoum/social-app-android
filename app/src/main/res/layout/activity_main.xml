@@ -4,6 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/intrinsic_padding"
     tools:context=".activities.MainActivity">
 
     <ListView

@@ -1,6 +1,7 @@
 package com.rozdoum.socialcomponents.managers;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -8,6 +9,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
@@ -28,6 +32,7 @@ public class DatabaseHelper {
 
     private Context context;
     private FirebaseDatabase database;
+    FirebaseStorage storage;
 
     public static DatabaseHelper getInstance(Context context) {
         if (instance == null) {
@@ -43,6 +48,7 @@ public class DatabaseHelper {
 
     public void init() {
         database = FirebaseDatabase.getInstance();
+        storage = FirebaseStorage.getInstance();
     }
 
     public void createOrUpdatePost(Post post) {
@@ -59,6 +65,12 @@ public class DatabaseHelper {
         }
     }
 
+    public UploadTask uploadImage(Uri uri) {
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://socialcomponents.appspot.com");
+        StorageReference riversRef = storageRef.child("images/"+uri.getLastPathSegment());
+        return riversRef.putFile(uri);
+    }
+
     public void getPostList(final OnDataChangedListener<Post> onDataChangedListener) {
         DatabaseReference databaseReference = database.getReference("posts");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -73,6 +85,7 @@ public class DatabaseHelper {
                         Post post = new Post();
                         post.setTitle((String) mapObj.get("title"));
                         post.setDescription((String) mapObj.get("description"));
+                        post.setImagePath((String) mapObj.get("imagePath"));
                         post.setCreatedDate((long) mapObj.get("createdDate"));
                         list.add(post);
                     }

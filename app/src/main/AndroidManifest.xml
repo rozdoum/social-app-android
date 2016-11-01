@@ -25,7 +25,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.CreatePostActivity"/>
+        <activity android:name=".activities.CreatePostActivity"
+            android:label="@string/label_create_post_activity"/>
     </application>
 
 </manifest>
