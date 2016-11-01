@@ -1,6 +1,6 @@
 package com.rozdoum.socialcomponents.model;
 
-import com.rozdoum.socialcomponents.util.FormatterUtil;
+import com.rozdoum.socialcomponents.utils.FormatterUtil;
 
 import java.util.Date;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.rozdoum.socialcomponents.util;
+package com.rozdoum.socialcomponents.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

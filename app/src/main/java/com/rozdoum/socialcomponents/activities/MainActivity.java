@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.rozdoum.socialcomponents.R;
@@ -48,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
         };
 
         PostManager.getInstance(getApplicationContext()).getPosts(onPostsDataChangedListener);
+
+        postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void openCreatePostActivity() {
