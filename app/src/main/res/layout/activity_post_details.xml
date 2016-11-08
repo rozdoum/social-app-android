@@ -10,12 +10,45 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.rozdoum.socialcomponents.activities.PostDetailsActivity">
 
+    <RelativeLayout
+        android:id="@+id/imageContainer"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/postImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"/>
+
+    </RelativeLayout>
+
     <TextView
-        android:text="Post Details"
+        android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="209dp"
-        android:id="@+id/textView" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/imageContainer"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:text="Title" />
+
+    <TextView
+        android:id="@+id/descriptionEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/titleTextView"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="description" />
+
+
 </RelativeLayout>

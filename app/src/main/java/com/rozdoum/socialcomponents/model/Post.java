@@ -2,6 +2,7 @@ package com.rozdoum.socialcomponents.model;
 
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Map;
  * Created by Kristina on 10/28/16.
  */
 
-public class Post {
+public class Post implements Serializable{
 
     private String title;
     private String description;

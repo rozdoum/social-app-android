@@ -7,7 +7,11 @@ package com.rozdoum.socialcomponents.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -30,6 +34,9 @@ public class ImageUtil {
     public static final int MAX_CACHE_SIZE = 157286400;   //150 Mb
     private static final int CACHE_VALID_DAYS = 30;
     private static final float DEFAULT_TOUCH_IMAGE_ZOOM = 1f;
+
+    private static final float IMAGE_SIZE_FACTOR_BY_SCREEN = 2f;
+    private static final float IMAGE_SIZE_FACTOR_BY_VIEW = 1.5f;
 
     public static final String TAG = ImageUtil.class.getSimpleName();
     public static final int N_THREADS = 3;
@@ -79,8 +86,15 @@ public class ImageUtil {
     }
 
     public Request getImage(final String imageUrl, final ImageView imageView, int defaultImageResId, final int errorImageResId) {
-        imageView.setImageResource(defaultImageResId);
+        return getImage(imageUrl, imageView, null, defaultImageResId, errorImageResId);
+    }
+
+    public Request getImage(final String imageUrl, final ImageView imageView, final ProgressBar progressBarView, int defaultImageResId, final int errorImageResId) {
+//        imageView.setImageResource(defaultImageResId);
 //        String imageUrl = String.format(HttpURL.GET_IMAGES.getStringURL(context), imageId);
+        if (progressBarView != null) {
+            showProgressBar(imageView, progressBarView, true);
+        }
 
         Request request = getImageThumbnail(imageUrl, imageUrl, new Response.ErrorListener() {
                     @Override
@@ -93,11 +107,20 @@ public class ImageUtil {
                     @Override
                     public void onResponse(Bitmap response) {
                         LogUtil.logInfo(TAG, "Successfully loaded image " + imageUrl);
-                        imageView.setImageBitmap(response);
+                        imageView.setImageBitmap(createScaledBitmap(response, calcMaxImageSize(imageView)));
+
+                        if (progressBarView != null) {
+                            showProgressBar(imageView, progressBarView, false);
+                        }
                     }
                 });
         addToRequestQueue(request);
         return request;
+    }
+
+    private void showProgressBar(ImageView imageView, ProgressBar progressBar, boolean visible) {
+        progressBar.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        imageView.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
     }
 
 //    public Request getImageForTouchImageView(final String imageId, final TouchImageView imageView,
@@ -141,6 +164,55 @@ public class ImageUtil {
 //                    }
 //                }));
 //    }
+
+    private int calcMaxImageSize(ImageView imageView) {
+        int maxImageSide;
+
+        if (imageView.getWidth() == 0
+                || (imageView.getParent() != null && ((View)imageView.getParent()).getWidth() == 0)) {
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            windowManager.getDefaultDisplay().getMetrics(displaymetrics);
+            int displayWidth = displaymetrics.widthPixels;
+
+            maxImageSide = (int) (displayWidth * IMAGE_SIZE_FACTOR_BY_SCREEN);
+            LogUtil.logDebug(TAG, "by screen, size: " + maxImageSide);
+        } else {
+            maxImageSide = (int) (imageView.getWidth() * IMAGE_SIZE_FACTOR_BY_VIEW);
+            LogUtil.logDebug(TAG, "by view, size: " + maxImageSide);
+        }
+
+        return maxImageSide;
+    }
+
+    private Bitmap createScaledBitmap(Bitmap src, int dstSideLength) {
+        return createScaledBitmap(src, dstSideLength, dstSideLength);
+    }
+
+    private Bitmap createScaledBitmap(Bitmap src, int dstWidth, int dstHeight) {
+        float originHeight = src.getHeight();
+        float originWidth = src.getWidth();
+
+        if (originHeight > dstHeight || originWidth > dstWidth) {
+
+            if (originHeight > dstHeight) {
+                float scale = originHeight / dstHeight;
+                originHeight = originHeight / scale;
+                originWidth = originWidth / scale;
+            }
+
+            if (originWidth > dstWidth) {
+                float scale = originWidth / dstWidth;
+                originHeight = originHeight / scale;
+                originWidth = originWidth / scale;
+            }
+
+            return Bitmap.createScaledBitmap(src, (int) originWidth, (int) originHeight, false);
+
+        } else {
+            return src;
+        }
+    }
 
     class DownloadImageThumbnailRequest extends Request<Bitmap> {
 

@@ -53,7 +53,10 @@ public class MainActivity extends AppCompatActivity {
         postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Post post = (Post) postsAdapter.getItem(position);
+
                 Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
+                intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
                 startActivity(intent);
             }
         });
