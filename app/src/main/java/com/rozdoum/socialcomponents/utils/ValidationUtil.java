@@ -1,4 +1,4 @@
-package com.rozdoum.socialcomponents.util;
+package com.rozdoum.socialcomponents.utils;
 
 /**
  * Created by Kristina on 8/8/15.

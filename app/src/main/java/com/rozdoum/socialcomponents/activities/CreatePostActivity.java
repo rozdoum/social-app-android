@@ -25,7 +25,7 @@ import com.rozdoum.socialcomponents.enums.TakePictureMenu;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
-import com.rozdoum.socialcomponents.util.ValidationUtil;
+import com.rozdoum.socialcomponents.utils.ValidationUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;

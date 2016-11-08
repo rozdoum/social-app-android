@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         postsListView = (ListView)findViewById(R.id.postsListView);
-        postsAdapter = new PostsAdapter();
+        postsAdapter = new PostsAdapter(this);
         postsListView.setAdapter(postsAdapter);
 
         OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {

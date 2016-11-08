@@ -1,5 +1,6 @@
 package com.rozdoum.socialcomponents.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,8 +8,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +23,17 @@ import java.util.List;
 public class PostsAdapter extends BaseAdapter {
 
     private List<Post> list = new ArrayList<>();
+    public ImageUtil imageUtil;
+
+    public PostsAdapter(Context context) {
+        imageUtil = ImageUtil.getInstance(context.getApplicationContext());
+    }
 
     class ViewHolder {
         ImageView postImageView;
         TextView titleTextView;
         TextView detailsTextView;
+        public Request imageRequest;
     }
 
     @Override
@@ -62,6 +71,14 @@ public class PostsAdapter extends BaseAdapter {
 
         holder.titleTextView.setText(post.getTitle());
         holder.detailsTextView.setText(post.getDescription());
+
+        String imageUrl = post.getImagePath();
+
+        if (holder.imageRequest != null) {
+            holder.imageRequest.cancel();
+        }
+
+        holder.imageRequest = imageUtil.getImage(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
 
         return convertView;
     }

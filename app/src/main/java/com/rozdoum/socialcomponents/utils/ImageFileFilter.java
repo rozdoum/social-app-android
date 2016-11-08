@@ -1,4 +1,4 @@
-package com.rozdoum.socialcomponents.util;
+package com.rozdoum.socialcomponents.utils;
 
 import java.io.File;
 import java.io.FileFilter;
