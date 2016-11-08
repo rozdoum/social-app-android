@@ -23,17 +23,17 @@ import java.util.List;
 public class PostsAdapter extends BaseAdapter {
 
     private List<Post> list = new ArrayList<>();
-    public ImageUtil imageUtil;
+    private ImageUtil imageUtil;
 
     public PostsAdapter(Context context) {
         imageUtil = ImageUtil.getInstance(context.getApplicationContext());
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         ImageView postImageView;
         TextView titleTextView;
         TextView detailsTextView;
-        public Request imageRequest;
+        Request imageRequest;
     }
 
     @Override
@@ -53,18 +53,19 @@ public class PostsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        View postCardView = convertView;
         ViewHolder holder = new ViewHolder();
 
-        if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item_list_view, parent, false);
+        if (postCardView == null) {
+            postCardView = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item_list_view, parent, false);
 
-            holder.postImageView = (ImageView) convertView.findViewById(R.id.postImageView);
-            holder.titleTextView = (TextView) convertView.findViewById(R.id.titleTextView);
-            holder.detailsTextView = (TextView) convertView.findViewById(R.id.detailsTextView);
+            holder.postImageView = (ImageView) postCardView.findViewById(R.id.postImageView);
+            holder.titleTextView = (TextView) postCardView.findViewById(R.id.titleTextView);
+            holder.detailsTextView = (TextView) postCardView.findViewById(R.id.detailsTextView);
 
-            convertView.setTag(holder);
+            postCardView.setTag(holder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            holder = (ViewHolder) postCardView.getTag();
         }
 
         Post post = list.get(position);
@@ -80,7 +81,7 @@ public class PostsAdapter extends BaseAdapter {
 
         holder.imageRequest = imageUtil.getImage(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
 
-        return convertView;
+        return postCardView;
     }
 
     public void setList(List<Post> list) {

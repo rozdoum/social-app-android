@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
@@ -68,7 +69,12 @@ public class DatabaseHelper {
     public UploadTask uploadImage(Uri uri) {
         StorageReference storageRef = storage.getReferenceFromUrl("gs://socialcomponents.appspot.com");
         StorageReference riversRef = storageRef.child("images/"+uri.getLastPathSegment());
-        return riversRef.putFile(uri);
+        // Create file metadata including the content type
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setCacheControl("max-age=7776000, Expires=7776000, public, must-revalidate")
+                .build();
+
+        return riversRef.putFile(uri, metadata);
     }
 
     public void getPostList(final OnDataChangedListener<Post> onDataChangedListener) {
