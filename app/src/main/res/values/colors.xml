@@ -3,4 +3,13 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="custom_divider_color">#d8d6d5</color>
+    <color name="orange_text">#d26623</color>
+    <color name="gray_text">#878787</color>
+
+    <color name="orange">#d26623</color>
+    <color name="light_orange_text">#eab283</color>
+    eab283
+
 </resources>

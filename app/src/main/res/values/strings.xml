@@ -18,4 +18,10 @@
     <string name="error_bigger_file">File size is bigger than 10Mb</string>
     <string name="message_creating_post">Creating post ..</string>
 
+    <string name="comment_text_hint">Enter your comment…</string>
+    <string name="button_post_comment">Post comment</string>
+
+    <string name="label_comments">Comments(%1$d):</string>
+
+
 </resources>

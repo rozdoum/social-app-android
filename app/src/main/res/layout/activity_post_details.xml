@@ -1,54 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_post_details"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.rozdoum.socialcomponents.activities.PostDetailsActivity">
+    android:layout_height="match_parent">
 
     <RelativeLayout
-        android:id="@+id/imageContainer"
+        android:id="@+id/activity_post_details"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_alignParentTop="true">
+        android:layout_height="wrap_content"
+        android:focusableInTouchMode="true"
+        android:padding="@dimen/intrinsic_padding">
 
-        <ImageView
-            android:id="@+id/postImageView"
+        <RelativeLayout
+            android:id="@+id/imageContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="invisible" />
+            android:layout_height="250dp"
+            android:layout_alignParentTop="true">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
+            <ImageView
+                android:id="@+id/postImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="invisible" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/titleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="invisible"/>
+            android:layout_below="@+id/imageContainer"
+            android:paddingLeft="@dimen/small_intrinsic_padding"
+            android:paddingRight="@dimen/small_intrinsic_padding"
+            android:layout_marginTop="@dimen/intrinsic_padding"
+            android:text="Title"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+        <TextView
+            android:id="@+id/descriptionEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/small_intrinsic_padding"
+            android:paddingRight="@dimen/small_intrinsic_padding"
+            android:layout_below="@+id/titleTextView"
+            android:layout_marginTop="@dimen/intrinsic_padding"
+            android:text="description" />
+
+        <TextView
+            android:id="@+id/commentsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/descriptionEditText"
+            android:layout_marginTop="@dimen/intrinsic_padding"
+            android:text="Comments"
+            android:textColor="@android:color/black"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/commentsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/commentsLabel"
+            android:layout_marginTop="@dimen/intrinsic_padding"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:id="@+id/createCommentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/commentsContainer"
+            android:layout_marginTop="@dimen/intrinsic_padding"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/commentEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:background="@drawable/create_comment_background"
+                android:gravity="top"
+                android:hint="@string/comment_text_hint"
+                android:inputType="textMultiLine"
+                android:minHeight="100dp"
+                android:padding="@dimen/small_intrinsic_padding" />
+
+            <Button
+                android:id="@+id/sendButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:background="@color/orange"
+                android:text="@string/button_post_comment"
+                android:textAllCaps="false"
+                android:textColor="@color/light_orange_text" />
+        </LinearLayout>
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/imageContainer"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-        android:text="Title" />
-
-    <TextView
-        android:id="@+id/descriptionEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/titleTextView"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:text="description" />
+</ScrollView>
 
 
-</RelativeLayout>

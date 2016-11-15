@@ -14,6 +14,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Post;
 
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class DatabaseHelper {
         try {
             DatabaseReference databaseReference = database.getReference();
             String postId = databaseReference.child("posts").push().getKey();
+            post.setId(postId);
             Map<String, Object> postValues = post.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put("/posts/" + postId, postValues);
@@ -66,9 +68,23 @@ public class DatabaseHelper {
         }
     }
 
+    public void createOrUpdateComment(String commentText, String postId) {
+        try {
+            DatabaseReference mCommentsReference = database.getReference();
+            String commentId = mCommentsReference.child("post-comments").child(postId).push().getKey();
+            Comment comment = new Comment(commentText);
+            comment.setId(commentId);
+
+            mCommentsReference.child("post-comments").child(postId).push().setValue(comment);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+    }
+
     public UploadTask uploadImage(Uri uri) {
         StorageReference storageRef = storage.getReferenceFromUrl("gs://socialcomponents.appspot.com");
-        StorageReference riversRef = storageRef.child("images/"+uri.getLastPathSegment());
+        StorageReference riversRef = storageRef.child("images/" + uri.getLastPathSegment());
         // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
                 .setCacheControl("max-age=7776000, Expires=7776000, public, must-revalidate")
@@ -85,10 +101,12 @@ public class DatabaseHelper {
                 Map<String, Object> objectMap = (HashMap<String, Object>)
                         dataSnapshot.getValue();
                 List<Post> list = new ArrayList<Post>();
-                for (Object obj : objectMap.values()) {
+                for (String key : objectMap.keySet()) {
+                    Object obj = objectMap.get(key);
                     if (obj instanceof Map) {
                         Map<String, Object> mapObj = (Map<String, Object>) obj;
                         Post post = new Post();
+                        post.setId(key);
                         post.setTitle((String) mapObj.get("title"));
                         post.setDescription((String) mapObj.get("description"));
                         post.setImagePath((String) mapObj.get("imagePath"));
@@ -106,4 +124,27 @@ public class DatabaseHelper {
             }
         });
     }
+
+    public void getCommentsList(String postId, final OnDataChangedListener<Comment> onDataChangedListener) {
+        DatabaseReference databaseReference = database.getReference("post-comments").child(postId);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Comment> list = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Comment comment = snapshot.getValue(Comment.class);
+                    list.add(comment);
+                }
+
+                onDataChangedListener.onListChanged(list);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 }
