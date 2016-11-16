@@ -31,6 +31,19 @@
         android:autoLink="web"
         android:paddingLeft="@dimen/intrinsic_padding"
         android:paddingRight="@dimen/intrinsic_padding"
+        android:textAppearance="@style/TextAppearance.Second.Black"
         android:text="Comment" />
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/commentTextView"
+        android:layout_toEndOf="@+id/avatarImageView"
+        android:autoLink="web"
+        android:paddingLeft="@dimen/intrinsic_padding"
+        android:paddingRight="@dimen/intrinsic_padding"
+        android:textAppearance="@style/TextAppearance.Second"
+        android:text="day ago" />
 
 </RelativeLayout>

@@ -18,4 +18,9 @@
         <item name="android:textColor">@color/gray_text</item>
     </style>
 
+    <style name="TextAppearance.Second.Black" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
 </resources>

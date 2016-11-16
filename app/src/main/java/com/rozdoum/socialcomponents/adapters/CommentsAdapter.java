@@ -1,6 +1,7 @@
 package com.rozdoum.socialcomponents.adapters;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,8 +49,13 @@ public class CommentsAdapter {
         TextView nameTextView = (TextView) convertView.findViewById(R.id.nameTextView);
         ImageView avatarImageView = (ImageView) convertView.findViewById(R.id.avatarImageView);
         TextView commentTextView = (TextView) convertView.findViewById(R.id.commentTextView);
+        TextView dateTextView = (TextView) convertView.findViewById(R.id.dateTextView);
 
         commentTextView.setText(comment.getText());
+
+        long now = System.currentTimeMillis();
+        CharSequence date = DateUtils.getRelativeTimeSpanString(comment.getCreatedDate(), now, DateUtils.MINUTE_IN_MILLIS);
+        dateTextView.setText(date);
 
         return convertView;
     }
