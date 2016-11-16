@@ -8,6 +8,7 @@ import java.io.FileFilter;
  */
 
 public class ImageFileFilter implements FileFilter {
+    //TODO: this class are not used. Remove it.
     private final String[] okFileExtensions = new String[]{"jpg", "png", "gif", "jpeg"};
 
     public boolean accept(File file) {

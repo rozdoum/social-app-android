@@ -53,6 +53,7 @@ public class PostsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        // TODO: why you create postCardView? Use contentView instead.
         View postCardView = convertView;
         ViewHolder holder = new ViewHolder();
 
