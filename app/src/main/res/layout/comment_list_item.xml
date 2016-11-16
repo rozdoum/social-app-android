@@ -12,21 +12,25 @@
         android:src="@drawable/ic_stub" />
 
     <TextView
+        android:id="@+id/nameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/avatarImageView"
+        android:paddingLeft="@dimen/intrinsic_padding"
+        android:paddingRight="@dimen/intrinsic_padding"
+        android:text="Author name"
+        android:textColor="@color/orange_text" />
+
+    <TextView
         android:id="@+id/commentTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nameTextView"
         android:layout_toEndOf="@+id/avatarImageView"
         android:autoLink="web"
+        android:paddingLeft="@dimen/intrinsic_padding"
+        android:paddingRight="@dimen/intrinsic_padding"
         android:text="Comment" />
-
-    <TextView
-        android:id="@+id/nameTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/avatarImageView"
-        android:text="Author name"
-        android:textColor="@color/orange_text" />
 
 </RelativeLayout>

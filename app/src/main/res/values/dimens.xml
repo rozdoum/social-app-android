@@ -8,5 +8,9 @@
     <dimen name="large_intrinsic_padding">16dp</dimen>
 
     <dimen name="description_min_height">100dp</dimen>
+    <dimen name="send_comment_button_width">50dp</dimen>
+
+    <dimen name="new_comment_min_height">50dp</dimen>
+    <dimen name="new_comment_max_height">100dp</dimen>
 
 </resources>

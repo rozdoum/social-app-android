@@ -1,111 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:id="@+id/activity_post_details"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:focusableInTouchMode="true"
-        android:padding="@dimen/intrinsic_padding">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/newCommentContainer"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="@dimen/intrinsic_padding"
+        android:paddingRight="@dimen/intrinsic_padding"
+        android:paddingTop="@dimen/intrinsic_padding">
 
         <RelativeLayout
-            android:id="@+id/imageContainer"
+            android:id="@+id/activity_post_details"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_alignParentTop="true">
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="true">
 
-            <ImageView
-                android:id="@+id/postImageView"
+            <RelativeLayout
+                android:id="@+id/imageContainer"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="invisible" />
+                android:layout_height="250dp"
+                android:layout_alignParentTop="true">
 
-            <ProgressBar
-                android:id="@+id/progressBar"
+                <ImageView
+                    android:id="@+id/postImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:visibility="invisible" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/titleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:visibility="invisible" />
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/imageContainer"
-            android:paddingLeft="@dimen/small_intrinsic_padding"
-            android:paddingRight="@dimen/small_intrinsic_padding"
-            android:layout_marginTop="@dimen/intrinsic_padding"
-            android:text="Title"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
-
-        <TextView
-            android:id="@+id/descriptionEditText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/small_intrinsic_padding"
-            android:paddingRight="@dimen/small_intrinsic_padding"
-            android:layout_below="@+id/titleTextView"
-            android:layout_marginTop="@dimen/intrinsic_padding"
-            android:text="description" />
-
-        <TextView
-            android:id="@+id/commentsLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/descriptionEditText"
-            android:layout_marginTop="@dimen/intrinsic_padding"
-            android:text="Comments"
-            android:textColor="@android:color/black"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/commentsContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/commentsLabel"
-            android:layout_marginTop="@dimen/intrinsic_padding"
-            android:orientation="vertical" />
-
-        <LinearLayout
-            android:id="@+id/createCommentContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/commentsContainer"
-            android:layout_marginTop="@dimen/intrinsic_padding"
-            android:orientation="vertical">
-
-            <EditText
-                android:id="@+id/commentEditText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_below="@+id/imageContainer"
                 android:layout_marginTop="@dimen/intrinsic_padding"
-                android:background="@drawable/create_comment_background"
-                android:gravity="top"
-                android:hint="@string/comment_text_hint"
-                android:inputType="textMultiLine"
-                android:minHeight="100dp"
-                android:padding="@dimen/small_intrinsic_padding" />
+                android:text="Title"
+                android:textAppearance="@style/TextAppearance.Title" />
 
-            <Button
-                android:id="@+id/sendButton"
+            <TextView
+                android:id="@+id/descriptionEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/titleTextView"
+                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:text="description"
+                android:textAppearance="@style/TextAppearance.Second" />
+
+            <TextView
+                android:id="@+id/commentsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/descriptionEditText"
+                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:text="Comments"
+                android:textColor="@android:color/black"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/commentsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_below="@+id/commentsLabel"
                 android:layout_marginTop="@dimen/intrinsic_padding"
-                android:background="@color/orange"
-                android:text="@string/button_post_comment"
-                android:textAllCaps="false"
-                android:textColor="@color/light_orange_text" />
-        </LinearLayout>
+                android:orientation="vertical" />
 
-    </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
 
-</ScrollView>
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_above="@+id/newCommentContainer"
+        android:background="@drawable/top_shadow" />
+
+    <LinearLayout
+        android:id="@+id/newCommentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/commentEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:hint="@string/comment_text_hint"
+            android:inputType="textMultiLine"
+            android:maxHeight="@dimen/new_comment_max_height"
+            android:minHeight="@dimen/new_comment_min_height"
+            android:padding="@dimen/intrinsic_padding" />
+
+        <ImageButton
+            android:id="@+id/sendButton"
+            android:layout_width="@dimen/send_comment_button_width"
+            android:layout_height="match_parent"
+            android:background="@color/orange"
+            android:src="@drawable/ic_send_white_24dp" />
+    </LinearLayout>
+
+</RelativeLayout>
+
+
 
 
