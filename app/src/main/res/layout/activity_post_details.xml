@@ -59,11 +59,36 @@
                 android:text="description"
                 android:textAppearance="@style/TextAppearance.Second" />
 
+            <RelativeLayout
+                android:id="@+id/likesContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/descriptionEditText"
+                android:layout_marginTop="@dimen/intrinsic_padding">
+
+                <ImageView
+                    android:id="@+id/likesImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_favorite_black_24dp" />
+
+                <TextView
+                    android:id="@+id/likeCounterTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/likesImageView"
+                    android:paddingLeft="@dimen/intrinsic_padding"
+                    android:text="19 likes" />
+
+            </RelativeLayout>
+
             <TextView
                 android:id="@+id/commentsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/descriptionEditText"
+                android:layout_below="@+id/likesContainer"
                 android:layout_marginTop="@dimen/intrinsic_padding"
                 android:text="Comments"
                 android:textColor="@android:color/black"
@@ -76,6 +101,7 @@
                 android:layout_below="@+id/commentsLabel"
                 android:layout_marginTop="@dimen/intrinsic_padding"
                 android:orientation="vertical" />
+
 
         </RelativeLayout>
     </ScrollView>

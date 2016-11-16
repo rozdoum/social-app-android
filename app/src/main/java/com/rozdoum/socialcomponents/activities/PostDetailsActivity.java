@@ -1,9 +1,16 @@
 package com.rozdoum.socialcomponents.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -16,8 +23,10 @@ import android.widget.TextView;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
+import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.model.Comment;
+import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
@@ -30,6 +39,10 @@ public class PostDetailsActivity extends AppCompatActivity {
     private EditText commentEditText;
     private Post post;
     private ScrollView scrollView;
+    private ViewGroup likesContainer;
+    private ImageView likesImageView;
+    private TextView commentsLabel;
+    private TextView likeCounterTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +60,13 @@ public class PostDetailsActivity extends AppCompatActivity {
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
         LinearLayout commentsContainer = (LinearLayout) findViewById(R.id.commentsContainer);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
-        final TextView commentsLabel = (TextView) findViewById(R.id.commentsLabel);
+        commentsLabel = (TextView) findViewById(R.id.commentsLabel);
         commentEditText = (EditText) findViewById(R.id.commentEditText);
         ImageButton sendButton = (ImageButton) findViewById(R.id.sendButton);
+        likesContainer = (ViewGroup) findViewById(R.id.likesContainer);
+        likesImageView = (ImageView) findViewById(R.id.likesImageView);
+        likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
+
 
         titleTextView.setText(post.getTitle());
         descriptionEditText.setText(post.getDescription());
@@ -66,8 +83,14 @@ public class PostDetailsActivity extends AppCompatActivity {
             }
         });
 
-        final CommentsAdapter commentsAdapter = new CommentsAdapter(commentsContainer);
-        OnDataChangedListener<Comment> onPostsDataChangedListener = new OnDataChangedListener<Comment>() {
+        CommentsAdapter commentsAdapter = new CommentsAdapter(commentsContainer);
+        ApplicationHelper.getDatabaseHelper().getCommentsList(post.getId(), createOnPostChangedDataListener(commentsAdapter));
+
+        initLikes();
+    }
+
+    private OnDataChangedListener<Comment> createOnPostChangedDataListener(final CommentsAdapter commentsAdapter) {
+        return new OnDataChangedListener<Comment>() {
             @Override
             public void onListChanged(List<Comment> list) {
                 commentsAdapter.setList(list);
@@ -79,8 +102,101 @@ public class PostDetailsActivity extends AppCompatActivity {
                 }
             }
         };
+    }
 
-        ApplicationHelper.getDatabaseHelper().getCommentsList(post.getId(), onPostsDataChangedListener);
+    private OnCountChangedListener<Like> createOnLikeCountChangedListener() {
+        return new OnCountChangedListener<Like>() {
+            @Override
+            public void onCountChanged(long count) {
+                String likeTextFormat = getString(R.string.label_likes);
+                likeCounterTextView.setText(String.format(likeTextFormat, count));
+            }
+        };
+    }
+
+    private void initLikes() {
+        ApplicationHelper.getDatabaseHelper().getLikesCount(post.getId(), createOnLikeCountChangedListener());
+
+        likesContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isActivated = !likesImageView.isActivated();
+                likesImageView.setActivated(isActivated);
+                animateImageView(likesImageView, isActivated);
+                if (isActivated) {
+                    addLike();
+                } else {
+                    removeLike();
+                }
+            }
+        });
+    }
+
+//    public void animateImageView(final ImageView v, boolean activated) {
+//        int activatedColor = getResources().getColor(R.color.colorAccent);
+//        int notActivatedColor = getResources().getColor(android.R.color.black);
+//
+//        final int destColour = activated ? activatedColor : notActivatedColor;
+//
+//        final ValueAnimator colorAnim = ObjectAnimator.ofFloat(0f, 1f);
+//        colorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator animation) {
+//                float mul = (Float) animation.getAnimatedValue();
+//                int alpha = adjustAlpha(destColour, mul);
+//                v.setColorFilter(alpha, PorterDuff.Mode.SRC_ATOP);
+//                if (mul == 0.0) {
+//                    v.setColorFilter(null);
+//                }
+//            }
+//        });
+//
+//        colorAnim.setDuration(300);
+//        colorAnim.start();
+//
+//    }
+
+    public void animateImageView(final ImageView v, boolean activated) {
+        AnimatorSet animatorSet = new AnimatorSet();
+
+        ObjectAnimator bounceAnimX = ObjectAnimator.ofFloat(v, "scaleX", 0.2f, 1f);
+        bounceAnimX.setDuration(300);
+        bounceAnimX.setInterpolator(new BounceInterpolator());
+
+        ObjectAnimator bounceAnimY = ObjectAnimator.ofFloat(v, "scaleY", 0.2f, 1f);
+        bounceAnimY.setDuration(300);
+        bounceAnimY.setInterpolator(new BounceInterpolator());
+        bounceAnimY.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                v.setImageResource(R.drawable.ic_favorite_red_24dp);
+            }
+        });
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+            }
+        });
+
+        animatorSet.play(bounceAnimX).with(bounceAnimY);
+        animatorSet.start();
+
+    }
+
+    public int adjustAlpha(int color, float factor) {
+        int alpha = Math.round(Color.alpha(color) * factor);
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+        return Color.argb(alpha, red, green, blue);
+    }
+
+    private void addLike() {
+        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId());
+    }
+
+    private void removeLike() {
     }
 
     private void sendComment() {

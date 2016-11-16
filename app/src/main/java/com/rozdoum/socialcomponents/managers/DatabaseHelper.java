@@ -13,9 +13,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.model.Comment;
+import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +80,22 @@ public class DatabaseHelper {
 
             mCommentsReference.child("post-comments").child(postId).push().setValue(comment);
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            LogUtil.logError(TAG, "createOrUpdateComment()", e);
+        }
+
+    }
+
+    public void createOrUpdateLike(String postId) {
+        try {
+            DatabaseReference mCommentsReference = database.getReference().child("post-likes").child(postId);
+            mCommentsReference.push();
+            String id = mCommentsReference.push().getKey();
+            Like like = new Like();
+            like.setId(id);
+
+            mCommentsReference.child(id).setValue(like);
+        } catch (Exception e) {
+            LogUtil.logError(TAG, "createOrUpdateLike()", e);
         }
 
     }
@@ -138,6 +156,22 @@ public class DatabaseHelper {
 
                 onDataChangedListener.onListChanged(list);
 
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void getLikesCount(String postId, final OnCountChangedListener<Like> onCountChangedListener) {
+        DatabaseReference databaseReference = database.getReference("post-likes").child(postId);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                long count = dataSnapshot.getChildrenCount();
+                onCountChangedListener.onCountChanged(count);
             }
 
             @Override
