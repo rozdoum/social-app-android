@@ -53,20 +53,18 @@ public class PostsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO: why you create postCardView? Use contentView instead.
-        View postCardView = convertView;
         ViewHolder holder = new ViewHolder();
 
-        if (postCardView == null) {
-            postCardView = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item_list_view, parent, false);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item_list_view, parent, false);
 
-            holder.postImageView = (ImageView) postCardView.findViewById(R.id.postImageView);
-            holder.titleTextView = (TextView) postCardView.findViewById(R.id.titleTextView);
-            holder.detailsTextView = (TextView) postCardView.findViewById(R.id.detailsTextView);
+            holder.postImageView = (ImageView) convertView.findViewById(R.id.postImageView);
+            holder.titleTextView = (TextView) convertView.findViewById(R.id.titleTextView);
+            holder.detailsTextView = (TextView) convertView.findViewById(R.id.detailsTextView);
 
-            postCardView.setTag(holder);
+            convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) postCardView.getTag();
+            holder = (ViewHolder) convertView.getTag();
         }
 
         Post post = list.get(position);
@@ -82,7 +80,7 @@ public class PostsAdapter extends BaseAdapter {
 
         holder.imageRequest = imageUtil.getImage(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
 
-        return postCardView;
+        return convertView;
     }
 
     public void setList(List<Post> list) {
