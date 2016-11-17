@@ -11,9 +11,9 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/newCommentContainer"
         android:layout_alignParentTop="true"
-        android:paddingLeft="@dimen/intrinsic_padding"
-        android:paddingRight="@dimen/intrinsic_padding"
-        android:paddingTop="@dimen/intrinsic_padding">
+        android:paddingLeft="@dimen/post_detail_screen_padding"
+        android:paddingRight="@dimen/post_detail_screen_padding"
+        android:paddingTop="@dimen/post_detail_screen_padding">
 
         <RelativeLayout
             android:id="@+id/activity_post_details"
