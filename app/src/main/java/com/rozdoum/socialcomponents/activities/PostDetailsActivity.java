@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -89,6 +90,13 @@ public class PostDetailsActivity extends AppCompatActivity {
         CommentsAdapter commentsAdapter = new CommentsAdapter(commentsContainer);
         ApplicationHelper.getDatabaseHelper().getCommentsList(post.getId(), createOnPostChangedDataListener(commentsAdapter));
 
+        postImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openImageDetailScreen();
+            }
+        });
+
         initLikes();
     }
 
@@ -115,6 +123,12 @@ public class PostDetailsActivity extends AppCompatActivity {
                 likeCounterTextView.setText(String.format(likeTextFormat, count));
             }
         };
+    }
+
+    private void openImageDetailScreen() {
+        Intent intent = new Intent(this, ImageDetailActivity.class);
+        intent.putExtra(ImageDetailActivity.IMAGE_URL_EXTRA_KEY, post.getImagePath());
+        startActivity(intent);
     }
 
     private void initLikes() {

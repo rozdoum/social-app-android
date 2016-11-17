@@ -25,15 +25,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.PostDetailsActivity"
             android:label="@string/label_post_detail_activity"
             android:parentActivityName=".activities.MainActivity" />
-
         <activity
             android:name=".activities.CreatePostActivity"
             android:label="@string/label_create_post_activity" />
+        <activity
+            android:name=".activities.ImageDetailActivity"
+            android:label="@string/label_image_detail_activity" />
     </application>
 
 </manifest>

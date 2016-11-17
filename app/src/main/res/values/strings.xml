@@ -2,6 +2,7 @@
     <string name="app_name">SocialComponents</string>
     <string name="label_create_post_activity">Create post</string>
     <string name="label_post_detail_activity">Post detail</string>
+    <string name="label_image_detail_activity">Image</string>
 
     <string name="text_take_photo">Take photo</string>
     <string name="text_pick_photo">Pick from Gallery</string>
