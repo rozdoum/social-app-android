@@ -8,19 +8,20 @@
 
     <ListView
         android:id="@+id/postsListView"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:divider="@null"
-        android:dividerHeight="0dp"/>
+        android:dividerHeight="0dp"
+        android:paddingTop="@dimen/small_intrinsic_padding" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addNewPostFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/intrinsic_padding"
-        android:clickable="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_margin="@dimen/intrinsic_padding"
+        android:clickable="true"
         android:src="@drawable/ic_add_white_48dp" />
 
 </RelativeLayout>
