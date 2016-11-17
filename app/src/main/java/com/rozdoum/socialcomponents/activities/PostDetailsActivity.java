@@ -218,7 +218,7 @@ public class PostDetailsActivity extends AppCompatActivity {
             commentEditText.setText(null);
             commentEditText.clearFocus();
             hideKeyBoard();
-            scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            scrollView.fullScroll(ScrollView.FOCUS_UP);
         }
     }
 

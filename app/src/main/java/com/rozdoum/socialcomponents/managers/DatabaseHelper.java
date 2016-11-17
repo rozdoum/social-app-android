@@ -21,6 +21,8 @@ import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +155,13 @@ public class DatabaseHelper {
                     Comment comment = snapshot.getValue(Comment.class);
                     list.add(comment);
                 }
+
+                Collections.sort(list, new Comparator<Comment>() {
+                    @Override
+                    public int compare(Comment lhs, Comment rhs) {
+                        return ((Long) rhs.getCreatedDate()).compareTo((Long) lhs.getCreatedDate());
+                    }
+                });
 
                 onDataChangedListener.onListChanged(list);
 
