@@ -75,27 +75,27 @@ public class DatabaseHelper {
 
     public void createOrUpdateComment(String commentText, String postId) {
         try {
-            DatabaseReference mCommentsReference = database.getReference();
-            String commentId = mCommentsReference.child("post-comments").child(postId).push().getKey();
+            DatabaseReference mCommentsReference = database.getReference().child("post-comments").child(postId);
+            mCommentsReference.push();
+            String commentId = mCommentsReference.getKey();
             Comment comment = new Comment(commentText);
             comment.setId(commentId);
 
-            mCommentsReference.child("post-comments").child(postId).push().setValue(comment);
+            mCommentsReference.child(commentId).setValue(comment);
         } catch (Exception e) {
             LogUtil.logError(TAG, "createOrUpdateComment()", e);
         }
-
     }
 
     public void createOrUpdateLike(String postId) {
         try {
-            DatabaseReference mCommentsReference = database.getReference().child("post-likes").child(postId);
-            mCommentsReference.push();
-            String id = mCommentsReference.push().getKey();
+            DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId);
+            mLikesReference.push();
+            String id = mLikesReference.push().getKey();
             Like like = new Like();
             like.setId(id);
 
-            mCommentsReference.child(id).setValue(like);
+            mLikesReference.child(id).setValue(like);
         } catch (Exception e) {
             LogUtil.logError(TAG, "createOrUpdateLike()", e);
         }
