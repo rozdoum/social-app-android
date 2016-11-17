@@ -61,20 +61,11 @@
                 android:id="@+id/descriptionEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/description_min_height"
                 android:gravity="start"
                 android:hint="@string/hint_description"
                 android:inputType="textMultiLine" />
 
         </android.support.design.widget.TextInputLayout>
-
-        <Button
-            android:id="@+id/buttonCreatePost"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/input_layout_description"
-            android:text="@string/button_create_post" />
 
     </RelativeLayout>
 

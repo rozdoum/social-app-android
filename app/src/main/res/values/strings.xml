@@ -9,7 +9,6 @@
 
     <string name="hint_title">Title</string>
     <string name="hint_description">Description</string>
-    <string name="button_create_post">Create post</string>
 
     <string name="message_post_was_created">Post was created</string>
     <string name="error_fail_create_post">Fail to create post</string>
@@ -24,5 +23,6 @@
     <string name="label_comments">Comments(%1$d):</string>
     <string name="label_likes">%1$d likes</string>
 
+    <string name="create_post_menu_label">Post</string>
 
 </resources>

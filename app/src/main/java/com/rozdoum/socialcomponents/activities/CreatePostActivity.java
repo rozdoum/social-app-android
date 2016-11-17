@@ -7,9 +7,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -25,8 +27,8 @@ import com.rozdoum.socialcomponents.enums.TakePictureMenu;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
-import com.rozdoum.socialcomponents.utils.ValidationUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
+import com.rozdoum.socialcomponents.utils.ValidationUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -61,8 +63,6 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_post_activity);
 
-        Button buttonCreatePost = (Button) findViewById(R.id.buttonCreatePost);
-
         titleEditText = (EditText) findViewById(R.id.titleEditText);
         descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -76,17 +76,12 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
                 chooserDialog.show(getFragmentManager(), TAG);
             }
         });
+    }
 
-        if (buttonCreatePost != null) {
-            buttonCreatePost.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showProgress(R.string.message_creating_post);
-                    hideKeyboard();
-                    PostManager.getInstance(CreatePostActivity.this).createPostWithImage(filePath, CreatePostActivity.this, createPost());
-                }
-            });
-        }
+    private void sendPost() {
+        showProgress(R.string.message_creating_post);
+        hideKeyboard();
+        PostManager.getInstance(CreatePostActivity.this).createPostWithImage(filePath, CreatePostActivity.this, createPost());
     }
 
     private Post createPost() {
@@ -358,6 +353,25 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
             case CHOOSE_PHOTO:
                 chooseImage();
                 break;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.create_post_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.post:
+                sendPost();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
