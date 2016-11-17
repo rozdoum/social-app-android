@@ -1,11 +1,15 @@
 package com.rozdoum.socialcomponents.activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -39,6 +43,9 @@ import java.io.File;
 public class CreatePostActivity extends AppCompatActivity implements OnPostCreatedListener, ChoseWayLoadImageDialog.OnChooseWayLoadImageListener {
 
     private static final String TAG = CreatePostActivity.class.getSimpleName();
+
+    private static final int HANDLE_CAMERA_PERM = 2;
+    private static final int WRITE_EXTERNAL_STORAGE_PERM = 3;
 
     private static final String SAVED_STATE_ACTIVITY_RESULT_OVER = "MainActivity.activity_result_over";
     private static final String SAVED_STATE_CHOOSER_TYPE = "MainActivity.chooserType";
@@ -122,6 +129,60 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
             filePath = imageChooserManager.choose();
         } catch (Exception e) {
             LogUtil.logError(TAG, "chooseImage()", e);
+        }
+    }
+
+    private boolean hasPermissionForTakePhoto() {
+        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        return rc == PackageManager.PERMISSION_GRANTED && hasStoragePermission();
+    }
+
+    private boolean hasStoragePermission() {
+        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        return rc == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestWriteExternalStoragePermission() {
+        LogUtil.logDebug(TAG, "WriteExternalStoragePermission permission is not granted. Requesting permission");
+
+        final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        final Activity thisActivity = this;
+        ActivityCompat.requestPermissions(thisActivity, permissions,
+                WRITE_EXTERNAL_STORAGE_PERM);
+    }
+
+    private void requestCameraPermission() {
+        LogUtil.logDebug(TAG, "Camera permission is not granted. Requesting permission");
+
+        final String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        ActivityCompat.requestPermissions(this, permissions,
+                HANDLE_CAMERA_PERM);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case WRITE_EXTERNAL_STORAGE_PERM: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    chooseImage();
+                }
+                break;
+            }
+
+            case HANDLE_CAMERA_PERM: {
+                if (grantResults.length == permissions.length) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            return;
+                        }
+                    }
+
+                    takePicture();
+                }
+                break;
+            }
         }
     }
 
@@ -356,15 +417,22 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         snackbar.show();
     }
 
-
     @Override
     public void onChooseWayLoadImage(TakePictureMenu choice) {
         switch (choice) {
             case TAKE_PHOTO:
-                takePicture();
+                if (hasPermissionForTakePhoto()) {
+                    takePicture();
+                } else {
+                    requestCameraPermission();
+                }
                 break;
             case CHOOSE_PHOTO:
-                chooseImage();
+                if (hasStoragePermission()) {
+                    chooseImage();
+                } else {
+                    requestWriteExternalStoragePermission();
+                }
                 break;
         }
     }
