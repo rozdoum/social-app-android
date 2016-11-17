@@ -4,8 +4,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -35,6 +37,7 @@ import java.util.List;
 public class PostDetailsActivity extends AppCompatActivity {
 
     public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
+    private static final int ANIMATION_DURATION = 300;
 
     private EditText commentEditText;
     private Post post;
@@ -122,7 +125,7 @@ public class PostDetailsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 boolean isActivated = !likesImageView.isActivated();
                 likesImageView.setActivated(isActivated);
-                animateImageView(likesImageView, isActivated);
+                startAnimateLikeButton(AnimationType.BOUNCE_ANIM);
                 if (isActivated) {
                     addLike();
                 } else {
@@ -132,44 +135,53 @@ public class PostDetailsActivity extends AppCompatActivity {
         });
     }
 
-//    public void animateImageView(final ImageView v, boolean activated) {
-//        int activatedColor = getResources().getColor(R.color.colorAccent);
-//        int notActivatedColor = getResources().getColor(android.R.color.black);
-//
-//        final int destColour = activated ? activatedColor : notActivatedColor;
-//
-//        final ValueAnimator colorAnim = ObjectAnimator.ofFloat(0f, 1f);
-//        colorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator animation) {
-//                float mul = (Float) animation.getAnimatedValue();
-//                int alpha = adjustAlpha(destColour, mul);
-//                v.setColorFilter(alpha, PorterDuff.Mode.SRC_ATOP);
-//                if (mul == 0.0) {
-//                    v.setColorFilter(null);
-//                }
-//            }
-//        });
-//
-//        colorAnim.setDuration(300);
-//        colorAnim.start();
-//
-//    }
+    private void startAnimateLikeButton(AnimationType animationType) {
+        switch (animationType) {
+            case BOUNCE_ANIM:
+                bounceAnimateImageView();
+                break;
+            case COLOR_ANIM:
+                colorAnimateImageView();
+                break;
+        }
+    }
 
-    public void animateImageView(final ImageView v, boolean activated) {
+    public void colorAnimateImageView() {
+        final int activatedColor = getResources().getColor(R.color.like_icon_activated);
+
+        final ValueAnimator colorAnim = likesImageView.isActivated() ? ObjectAnimator.ofFloat(0f, 1f)
+                : ObjectAnimator.ofFloat(1f, 0f);
+        colorAnim.setDuration(ANIMATION_DURATION);
+        colorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float mul = (Float) animation.getAnimatedValue();
+                int alpha = adjustAlpha(activatedColor, mul);
+                likesImageView.setColorFilter(alpha, PorterDuff.Mode.SRC_ATOP);
+                if (mul == 0.0) {
+                    likesImageView.setColorFilter(null);
+                }
+            }
+        });
+
+        colorAnim.start();
+    }
+
+    public void bounceAnimateImageView() {
         AnimatorSet animatorSet = new AnimatorSet();
 
-        ObjectAnimator bounceAnimX = ObjectAnimator.ofFloat(v, "scaleX", 0.2f, 1f);
-        bounceAnimX.setDuration(300);
+        ObjectAnimator bounceAnimX = ObjectAnimator.ofFloat(likesImageView, "scaleX", 0.2f, 1f);
+        bounceAnimX.setDuration(ANIMATION_DURATION);
         bounceAnimX.setInterpolator(new BounceInterpolator());
 
-        ObjectAnimator bounceAnimY = ObjectAnimator.ofFloat(v, "scaleY", 0.2f, 1f);
-        bounceAnimY.setDuration(300);
+        ObjectAnimator bounceAnimY = ObjectAnimator.ofFloat(likesImageView, "scaleY", 0.2f, 1f);
+        bounceAnimY.setDuration(ANIMATION_DURATION);
         bounceAnimY.setInterpolator(new BounceInterpolator());
         bounceAnimY.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                v.setImageResource(R.drawable.ic_favorite_red_24dp);
+                likesImageView.setImageResource(likesImageView.isActivated() ? R.drawable.ic_favorite_24px
+                        : R.drawable.ic_favorite_border_24px);
             }
         });
 
@@ -181,7 +193,6 @@ public class PostDetailsActivity extends AppCompatActivity {
 
         animatorSet.play(bounceAnimX).with(bounceAnimY);
         animatorSet.start();
-
     }
 
     public int adjustAlpha(int color, float factor) {
@@ -218,5 +229,9 @@ public class PostDetailsActivity extends AppCompatActivity {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    enum AnimationType {
+        COLOR_ANIM, BOUNCE_ANIM
     }
 }

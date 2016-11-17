@@ -13,4 +13,7 @@
 
     <color name="light_gray">#d8d6d5</color>
 
+    <color name="like_icon_activated">#d50000</color>
+    <color name="like_icon_deactivated">#bdbdbd</color>
+
 </resources>
