@@ -6,6 +6,7 @@
     <string name="text_take_photo">Take photo</string>
     <string name="text_pick_photo">Pick from Gallery</string>
     <string name="button_title_cancel">Cancel</string>
+    <string name="button_ok">OK</string>
 
     <string name="hint_title">Title</string>
     <string name="hint_description">Description</string>
@@ -16,6 +17,9 @@
     <string name="error_incorrect_file_type">Incorrect file type</string>
     <string name="error_bigger_file">File size is bigger than 10Mb</string>
     <string name="message_creating_post">Creating post ..</string>
+    <string name="warning_empty_image">Image is required</string>
+    <string name="warning_empty_title">Title is required</string>
+    <string name="warning_empty_description">Description is required</string>
 
     <string name="comment_text_hint">Enter your comment…</string>
     <string name="button_post_comment">Post comment</string>

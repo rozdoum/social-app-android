@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -58,10 +60,14 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
 
     private boolean isActivityResultOver = false;
 
+    private PostManager postManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_post_activity);
+
+        postManager = PostManager.getInstance(CreatePostActivity.this);
 
         titleEditText = (EditText) findViewById(R.id.titleEditText);
         descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
@@ -78,30 +84,30 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         });
     }
 
-    private void sendPost() {
-        showProgress(R.string.message_creating_post);
-        hideKeyboard();
-        PostManager.getInstance(CreatePostActivity.this).createPostWithImage(filePath, CreatePostActivity.this, createPost());
-    }
+    private void attemptCreatePost() {
+        int warningMessageRes = 0;
+        String title = titleEditText.getText().toString();
+        String description = descriptionEditText.getText().toString();
 
-    private Post createPost() {
-        String title = null;
-        String description = null;
-
-        Post post = new Post();
-
-        if (titleEditText != null && titleEditText.getText() != null) {
-            title = titleEditText.getText().toString();
+        if (filePath == null || !(new File(filePath).exists())) {
+            warningMessageRes = R.string.warning_empty_image;
+        } else if (TextUtils.isEmpty(title)) {
+            warningMessageRes = R.string.warning_empty_title;
+        } else if (TextUtils.isEmpty(description)) {
+            warningMessageRes = R.string.warning_empty_description;
         }
 
-        if (descriptionEditText != null && descriptionEditText.getText() != null) {
-            description = descriptionEditText.getText().toString();
+        if (warningMessageRes == 0) {
+            showProgress(R.string.message_creating_post);
+            hideKeyboard();
+
+            Post post = new Post();
+            post.setTitle(title);
+            post.setDescription(description);
+            postManager.createPostWithImage(filePath, CreatePostActivity.this, post);
+        } else {
+            showWarningDialog(warningMessageRes);
         }
-
-        post.setTitle(title);
-        post.setDescription(description);
-
-        return post;
     }
 
     private void chooseImage() {
@@ -319,6 +325,13 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         snackbar.show();
     }
 
+    private void showWarningDialog(int messageId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(messageId);
+        builder.setPositiveButton(R.string.button_ok, null);
+        builder.show();
+    }
+
     @Override
     public void onPostCreated(boolean success) {
         hideProgress();
@@ -368,7 +381,7 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.post:
-                sendPost();
+                attemptCreatePost();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
