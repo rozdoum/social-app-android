@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,8 @@ public class PostDetailsActivity extends AppCompatActivity {
     private ImageView likesImageView;
     private TextView commentsLabel;
     private TextView likeCounterTextView;
+
+    private AnimationType likeAnimationType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +135,9 @@ public class PostDetailsActivity extends AppCompatActivity {
     }
 
     private void initLikes() {
+        //set default animation type
+        likeAnimationType = AnimationType.BOUNCE_ANIM;
+
         ApplicationHelper.getDatabaseHelper().getLikesCount(post.getId(), createOnLikeCountChangedListener());
 
         likesContainer.setOnClickListener(new View.OnClickListener() {
@@ -139,12 +145,30 @@ public class PostDetailsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 boolean isActivated = !likesImageView.isActivated();
                 likesImageView.setActivated(isActivated);
-                startAnimateLikeButton(AnimationType.BOUNCE_ANIM);
+                startAnimateLikeButton(likeAnimationType);
                 if (isActivated) {
                     addLike();
                 } else {
                     removeLike();
                 }
+            }
+        });
+
+        //long click for changing animation
+        likesContainer.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (likeAnimationType == AnimationType.BOUNCE_ANIM) {
+                    likeAnimationType = AnimationType.COLOR_ANIM;
+                } else {
+                    likeAnimationType = AnimationType.BOUNCE_ANIM;
+                }
+
+                Snackbar snackbar = Snackbar
+                        .make(likesContainer, "Animation was changed", Snackbar.LENGTH_LONG);
+
+                snackbar.show();
+                return true;
             }
         });
     }
