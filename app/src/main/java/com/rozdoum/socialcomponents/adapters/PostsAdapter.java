@@ -74,11 +74,13 @@ public class PostsAdapter extends BaseAdapter {
 
         String imageUrl = post.getImagePath();
 
-        if (holder.imageRequest != null) {
-            holder.imageRequest.cancel();
-        }
+//        if (holder.imageRequest != null) {
+//            holder.imageRequest.cancel();
+//        }
 
-        holder.imageRequest = imageUtil.getImage(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+//        holder.imageRequest = imageUtil.getImage(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+
+        imageUtil.getImageThumb(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
 
         return convertView;
     }

@@ -24,8 +24,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageRequest;
-import com.rozdoum.socialcomponents.views.TouchImageView;
 
 import java.util.Calendar;
 
@@ -44,14 +44,18 @@ public class ImageUtil {
     private static ImageUtil instance;
     private final RequestQueue mRequestQueue;
     private Context context;
+    private ImageLoader imageLoader;
+    private ImageLoader imageLoaderBase;
 
     private ImageUtil(final Context context) {
         this.context = context;
+
 
         Cache cache = new DiskBasedCache(ImagesDir.getTempImagesDir(context), MAX_CACHE_SIZE);
         Network network = new BasicNetwork(new HurlStack());
         mRequestQueue = new RequestQueue(cache, network, N_THREADS);
         mRequestQueue.start();
+        imageLoader = new ImageLoader(mRequestQueue, new LruBitmapCache(LruBitmapCache.getCacheSize(context)));
     }
 
     public static ImageUtil getInstance(Context context) {
@@ -70,60 +74,66 @@ public class ImageUtil {
         getRequestQueue().add(req);
     }
 
-    public Request downloadImage(String url, String hash,
-                                 Response.ErrorListener errorListener,
-                                 Response.Listener<Bitmap> listener) {
-        return new DownloadImageThumbnailRequest(url, hash, errorListener, listener, false);
-    }
+//    public Request downloadImage(String url, String hash,
+//                                 Response.ErrorListener errorListener,
+//                                 Response.Listener<Bitmap> listener) {
+//        return new DownloadImageThumbnailRequest(url, hash, errorListener, listener, false);
+//    }
 
     public Request getImageThumbnail(String url, String hash,
+                                     int maxWidth, int maxHeight,
                                      Response.ErrorListener errorListener,
                                      Response.Listener<Bitmap> listener) {
-        return new DownloadImageThumbnailRequest(url, hash, errorListener, listener, true);
+
+        return new DownloadImageThumbnailRequest(url, hash, errorListener, listener, true, maxWidth, maxHeight);
     }
 
     public Cache.Entry getCashedThumbnailEntry(String hash) {
         return mRequestQueue.getCache().get(hash);
     }
 
-    public Request getImage(final String imageUrl, final ImageView imageView, int defaultImageResId, final int errorImageResId) {
-        return getImage(imageUrl, imageView, null, defaultImageResId, errorImageResId);
-    }
+//    public Request getImage(final String imageUrl, final ImageView imageView, int defaultImageResId, final int errorImageResId) {
+//        return getImage(imageUrl, imageView, null, defaultImageResId, errorImageResId);
+//    }
 
-    public Request getImage(final String imageUrl, final ImageView imageView,
-                            final ProgressBar progressBarView, int defaultImageResId, final int errorImageResId) {
+//    public Request getImage(final String imageUrl, final ImageView imageView,
+//                            final ProgressBar progressBarView, int defaultImageResId, final int errorImageResId) {
 //        imageView.setImageResource(defaultImageResId);
-        if (progressBarView != null) {
-            showProgressBar(imageView, progressBarView, true);
-        }
+//        String hash = "thumb" + imageUrl;
+//
+//        if (progressBarView != null) {
+//            showProgressBar(imageView, progressBarView, true);
+//        }
+//
+////        float mux = imageView instanceof TouchImageView ? TOUCH_IMAGE_ZOOM_RATE : IMPROVE_IMAGE_QUALITY_FACTOR;
+//
+//        int maxImageWidth = (int) (calcMaxWidth(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
+//        int maxImageHeight = (int) (calcMaxHeight(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
+//
+//        Request request = getImageThumbnail(imageUrl, hash, maxImageWidth, maxImageHeight, new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        LogUtil.logError(TAG, "Failed load image " + imageUrl, error);
+//                        imageView.setImageResource(errorImageResId);
+//                    }
+//                },
+//                new Response.Listener<Bitmap>() {
+//                    @Override
+//                    public void onResponse(Bitmap response) {
+//                        LogUtil.logInfo(TAG, "Successfully loaded image " + imageUrl);
+//
+//                        imageView.setImageBitmap(response);
+////                        imageView.setImageBitmap(createScaledBitmap(response, maxImageWidth, maxImageHeight));
+//                        if (progressBarView != null) {
+//                            showProgressBar(imageView, progressBarView, false);
+//                        }
+//                    }
+//                });
+//        addToRequestQueue(request);
+//        return request;
+//    }
 
-        Request request = getImageThumbnail(imageUrl, imageUrl, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        LogUtil.logError(TAG, "Failed load image " + imageUrl, error);
-                        imageView.setImageResource(errorImageResId);
-                    }
-                },
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap response) {
-                        LogUtil.logInfo(TAG, "Successfully loaded image " + imageUrl);
-
-                        float mux = imageView instanceof TouchImageView ? TOUCH_IMAGE_ZOOM_RATE : IMPROVE_IMAGE_QUALITY_FACTOR;
-
-                        int maxImageWidth = (int) (calcMaxWidth(imageView) * mux);
-                        int maxImageHeight = (int) (calcMaxHeight(imageView) * mux);
-                        imageView.setImageBitmap(createScaledBitmap(response, maxImageWidth, maxImageHeight));
-                        if (progressBarView != null) {
-                            showProgressBar(imageView, progressBarView, false);
-                        }
-                    }
-                });
-        addToRequestQueue(request);
-        return request;
-    }
-
-    private void showProgressBar(ImageView imageView, ProgressBar progressBar, boolean visible) {
+    private void setProgressBarVisible(ImageView imageView, ProgressBar progressBar, boolean visible) {
         progressBar.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
         imageView.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
     }
@@ -198,13 +208,14 @@ public class ImageUtil {
 
         public DownloadImageThumbnailRequest(String url, String hash,
                                              Response.ErrorListener errorListener,
-                                             Response.Listener<Bitmap> listener, boolean isBitmapNeeded) {
+                                             Response.Listener<Bitmap> listener, boolean isBitmapNeeded,
+                                             int maxWidth, int maxHeight) {
             super(Request.Method.GET, url, errorListener);
             this.hash = hash;
             this.listener = listener;
             this.isBitmapNeeded = isBitmapNeeded;
 
-            imageRequest = new MyImageRequest(url, listener, errorListener);
+            imageRequest = new MyImageRequest(url, listener, errorListener, maxWidth, maxHeight);
         }
 
         @Override
@@ -250,7 +261,8 @@ public class ImageUtil {
 
             public MyImageRequest(String url,
                                   Response.Listener<Bitmap> listener,
-                                  Response.ErrorListener errorListener) {
+                                  Response.ErrorListener errorListener,
+                                  int maxWidth, int maxHeight) {
                 super(url, listener, maxWidth, maxHeight, scaleType, decodeConfig, errorListener);
             }
 
@@ -264,5 +276,57 @@ public class ImageUtil {
                 super.deliverResponse(response);
             }
         }
+    }
+
+    public void getImageThumb(final String imageUrl, final ImageView imageView, int defaultImageResId, final int errorImageResId) {
+        imageView.setImageResource(defaultImageResId);
+
+        int maxImageWidth = (int) (calcMaxWidth(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
+        int maxImageHeight = (int) (calcMaxHeight(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
+
+        ImageLoader.ImageListener listener = new ImageLoader.ImageListener() {
+            @Override
+            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                imageView.setImageBitmap(response.getBitmap());
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                imageView.setImageResource(errorImageResId);
+                LogUtil.logError(TAG, "Failed load image " + imageUrl, error);
+            }
+        };
+
+        imageLoader.get(imageUrl, listener, maxImageWidth, maxImageHeight);
+
+    }
+
+    public void getImage(final String imageUrl, final ImageView imageView,
+                         final ProgressBar progressBarView, final int errorImageResId) {
+
+        if (progressBarView != null) {
+            setProgressBarVisible(imageView, progressBarView, true);
+        }
+
+        int maxImageWidth = (int) (calcMaxWidth(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
+        int maxImageHeight = (int) (calcMaxHeight(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
+
+        ImageLoader.ImageListener listener = new ImageLoader.ImageListener() {
+            @Override
+            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                imageView.setImageBitmap(response.getBitmap());
+                setProgressBarVisible(imageView, progressBarView, false);
+            }
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                imageView.setImageResource(errorImageResId);
+                setProgressBarVisible(imageView, progressBarView, false);
+                LogUtil.logError(TAG, "Failed load image " + imageUrl, error);
+            }
+        };
+
+        imageLoader.get(imageUrl, listener, maxImageWidth, maxImageHeight);
+
     }
 }

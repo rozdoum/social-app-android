@@ -29,7 +29,7 @@ public class ImageDetailActivity extends AppCompatActivity {
         String imageUrl = getIntent().getStringExtra(IMAGE_URL_EXTRA_KEY);
 
         ImageUtil imageUtil = ImageUtil.getInstance(this);
-        imageUtil.getImage(imageUrl, touchImageView, progressBar, R.drawable.ic_stub, R.drawable.ic_stub);
+        imageUtil.getImage(imageUrl, touchImageView, progressBar, R.drawable.ic_stub);
     }
 
     @Override
