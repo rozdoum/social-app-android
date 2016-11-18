@@ -15,6 +15,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
@@ -87,12 +88,12 @@ public class DatabaseHelper {
         }
     }
 
-    public void createOrUpdateLike(String postId) {
+    public void createOrUpdateLike(String postId, String authorId) {
         try {
-            DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId);
+            DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
             mLikesReference.push();
             String id = mLikesReference.push().getKey();
-            Like like = new Like();
+            Like like = new Like(authorId);
             like.setId(id);
 
             mLikesReference.child(id).setValue(like);
@@ -100,6 +101,11 @@ public class DatabaseHelper {
             LogUtil.logError(TAG, "createOrUpdateLike()", e);
         }
 
+    }
+
+    public void removeLike(String postId, String authorId) {
+        DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
+        mLikesReference.removeValue();
     }
 
     public UploadTask uploadImage(Uri uri) {
@@ -181,6 +187,21 @@ public class DatabaseHelper {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 long count = dataSnapshot.getChildrenCount();
                 onCountChangedListener.onCountChanged(count);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void hasCurrentUserLike(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
+        DatabaseReference databaseReference = database.getReference("post-likes").child(postId).child(userId);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onObjectExistListener.onDataChanged(dataSnapshot.exists());
             }
 
             @Override

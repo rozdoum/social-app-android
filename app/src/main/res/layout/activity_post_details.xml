@@ -80,8 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@+id/likesImageView"
-                    android:paddingLeft="@dimen/intrinsic_padding"
-                    android:text="19 likes" />
+                    android:paddingLeft="@dimen/intrinsic_padding" />
 
             </RelativeLayout>
 
