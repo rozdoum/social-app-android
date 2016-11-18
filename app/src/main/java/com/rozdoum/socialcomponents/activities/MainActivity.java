@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.managers.PostManager;
@@ -21,45 +23,67 @@ public class MainActivity extends AppCompatActivity {
     private ListView postsListView;
     private PostsAdapter postsAdapter;
 
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-        if (floatingActionButton != null) {
-            floatingActionButton.setOnClickListener(new View.OnClickListener() {
+//        mAuth = FirebaseAuth.getInstance();
+//        user = mAuth.getCurrentUser();
+//        if (user == null) {
+//            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(intent);
+//        } else {
+            initContentView();
+//        }
+    }
+
+    private void  initContentView() {
+        if (postsListView == null) {
+            FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
+
+            if (floatingActionButton != null) {
+                floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openCreatePostActivity();
+                    }
+                });
+            }
+
+            postsListView = (ListView) findViewById(R.id.postsListView);
+            postsAdapter = new PostsAdapter(this);
+            postsListView.setAdapter(postsAdapter);
+
+            OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
                 @Override
-                public void onClick(View v) {
-                    openCreatePostActivity();
+                public void onListChanged(List<Post> list) {
+                    postsAdapter.setList(list);
+                }
+            };
+
+            PostManager.getInstance(getApplicationContext()).getPosts(onPostsDataChangedListener);
+
+            postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Post post = (Post) postsAdapter.getItem(position);
+
+                    Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
+                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+                    startActivity(intent);
                 }
             });
         }
-
-        postsListView = (ListView)findViewById(R.id.postsListView);
-        postsAdapter = new PostsAdapter(this);
-        postsListView.setAdapter(postsAdapter);
-
-        OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
-            @Override
-            public void onListChanged(List<Post> list) {
-                postsAdapter.setList(list);
-            }
-        };
-
-        PostManager.getInstance(getApplicationContext()).getPosts(onPostsDataChangedListener);
-
-        postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Post post = (Post) postsAdapter.getItem(position);
-
-                Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
-                intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                startActivity(intent);
-            }
-        });
     }
 
     private void openCreatePostActivity() {
