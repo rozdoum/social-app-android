@@ -25,10 +25,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.rozdoum.socialcomponents.ApplicationHelper;
+import com.rozdoum.socialcomponents.Bootstrap;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
@@ -50,6 +52,8 @@ public class PostDetailsActivity extends AppCompatActivity {
     private TextView likeCounterTextView;
 
     private AnimationType likeAnimationType;
+    private boolean isLiked = false;
+    private boolean likeIconInitialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +138,23 @@ public class PostDetailsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private OnObjectExistListener<Like> createOnLikeObjectExistListener() {
+        return new OnObjectExistListener<Like>() {
+            @Override
+            public void onDataChanged(boolean exist) {
+                if (!likeIconInitialized) {
+                    likesImageView.setImageResource(exist ? R.drawable.ic_favorite_24px : R.drawable.ic_favorite_border_24px);
+                    likeIconInitialized = true;
+                }
+
+                isLiked = exist;
+            }
+        };
+    }
+
     private void initLikes() {
+        ApplicationHelper.getDatabaseHelper().hasCurrentUserLike(post.getId(), Bootstrap.USER_ID, createOnLikeObjectExistListener());
+
         //set default animation type
         likeAnimationType = AnimationType.BOUNCE_ANIM;
 
@@ -143,10 +163,9 @@ public class PostDetailsActivity extends AppCompatActivity {
         likesContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isActivated = !likesImageView.isActivated();
-                likesImageView.setActivated(isActivated);
                 startAnimateLikeButton(likeAnimationType);
-                if (isActivated) {
+
+                if (!isLiked) {
                     addLike();
                 } else {
                     removeLike();
@@ -187,7 +206,7 @@ public class PostDetailsActivity extends AppCompatActivity {
     public void colorAnimateImageView() {
         final int activatedColor = getResources().getColor(R.color.like_icon_activated);
 
-        final ValueAnimator colorAnim = likesImageView.isActivated() ? ObjectAnimator.ofFloat(0f, 1f)
+        final ValueAnimator colorAnim = !isLiked ? ObjectAnimator.ofFloat(0f, 1f)
                 : ObjectAnimator.ofFloat(1f, 0f);
         colorAnim.setDuration(ANIMATION_DURATION);
         colorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -218,7 +237,7 @@ public class PostDetailsActivity extends AppCompatActivity {
         bounceAnimY.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                likesImageView.setImageResource(likesImageView.isActivated() ? R.drawable.ic_favorite_24px
+                likesImageView.setImageResource(!isLiked ? R.drawable.ic_favorite_24px
                         : R.drawable.ic_favorite_border_24px);
             }
         });
@@ -242,10 +261,11 @@ public class PostDetailsActivity extends AppCompatActivity {
     }
 
     private void addLike() {
-        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId());
+        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId(), Bootstrap.USER_ID);
     }
 
     private void removeLike() {
+        ApplicationHelper.getDatabaseHelper().removeLike(post.getId(), Bootstrap.USER_ID);
     }
 
     private void sendComment() {

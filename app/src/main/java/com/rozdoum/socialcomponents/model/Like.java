@@ -12,6 +12,10 @@ public class Like {
 
     public Like() {
         // Default constructor required for calls to DataSnapshot.getValue(Comment.class)
+    }
+
+    public Like(String authorId) {
+        this.authorId = authorId;
         this.createdDate = Calendar.getInstance().getTimeInMillis();
     }
 
