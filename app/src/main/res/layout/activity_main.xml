@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:divider="@null"
         android:dividerHeight="0dp"
-        android:paddingTop="@dimen/small_intrinsic_padding" />
+        android:paddingBottom="@dimen/intrinsic_padding" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addNewPostFab"
