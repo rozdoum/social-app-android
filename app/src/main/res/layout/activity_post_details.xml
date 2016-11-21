@@ -10,16 +10,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/newCommentContainer"
-        android:layout_alignParentTop="true"
-        android:paddingLeft="@dimen/post_detail_screen_padding"
-        android:paddingRight="@dimen/post_detail_screen_padding"
-        android:paddingTop="@dimen/post_detail_screen_padding">
+        android:layout_alignParentTop="true">
 
         <RelativeLayout
             android:id="@+id/activity_post_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusableInTouchMode="true">
+            android:focusableInTouchMode="true"
+            android:paddingLeft="@dimen/post_detail_screen_padding"
+            android:paddingRight="@dimen/post_detail_screen_padding"
+            android:paddingTop="@dimen/post_detail_screen_padding">
 
             <RelativeLayout
                 android:id="@+id/imageContainer"
@@ -136,7 +136,7 @@
             android:id="@+id/sendButton"
             android:layout_width="@dimen/send_comment_button_width"
             android:layout_height="match_parent"
-            android:background="@color/orange"
+            android:background="@color/send_button_color"
             android:src="@drawable/ic_send_white_24dp" />
     </LinearLayout>
 

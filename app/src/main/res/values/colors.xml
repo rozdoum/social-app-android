@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="primary">#795548</color>
+    <color name="primary_dark">#5D4037</color>
+    <color name="primary_light">#D7CCC8</color>
+    <color name="accent">#FF5252</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#BDBDBD</color>
 
-    <color name="custom_divider_color">#d8d6d5</color>
-    <color name="orange_text">#d26623</color>
-    <color name="gray_text">#878787</color>
+    <color name="custom_divider_color">#BDBDBD</color>
+    <color name="highlight_text">@color/primary</color>
 
-    <color name="orange">#d26623</color>
-    <color name="light_orange_text">#eab283</color>
+    <color name="send_button_color">@color/primary</color>
 
     <color name="light_gray">#d8d6d5</color>
 
-    <color name="like_icon_activated">#d50000</color>
+    <color name="like_icon_activated">@color/accent</color>
     <color name="like_icon_deactivated">#bdbdbd</color>
 
 </resources>

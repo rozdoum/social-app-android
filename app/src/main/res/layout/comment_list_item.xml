@@ -20,7 +20,7 @@
         android:paddingLeft="@dimen/intrinsic_padding"
         android:paddingRight="@dimen/intrinsic_padding"
         android:text="Author name"
-        android:textColor="@color/orange_text" />
+        android:textColor="@color/highlight_text" />
 
     <TextView
         android:id="@+id/commentTextView"
