@@ -8,6 +8,13 @@
         <item name="colorAccent">@color/accent</item>
     </style>
 
+    <style name="AppCompat.Black.FullScreen" parent="AppTheme">
+        <item name="colorPrimaryDark">@android:color/background_dark</item>
+        <item name="android:colorBackground">@android:color/background_dark</item>
+        <item name="android:windowBackground">@android:color/background_dark</item>
+        <item name="colorPrimary">@android:color/background_dark</item>
+    </style>
+
     <style name="TextAppearance.Title" parent="@android:style/TextAppearance">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/primary_text</item>
