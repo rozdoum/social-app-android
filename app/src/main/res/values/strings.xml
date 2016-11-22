@@ -29,19 +29,30 @@
     <string name="label_likes">%1$d likes</string>
 
     <string name="create_post_menu_label">Post</string>
+    <string name="sign_out_menu_label">Sign out</string>
     <string name="title_activity_login">Sign in</string>
 
-    <!-- Strings related to login -->
+    <!-- Strings related to registration and login -->
     <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="prompt_name">Name</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_conf_password">Confirm password</string>
+    <string name="action_register">Register</string>
+    <string name="error_field_required">This field is required</string>
     <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_confirm_password">Wrong password confirmation</string>
+    <string name="action_sign_in">Sign in</string>
+
+
+    <string name="loading">Loading...</string>
+
+    <!-- Strings related to login -->
+
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="title_activity_registration">Registration</string>
 
 </resources>
