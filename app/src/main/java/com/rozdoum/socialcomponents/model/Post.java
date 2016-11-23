@@ -18,6 +18,12 @@ public class Post implements Serializable{
     private String description;
     private long createdDate;
     private String imagePath;
+    private int commentsCount;
+    private int likesCount;
+
+    public Post() {
+        this.createdDate = new Date().getTime();
+    }
 
     public String getId() {
         return id;
@@ -57,6 +63,22 @@ public class Post implements Serializable{
 
     public void setCreatedDate(long createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
+
+    public int getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
     }
 
     public Map<String,Object> toMap() {
