@@ -55,6 +55,7 @@ public class DatabaseHelper {
 
     public void init() {
         database = FirebaseDatabase.getInstance();
+        database.setPersistenceEnabled(true);
         storage = FirebaseStorage.getInstance();
     }
 
@@ -115,6 +116,7 @@ public class DatabaseHelper {
 
     public void getPostList(final OnDataChangedListener<Post> onDataChangedListener) {
         DatabaseReference databaseReference = database.getReference("posts");
+        databaseReference.keepSynced(true);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

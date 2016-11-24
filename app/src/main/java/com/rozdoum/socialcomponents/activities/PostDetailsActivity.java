@@ -74,14 +74,13 @@ public class PostDetailsActivity extends AppCompatActivity {
         likesImageView = (ImageView) findViewById(R.id.likesImageView);
         likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
 
-
         titleTextView.setText(post.getTitle());
         descriptionEditText.setText(post.getDescription());
 
         String imageUrl = post.getImagePath();
 
         ImageUtil imageUtil = ImageUtil.getInstance(this);
-        imageUtil.getImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub);
+        imageUtil.getFullImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
