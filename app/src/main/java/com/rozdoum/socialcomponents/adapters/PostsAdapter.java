@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
+import com.android.volley.toolbox.ImageLoader;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -33,7 +33,7 @@ public class PostsAdapter extends BaseAdapter {
         ImageView postImageView;
         TextView titleTextView;
         TextView detailsTextView;
-        Request imageRequest;
+        ImageLoader.ImageContainer imageRequest;
     }
 
     @Override
@@ -72,13 +72,12 @@ public class PostsAdapter extends BaseAdapter {
         holder.titleTextView.setText(post.getTitle());
         holder.detailsTextView.setText(post.getDescription());
 
-        String imageUrl = post.getImagePath();
-
         if (holder.imageRequest != null) {
-            holder.imageRequest.cancel();
+            holder.imageRequest.cancelRequest();
         }
 
-        holder.imageRequest = imageUtil.getImage(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+        String imageUrl = post.getImagePath();
+        holder.imageRequest = imageUtil.getImageThumb(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
 
         return convertView;
     }
