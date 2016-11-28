@@ -36,7 +36,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.model.User;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
@@ -44,6 +44,7 @@ import com.rozdoum.socialcomponents.utils.ValidationUtil;
 public class LoginActivity extends AppCompatActivity implements OnClickListener, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int SIGN_IN_GOOGLE = 9001;
+    public static final int MAX_PERMISSIBLE_PROFILE_PHOTO_SIZE = 1280;
 
     private EditText mEmailView;
     private EditText mPasswordView;
@@ -54,6 +55,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
     private GoogleApiClient mGoogleApiClient;
 
     private CallbackManager mCallbackManager;
+    private String profilePhotoUrlLarge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +76,13 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    // User is signed in
+                    // Profile is signed in
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    createUser(user);
                     startMainActivity();
                     finish();
                 } else {
-                    // User is signed out
+                    // Profile is signed out
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_out");
                 }
             }
@@ -96,6 +99,8 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
             @Override
             public void onSuccess(LoginResult loginResult) {
                 LogUtil.logDebug(TAG, "facebook:onSuccess:" + loginResult);
+                profilePhotoUrlLarge = String.format(getString(R.string.facebook_large_image_url_pattern),
+                        loginResult.getAccessToken().getUserId());
                 handleFacebookAccessToken(loginResult.getAccessToken());
             }
 
@@ -147,6 +152,8 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
             if (result.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
+                profilePhotoUrlLarge = String.format(getString(R.string.google_large_image_url_pattern),
+                        account.getPhotoUrl(), MAX_PERMISSIBLE_PROFILE_PHOTO_SIZE);
                 firebaseAuthWithGoogle(account);
             } else {
                 LogUtil.logDebug(TAG, "SIGN_IN_GOOGLE failed :" + result);
@@ -187,9 +194,11 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
     }
 
     private void createUser(FirebaseUser firebaseUser) {
-        User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName());
-        user.email = firebaseUser.getEmail();
-        user.photoUrl = firebaseUser.getPhotoUrl().toString();
+        Profile user = new Profile(firebaseUser.getUid());
+        user.setEmail(firebaseUser.getEmail());
+        user.setUsername(firebaseUser.getDisplayName());
+        user.setPhotoUrl(profilePhotoUrlLarge);
+//        user.setPhotoUrl(firebaseUser.getPhotoUrl().toString());
 
     }
 

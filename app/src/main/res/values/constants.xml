@@ -2,5 +2,6 @@
 <resources>
     <string name="google_web_client_id">196433492167-vl2r7i9ciu3jr72oqpqh57l9716h85o4.apps.googleusercontent.com</string>
     <string name="facebook_app_id">415080662213842</string>
-
+    <string name="facebook_large_image_url_pattern">https://graph.facebook.com/%1$s/picture?type=large</string>
+    <string name="google_large_image_url_pattern">%1$s?sz=%2$d</string>
 </resources>
