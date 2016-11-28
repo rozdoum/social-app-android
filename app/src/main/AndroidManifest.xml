@@ -40,7 +40,7 @@
         <activity
             android:name=".activities.ImageDetailActivity"
             android:label="@string/label_image_detail_activity"
-            android:theme="@style/AppCompat.Black.FullScreen" />
+            android:theme="@style/AppCompat.Black.NoActionBar" />
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login"/>

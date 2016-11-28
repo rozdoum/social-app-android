@@ -4,6 +4,7 @@
     <color name="primary_dark">#5D4037</color>
     <color name="primary_light">#D7CCC8</color>
     <color name="accent">#FF5252</color>
+    <color name="dart_transparent">#81000000</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
