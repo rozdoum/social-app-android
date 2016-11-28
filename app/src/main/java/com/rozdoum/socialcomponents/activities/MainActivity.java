@@ -1,15 +1,14 @@
 package com.rozdoum.socialcomponents.activities;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.managers.PostManager;
@@ -20,11 +19,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ListView postsListView;
     private PostsAdapter postsAdapter;
-
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void  initContentView() {
-        if (postsListView == null) {
+        if (recyclerView == null) {
             FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
 
             if (floatingActionButton != null) {
@@ -60,9 +56,24 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
-            postsListView = (ListView) findViewById(R.id.postsListView);
+            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             postsAdapter = new PostsAdapter(this);
-            postsListView.setAdapter(postsAdapter);
+
+            postsAdapter.setOnItemClickListener(new PostsAdapter.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(Post post) {
+                    Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
+                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+                    startActivity(intent);
+                }
+            });
+
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(postsAdapter);
+
+            recyclerView.setAdapter(postsAdapter);
 
             OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
                 @Override
@@ -72,17 +83,6 @@ public class MainActivity extends AppCompatActivity {
             };
 
             PostManager.getInstance(getApplicationContext()).getPosts(onPostsDataChangedListener);
-
-            postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Post post = (Post) postsAdapter.getItem(position);
-
-                    Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
-                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivity(intent);
-                }
-            });
         }
     }
 

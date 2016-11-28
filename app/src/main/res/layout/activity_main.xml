@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <ListView
-        android:id="@+id/postsListView"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:divider="@null"
