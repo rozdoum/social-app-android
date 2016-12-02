@@ -5,7 +5,7 @@
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:padding="@dimen/intrinsic_padding"
-    tools:context="com.rozdoum.socialcomponents.activities.RegistrationActivity">
+    tools:context="com.rozdoum.socialcomponents.activities.CreateProfileActivity">
 
     <ScrollView
         android:id="@+id/regForm"
@@ -16,8 +16,8 @@
             android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:focusableInTouchMode="true">
+            android:focusableInTouchMode="true"
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/imageContainer"
@@ -46,57 +46,14 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/emailEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_email"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
                     android:id="@+id/nameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_name"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/passwordEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_password"
-                    android:inputType="textPassword"
-                    android:maxLines="1"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/confirmPasswordEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_conf_password"
-                    android:imeActionId="@+id/login"
-                    android:imeActionLabel="@string/action_sign_in"
+                    android:imeActionId="@+id/createProdile"
                     android:imeOptions="actionUnspecified"
-                    android:inputType="textPassword"
-                    android:maxLines="1"/>
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -106,7 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/action_register"
+                android:text="@string/action_create_profile"
                 android:textStyle="bold" />
 
         </LinearLayout>

@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
@@ -27,8 +28,11 @@ import com.google.firebase.auth.UserInfo;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.managers.PostManager;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
@@ -58,8 +62,26 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         if (user == null) {
             startLoginActivity();
         } else {
-            initContentView();
+            final ProfileManager profileManager = ProfileManager.getInstance(this);
+
+            profileManager.isProfileExist(user.getUid(), new OnObjectExistListener<Profile>() {
+                @Override
+                public void onDataChanged(boolean exist) {
+                    if (exist) {
+                        initContentView();
+                    } else {
+                        Profile profile = profileManager.buildProfile(user, null);
+                        startCreateProfileActivity(profile);
+                    }
+                }
+            });
         }
+    }
+
+    private void startCreateProfileActivity(Profile profile) {
+        Intent intent = new Intent(MainActivity.this, CreateProfileActivity.class);
+        intent.putExtra(CreateProfileActivity.PROFILE_EXTRA_KEY, profile);
+        startActivity(intent);
     }
 
     private void startLoginActivity() {
@@ -142,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     }
 
     private void logoutFacebook() {
+        FacebookSdk.sdkInitialize(getApplicationContext());
         LoginManager.getInstance().logOut();
     }
 

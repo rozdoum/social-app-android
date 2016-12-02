@@ -2,8 +2,11 @@ package com.rozdoum.socialcomponents.managers;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -13,12 +16,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -57,6 +63,22 @@ public class DatabaseHelper {
     public void init() {
         database = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
+    }
+
+    public DatabaseReference getDatabaseReference() {
+        return database.getReference();
+    }
+
+    public void createOrUpdateProfile(Profile profile, final OnProfileCreatedListener onProfileCreatedListener) {
+        DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
+        Task<Void> task = databaseReference.child("profiles").child(profile.getId()).setValue(profile);
+        task.addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                onProfileCreatedListener.onProfileCreated(task.isSuccessful());
+                LogUtil.logDebug(TAG, "createOrUpdateProfile, success: " + task.isSuccessful());
+            }
+        });
     }
 
     public void createOrUpdatePost(Post post) {

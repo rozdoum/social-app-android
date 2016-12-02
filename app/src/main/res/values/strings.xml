@@ -3,6 +3,9 @@
     <string name="label_create_post_activity">Create post</string>
     <string name="label_post_detail_activity">Post detail</string>
     <string name="label_image_detail_activity">Image</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_registration">Registration</string>
+    <string name="title_activity_create_profile">Create profile</string>
 
     <string name="text_take_photo">Take photo</string>
     <string name="text_pick_photo">Pick from Gallery</string>
@@ -15,6 +18,7 @@
     <string name="message_post_was_created">Post was created</string>
     <string name="error_fail_create_post">Fail to create post</string>
     <string name="error_fail_load_image">Fail to load image</string>
+    <string name="error_fail_crop_image">Fail to crop image</string>
     <string name="error_incorrect_file_type">Incorrect file type</string>
     <string name="error_bigger_file">File size is bigger than 10Mb</string>
     <string name="message_creating_post">Creating post ..</string>
@@ -30,7 +34,7 @@
 
     <string name="create_post_menu_label">Post</string>
     <string name="sign_out_menu_label">Sign out</string>
-    <string name="title_activity_login">Sign in</string>
+
 
     <!-- Strings related to registration and login -->
     <string name="prompt_email">Email</string>
@@ -38,10 +42,13 @@
     <string name="prompt_password">Password</string>
     <string name="prompt_conf_password">Confirm password</string>
     <string name="action_register">Register</string>
+    <string name="action_create_profile">Create profile</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_confirm_password">Wrong password confirmation</string>
     <string name="action_sign_in">Sign in</string>
+    <string name="permissions_not_granted">Cancelling, required permissions are not granted</string>
+    <string name="error_fail_create_profile">Fail to create profile</string>
 
 
     <string name="loading">Loading...</string>
@@ -53,6 +60,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="title_activity_registration">Registration</string>
+
 
 </resources>

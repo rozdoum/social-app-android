@@ -36,6 +36,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
@@ -45,6 +46,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int SIGN_IN_GOOGLE = 9001;
     public static final int MAX_PERMISSIBLE_PROFILE_PHOTO_SIZE = 1280;
+
 
     private EditText mEmailView;
     private EditText mPasswordView;
@@ -67,6 +69,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
         mPasswordView = (EditText) findViewById(R.id.password);
         findViewById(R.id.emailSignInButton).setOnClickListener(this);
         findViewById(R.id.googleSignInButton).setOnClickListener(this);
+        findViewById(R.id.registerButton).setOnClickListener(this);
 
         // Configure firebase auth
         mAuth = FirebaseAuth.getInstance();
@@ -78,8 +81,8 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
                 if (user != null) {
                     // Profile is signed in
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    createUser(user);
-                    startMainActivity();
+                    Profile profile = ProfileManager.getInstance(LoginActivity.this).buildProfile(user, profilePhotoUrlLarge);
+                    startCreateProfileActivity(profile);
                     finish();
                 } else {
                     // Profile is signed out
@@ -162,9 +165,14 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
         }
     }
 
-    private void startMainActivity() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    private void startCreateProfileActivity(Profile profile) {
+        Intent intent = new Intent(LoginActivity.this, CreateProfileActivity.class);
+        intent.putExtra(CreateProfileActivity.PROFILE_EXTRA_KEY, profile);
+        startActivity(intent);
+    }
+
+    private void startRegistrationActivity() {
+        Intent intent = new Intent(LoginActivity.this, CreateProfileActivity.class);
         startActivity(intent);
     }
 
@@ -193,14 +201,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
                 });
     }
 
-    private void createUser(FirebaseUser firebaseUser) {
-        Profile user = new Profile(firebaseUser.getUid());
-        user.setEmail(firebaseUser.getEmail());
-        user.setUsername(firebaseUser.getDisplayName());
-        user.setPhotoUrl(profilePhotoUrlLarge);
-//        user.setPhotoUrl(firebaseUser.getPhotoUrl().toString());
 
-    }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         LogUtil.logDebug(TAG, "firebaseAuthWithGoogle:" + acct.getId());
@@ -308,6 +309,8 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
             attemptLoginWithEmail();
         } else if (i == R.id.googleSignInButton) {
             signInWithGoogle();
+        } else if (i == R.id.registerButton) {
+            startRegistrationActivity();
         }
     }
 }

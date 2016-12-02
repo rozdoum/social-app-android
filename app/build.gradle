@@ -53,6 +53,7 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.kbeanie:image-chooser-library:1.5.8@aar'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.3.1'
 
     compile 'com.google.firebase:firebase-auth:9.8.0'
     compile 'com.google.android.gms:play-services-auth:9.8.0'

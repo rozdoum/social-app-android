@@ -45,6 +45,11 @@
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login"/>
+        <activity
+            android:name=".activities.CreateProfileActivity"
+            android:label="@string/title_activity_create_profile"/>
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
     </application>
 
 </manifest>

@@ -2,8 +2,10 @@ package com.rozdoum.socialcomponents.model;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.io.Serializable;
+
 @IgnoreExtraProperties
-public class Profile {
+public class Profile implements Serializable {
 
     private String id;
     private String username;
