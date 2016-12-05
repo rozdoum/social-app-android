@@ -9,10 +9,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -28,6 +30,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
+import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -57,6 +60,11 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_profile);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         // Set up the login form.
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         imageView = (ImageView) findViewById(R.id.imageView);
@@ -74,7 +82,7 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.createProdile || id == EditorInfo.IME_NULL) {
-                    attemptRegistration();
+                    attemptCreateProfile();
                     return true;
                 }
                 return false;
@@ -85,7 +93,7 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
         createProfileButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptRegistration();
+                attemptCreateProfile();
             }
         });
 
@@ -115,7 +123,7 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
         super.onRestoreInstanceState(savedInstanceState);
     }
 
-    private void attemptRegistration() {
+    private void attemptCreateProfile() {
 
         // Reset errors.
         nameEditText.setError(null);
@@ -294,21 +302,26 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
         }
     }
 
-    private void startMainActivity() {
-        Intent intent = new Intent(CreateProfileActivity.this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }
-
     @Override
     public void onProfileCreated(boolean success) {
         hideProgressDialog();
 
         if (success) {
-            startMainActivity();
+            finish();
+            PreferencesUtil.setProfileCreated(this, success);
         } else {
             showSnackBar(R.string.error_fail_create_profile);
         }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+        }
+        return (super.onOptionsItemSelected(menuItem));
     }
 }
 

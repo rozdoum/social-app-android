@@ -1,12 +1,14 @@
 package com.rozdoum.socialcomponents.managers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,10 +16,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
+import com.rozdoum.socialcomponents.activities.CreateProfileActivity;
+import com.rozdoum.socialcomponents.activities.LoginActivity;
+import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.LogUtil;
+import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
 /**
  * Created by Kristina on 10/28/16.
@@ -100,6 +106,18 @@ public class ProfileManager {
         } else {
             onProfileCreatedListener.onProfileCreated(false);
             LogUtil.logDebug(TAG, "fail to upload image");
+        }
+    }
+
+    public ProfileStatus checkProfile() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+            return ProfileStatus.NOT_AUTHORIZED;
+        } else if (!PreferencesUtil.isProfileCreated(context)){
+            return ProfileStatus.NO_PROFILE;
+        } else {
+            return ProfileStatus.PROFILE_CREATED;
         }
     }
 }

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,68 +26,38 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
+import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
-import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
+import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements  GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
 
     private ListView postsListView;
     private PostsAdapter postsAdapter;
 
     private FirebaseAuth mAuth;
-    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
-        if (user == null) {
-            startLoginActivity();
-        } else {
-            final ProfileManager profileManager = ProfileManager.getInstance(this);
-
-            profileManager.isProfileExist(user.getUid(), new OnObjectExistListener<Profile>() {
-                @Override
-                public void onDataChanged(boolean exist) {
-                    if (exist) {
-                        initContentView();
-                    } else {
-                        Profile profile = profileManager.buildProfile(user, null);
-                        startCreateProfileActivity(profile);
-                    }
-                }
-            });
-        }
+        initContentView();
     }
 
-    private void startCreateProfileActivity(Profile profile) {
-        Intent intent = new Intent(MainActivity.this, CreateProfileActivity.class);
-        intent.putExtra(CreateProfileActivity.PROFILE_EXTRA_KEY, profile);
-        startActivity(intent);
-    }
-
-    private void startLoginActivity() {
+    private void startMainActivity() {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        finish();
     }
 
     private void initContentView() {
@@ -99,7 +68,13 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                 floatingActionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        openCreatePostActivity();
+                        ProfileStatus profileStatus = ProfileManager.getInstance(MainActivity.this).checkProfile();
+
+                        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+                            openCreatePostActivity();
+                        } else {
+                            doAuthorization(profileStatus);
+                        }
                     }
                 });
             }
@@ -160,7 +135,8 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
 
     private void logoutFirebase() {
         mAuth.signOut();
-        startLoginActivity();
+        PreferencesUtil.setProfileCreated(this, false);
+//        startMainActivity();
     }
 
     private void logoutFacebook() {

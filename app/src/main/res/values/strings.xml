@@ -4,7 +4,6 @@
     <string name="label_post_detail_activity">Post detail</string>
     <string name="label_image_detail_activity">Image</string>
     <string name="title_activity_login">Sign in</string>
-    <string name="title_activity_registration">Registration</string>
     <string name="title_activity_create_profile">Create profile</string>
 
     <string name="text_take_photo">Take photo</string>
@@ -41,14 +40,14 @@
     <string name="prompt_name">Name</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_conf_password">Confirm password</string>
-    <string name="action_register">Register</string>
-    <string name="action_create_profile">Create profile</string>
+    <string name="action_create_profile">Continue</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_confirm_password">Wrong password confirmation</string>
     <string name="action_sign_in">Sign in</string>
     <string name="permissions_not_granted">Cancelling, required permissions are not granted</string>
     <string name="error_fail_create_profile">Fail to create profile</string>
+    <string name="text_login">Thank you for using our application! Please, sign in for continue your action.</string>
 
 
     <string name="loading">Loading...</string>

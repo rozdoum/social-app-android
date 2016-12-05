@@ -4,15 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -40,16 +37,12 @@ import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
-import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
-public class LoginActivity extends AppCompatActivity implements OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int SIGN_IN_GOOGLE = 9001;
     public static final int MAX_PERMISSIBLE_PROFILE_PHOTO_SIZE = 1280;
 
-
-    private EditText mEmailView;
-    private EditText mPasswordView;
     private ProgressDialog mProgressDialog;
 
     private FirebaseAuth mAuth;
@@ -65,14 +58,21 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
 
-        mEmailView = (EditText) findViewById(R.id.email);
-        mPasswordView = (EditText) findViewById(R.id.password);
-        findViewById(R.id.emailSignInButton).setOnClickListener(this);
-        findViewById(R.id.googleSignInButton).setOnClickListener(this);
-        findViewById(R.id.registerButton).setOnClickListener(this);
+        ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // Configure firebase auth
         mAuth = FirebaseAuth.getInstance();
+
+        findViewById(R.id.googleSignInButton).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signInWithGoogle();
+            }
+        });
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -81,7 +81,8 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
                 if (user != null) {
                     // Profile is signed in
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Profile profile = ProfileManager.getInstance(LoginActivity.this).buildProfile(user, profilePhotoUrlLarge);
+                    Profile profile = ProfileManager.getInstance(LoginActivity.this)
+                            .buildProfile(user, profilePhotoUrlLarge);
                     startCreateProfileActivity(profile);
                     finish();
                 } else {
@@ -115,17 +116,6 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
             @Override
             public void onError(FacebookException error) {
                 LogUtil.logError(TAG, "facebook:onError", error);
-            }
-        });
-
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLoginWithEmail();
-                    return true;
-                }
-                return false;
             }
         });
     }
@@ -171,11 +161,6 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
         startActivity(intent);
     }
 
-    private void startRegistrationActivity() {
-        Intent intent = new Intent(LoginActivity.this, CreateProfileActivity.class);
-        startActivity(intent);
-    }
-
     private void handleFacebookAccessToken(AccessToken token) {
         LogUtil.logDebug(TAG, "handleFacebookAccessToken:" + token);
         showProgressDialog();
@@ -200,8 +185,6 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
                     }
                 });
     }
-
-
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         LogUtil.logDebug(TAG, "firebaseAuthWithGoogle:" + acct.getId());
@@ -240,52 +223,6 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
         startActivityForResult(signInIntent, SIGN_IN_GOOGLE);
     }
 
-    private void attemptLoginWithEmail() {
-
-        // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
-
-        // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
-
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password)) {
-            mPasswordView.setError(getString(R.string.error_field_required));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!ValidationUtil.isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgressDialog();
-
-            // TODO: 22.11.16 do sign in
-
-        }
-    }
-
-
     public void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
@@ -303,15 +240,12 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
     }
 
     @Override
-    public void onClick(View v) {
-        int i = v.getId();
-        if (i == R.id.emailSignInButton) {
-            attemptLoginWithEmail();
-        } else if (i == R.id.googleSignInButton) {
-            signInWithGoogle();
-        } else if (i == R.id.registerButton) {
-            startRegistrationActivity();
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
         }
+        return (super.onOptionsItemSelected(menuItem));
     }
 }
 

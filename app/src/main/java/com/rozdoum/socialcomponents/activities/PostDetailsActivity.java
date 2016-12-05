@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
@@ -28,6 +27,8 @@ import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.Bootstrap;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
+import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
@@ -38,7 +39,7 @@ import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.List;
 
-public class PostDetailsActivity extends AppCompatActivity {
+public class PostDetailsActivity extends BaseActivity {
 
     public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
     private static final int ANIMATION_DURATION = 300;
@@ -90,7 +91,13 @@ public class PostDetailsActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendComment();
+                ProfileStatus profileStatus = ProfileManager.getInstance(PostDetailsActivity.this).checkProfile();
+
+                if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+                    sendComment();
+                } else {
+                    doAuthorization(profileStatus);
+                }
             }
         });
 
@@ -163,12 +170,12 @@ public class PostDetailsActivity extends AppCompatActivity {
         likesContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startAnimateLikeButton(likeAnimationType);
+                ProfileStatus profileStatus = ProfileManager.getInstance(PostDetailsActivity.this).checkProfile();
 
-                if (!isLiked) {
-                    addLike();
+                if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+                    likeClickAction();
                 } else {
-                    removeLike();
+                    doAuthorization(profileStatus);
                 }
             }
         });
@@ -190,6 +197,16 @@ public class PostDetailsActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void likeClickAction() {
+        startAnimateLikeButton(likeAnimationType);
+
+        if (!isLiked) {
+            addLike();
+        } else {
+            removeLike();
+        }
     }
 
     private void startAnimateLikeButton(AnimationType animationType) {
