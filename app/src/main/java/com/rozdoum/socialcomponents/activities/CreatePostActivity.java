@@ -2,22 +2,17 @@ package com.rozdoum.socialcomponents.activities;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -40,7 +35,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
-public class CreatePostActivity extends AppCompatActivity implements OnPostCreatedListener, ChoseWayLoadImageDialog.OnChooseWayLoadImageListener {
+public class CreatePostActivity extends BaseActivity implements OnPostCreatedListener, ChoseWayLoadImageDialog.OnChooseWayLoadImageListener {
 
     private static final String TAG = CreatePostActivity.class.getSimpleName();
 
@@ -58,7 +53,6 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
 
     private ImageChooserManager imageChooserManager;
 
-    private ProgressDialog progressDialog;
     private ProgressBar progressBar;
     private String filePath;
 
@@ -73,6 +67,9 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_post_activity);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         postManager = PostManager.getInstance(CreatePostActivity.this);
 
@@ -354,43 +351,6 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
     private void populateData() {
         LogUtil.logDebug(TAG, "Populating Data");
         loadImage(imageView, filePath);
-    }
-
-    public void showProgress(int message) {
-        hideProgress();
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(message));
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-    }
-
-    public void hideProgress() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
-    }
-
-    private void hideKeyboard() {
-        // Check if no view has focus:
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
-    private void showSnackBar(int messageId) {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
-                messageId, Snackbar.LENGTH_LONG);
-        snackbar.show();
-    }
-
-    private void showWarningDialog(int messageId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.button_ok, null);
-        builder.show();
     }
 
     @Override

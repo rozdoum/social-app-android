@@ -3,18 +3,12 @@ package com.rozdoum.socialcomponents.activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -39,7 +33,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 
-public class CreateProfileActivity extends AppCompatActivity implements OnProfileCreatedListener {
+public class CreateProfileActivity extends BaseActivity implements OnProfileCreatedListener {
     private static final String TAG = CreateProfileActivity.class.getSimpleName();
     public static final int MAX_FILE_SIZE_IN_BYTES = 10485760;   //10 Mb
     private static final int MAX_AVATAR_SIZE = 1280; //px, side of square
@@ -51,7 +45,6 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
     private EditText nameEditText;
     private ImageView imageView;
     private ProgressBar progressBar;
-    private ProgressDialog mProgressDialog;
 
     private Uri imageUri;
     private Profile profile;
@@ -60,7 +53,6 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_profile);
-        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -147,33 +139,10 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgressDialog();
+            showProgress();
             profile.setUsername(name);
             ProfileManager.getInstance(this).createProfile(profile, imageUri, this);
         }
-    }
-
-    public void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    public void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
-    }
-
-    private void showWarningDialog(int messageId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.button_ok, null);
-        builder.show();
     }
 
     @SuppressLint("NewApi")
@@ -263,12 +232,6 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
         return result;
     }
 
-    private void showSnackBar(int messageId) {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
-                messageId, Snackbar.LENGTH_LONG);
-        snackbar.show();
-    }
-
     private void startCropImageActivity(Uri imageUri) {
         if (isImageFileValid(imageUri.getPath())) {
             CropImage.activity(imageUri)
@@ -304,7 +267,7 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
 
     @Override
     public void onProfileCreated(boolean success) {
-        hideProgressDialog();
+        hideProgress();
 
         if (success) {
             finish();
@@ -312,16 +275,6 @@ public class CreateProfileActivity extends AppCompatActivity implements OnProfil
         } else {
             showSnackBar(R.string.error_fail_create_profile);
         }
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-        }
-        return (super.onOptionsItemSelected(menuItem));
     }
 }
 

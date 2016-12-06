@@ -1,13 +1,9 @@
 package com.rozdoum.socialcomponents.activities;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
@@ -38,12 +34,10 @@ import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
-public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class LoginActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int SIGN_IN_GOOGLE = 9001;
     public static final int MAX_PERMISSIBLE_PROFILE_PHOTO_SIZE = 1280;
-
-    private ProgressDialog mProgressDialog;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -57,9 +51,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
-
-        ActionBar actionBar = getSupportActionBar();
-
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -163,7 +154,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private void handleFacebookAccessToken(AccessToken token) {
         LogUtil.logDebug(TAG, "handleFacebookAccessToken:" + token);
-        showProgressDialog();
+        showProgress();
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
@@ -181,14 +172,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                                     Toast.LENGTH_SHORT).show();
                         }
 
-                        hideProgressDialog();
+                        hideProgress();
                     }
                 });
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         LogUtil.logDebug(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        showProgressDialog();
+        showProgress();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
@@ -205,7 +196,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
-                        hideProgressDialog();
+                        hideProgress();
                     }
                 });
     }
@@ -221,31 +212,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private void signInWithGoogle() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, SIGN_IN_GOOGLE);
-    }
-
-    public void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    public void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-        }
-        return (super.onOptionsItemSelected(menuItem));
     }
 }
 
