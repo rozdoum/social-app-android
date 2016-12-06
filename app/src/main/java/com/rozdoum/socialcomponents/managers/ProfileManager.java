@@ -1,10 +1,8 @@
 package com.rozdoum.socialcomponents.managers;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -16,8 +14,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
-import com.rozdoum.socialcomponents.activities.CreateProfileActivity;
-import com.rozdoum.socialcomponents.activities.LoginActivity;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
@@ -50,11 +46,11 @@ public class ProfileManager {
         databaseHelper = ApplicationHelper.getDatabaseHelper();
     }
 
-    public Profile buildProfile(FirebaseUser firebaseUser, @Nullable String profilePhotoUrlLarge) {
+    public Profile buildProfile(FirebaseUser firebaseUser) {
         Profile profile = new Profile(firebaseUser.getUid());
         profile.setEmail(firebaseUser.getEmail());
         profile.setUsername(firebaseUser.getDisplayName());
-        profile.setPhotoUrl(profilePhotoUrlLarge);
+        profile.setPhotoUrl(firebaseUser.getPhotoUrl().toString());
         return profile;
     }
 
