@@ -115,8 +115,15 @@ public abstract class PickImageActivity extends BaseActivity {
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Uri imageUri = CropImage.getPickImageResultUri(this, data);
             this.imageUri = imageUri;
-            if (isImageFileValid(imageUri)) {
-                onImagePikedAction();
+            // For API >= 23 we need to check specifically that we have permissions to read external storage.
+            if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
+                // request permissions and handle the result in onRequestPermissionsResult()
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
+            } else {
+                // no permissions required or already grunted
+                if (isImageFileValid(imageUri)) {
+                    onImagePikedAction();
+                }
             }
         }
     }
@@ -130,6 +137,18 @@ public abstract class PickImageActivity extends BaseActivity {
             } else {
                 showSnackBar(R.string.permissions_not_granted);
                 LogUtil.logDebug(TAG, "CAMERA_CAPTURE_PERMISSIONS not granted");
+            }
+        }
+        if (requestCode == CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
+            if (imageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // required permissions granted, start crop image activity
+                LogUtil.logDebug(TAG, "PICK_IMAGE_PERMISSIONS granted");
+//                if (isImageFileValid(imageUri)) {
+                onImagePikedAction();
+//                }
+            } else {
+                showSnackBar(R.string.permissions_not_granted);
+                LogUtil.logDebug(TAG, "PICK_IMAGE_PERMISSIONS not granted");
             }
         }
     }
