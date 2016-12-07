@@ -1,6 +1,7 @@
 package com.rozdoum.socialcomponents.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -28,9 +29,8 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
@@ -72,10 +72,18 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                 if (user != null) {
                     // Profile is signed in
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Profile profile = ProfileManager.getInstance(LoginActivity.this)
-                            .buildProfile(user, profilePhotoUrlLarge);
-                    startCreateProfileActivity(profile);
-                    finish();
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                            .setPhotoUri(Uri.parse(profilePhotoUrlLarge))
+                            .build();
+
+                    user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            hideProgress();
+                            startCreateProfileActivity();
+                            finish();
+                        }
+                    });
                 } else {
                     // Profile is signed out
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_out");
@@ -115,6 +123,10 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
+
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
     }
 
     @Override
@@ -122,6 +134,11 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
         super.onStop();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
+        }
+
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.stopAutoManage(this);
+            mGoogleApiClient.disconnect();
         }
     }
 
@@ -134,6 +151,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
         if (requestCode == SIGN_IN_GOOGLE) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
+                showProgress();
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
                 profilePhotoUrlLarge = String.format(getString(R.string.google_large_image_url_pattern),
@@ -146,9 +164,8 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
         }
     }
 
-    private void startCreateProfileActivity(Profile profile) {
+    private void startCreateProfileActivity() {
         Intent intent = new Intent(LoginActivity.this, CreateProfileActivity.class);
-        intent.putExtra(CreateProfileActivity.PROFILE_EXTRA_KEY, profile);
         startActivity(intent);
     }
 
@@ -171,8 +188,6 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
-
-                        hideProgress();
                     }
                 });
     }
@@ -196,7 +211,6 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
-                        hideProgress();
                     }
                 });
     }

@@ -88,7 +88,7 @@ public abstract class PickImageActivity extends BaseActivity {
         boolean result = false;
 
         if (imageUri != null) {
-            if (ValidationUtil.isImage(imageUri.getPath())) {
+            if (ValidationUtil.isImage(imageUri, this)) {
                 File imageFile = new File(imageUri.getPath());
                 if (imageFile.length() > MAX_FILE_SIZE_IN_BYTES) {
                     message = R.string.error_bigger_file;

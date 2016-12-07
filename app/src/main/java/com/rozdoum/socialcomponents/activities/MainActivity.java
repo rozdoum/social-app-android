@@ -44,6 +44,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     private PostsAdapter postsAdapter;
 
     private FirebaseAuth mAuth;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,24 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
 
         mAuth = FirebaseAuth.getInstance();
         initContentView();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.stopAutoManage(this);
+            mGoogleApiClient.disconnect();
+        }
     }
 
     private void startMainActivity() {
@@ -145,8 +164,14 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.OnConn
     }
 
     private void logoutGoogle() {
-        final GoogleApiClient mGoogleApiClient = GoogleApiHelper.createGoogleApiClient(this);
-        mGoogleApiClient.connect();
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = GoogleApiHelper.createGoogleApiClient(this);
+        }
+
+        if (!mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+
         mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
             @Override
             public void onConnected(@Nullable Bundle bundle) {
