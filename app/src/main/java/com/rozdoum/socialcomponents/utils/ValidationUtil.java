@@ -1,5 +1,8 @@
 package com.rozdoum.socialcomponents.utils;
 
+import android.content.Context;
+import android.net.Uri;
+
 /**
  * Created by Kristina on 8/8/15.
  */
@@ -43,18 +46,24 @@ public class ValidationUtil {
         return password.length() >= 6;
     }
 
-    public static boolean isImage(String path){
+    public static boolean isImage(Uri uri, Context context) {
+        String mimeType = context.getContentResolver().getType(uri);
 
-        String filenameArray[] = path.split("\\.");
-        String extension = filenameArray[filenameArray.length-1];
+        if (mimeType != null) {
+            return mimeType.contains("image");
+        } else {
+            String filenameArray[] = uri.getPath().split("\\.");
+            String extension = filenameArray[filenameArray.length - 1];
 
-        if (extension != null) {
-            for (String type : IMAGE_TYPE) {
-                if (type.toLowerCase().equals(extension.toLowerCase())) {
-                    return true;
+            if (extension != null) {
+                for (String type : IMAGE_TYPE) {
+                    if (type.toLowerCase().equals(extension.toLowerCase())) {
+                        return true;
+                    }
                 }
             }
         }
+
         return false;
     }
 
