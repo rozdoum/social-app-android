@@ -11,27 +11,29 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 
 public abstract class PickImageActivity extends BaseActivity {
     private static final String TAG = PickImageActivity.class.getSimpleName();
-    public static final int MAX_FILE_SIZE_IN_BYTES = 10485760;   //10 Mb
+    protected static final int MAX_FILE_SIZE_IN_BYTES = 10485760;   //10 Mb
     private static final String SAVED_STATE_IMAGE_URI = "RegistrationActivity.SAVED_STATE_IMAGE_URI";
 
-    public Uri imageUri;
+    protected Uri imageUri;
 
-    public abstract ProgressBar getProgressView();
+    protected abstract ProgressBar getProgressView();
 
-    public abstract ImageView getImageView();
+    protected abstract ImageView getImageView();
 
-    public abstract void onImagePikedAction();
+    protected abstract void onImagePikedAction();
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -60,7 +62,7 @@ public abstract class PickImageActivity extends BaseActivity {
         }
     }
 
-    public void loadImageToImageView() {
+    protected void loadImageToImageView() {
         Picasso.with(PickImageActivity.this)
                 .load(imageUri)
                 .fit()
@@ -83,7 +85,7 @@ public abstract class PickImageActivity extends BaseActivity {
                 });
     }
 
-    public boolean isImageFileValid(Uri imageUri) {
+    protected boolean isImageFileValid(Uri imageUri) {
         int message = R.string.error_general;
         boolean result = false;
 
@@ -151,6 +153,28 @@ public abstract class PickImageActivity extends BaseActivity {
                 LogUtil.logDebug(TAG, "PICK_IMAGE_PERMISSIONS not granted");
             }
         }
+    }
+
+    protected void handleCropImageResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                imageUri = result.getUri();
+                loadImageToImageView();
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                LogUtil.logError(TAG, "crop image error", result.getError());
+                showSnackBar(R.string.error_fail_crop_image);
+            }
+        }
+    }
+
+    protected void startCropImageActivity() {
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setFixAspectRatio(true)
+                .setMinCropResultSize(Constants.Profile.MIN_AVATAR_SIZE, Constants.Profile.MIN_AVATAR_SIZE)
+                .setRequestedSize(Constants.Profile.MAX_AVATAR_SIZE, Constants.Profile.MAX_AVATAR_SIZE)
+                .start(this);
     }
 }
 

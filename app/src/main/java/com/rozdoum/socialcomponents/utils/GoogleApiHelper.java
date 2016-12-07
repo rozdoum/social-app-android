@@ -15,7 +15,7 @@ public class GoogleApiHelper {
         if (fragmentActivity instanceof GoogleApiClient.OnConnectionFailedListener) {
             failedListener = (GoogleApiClient.OnConnectionFailedListener) fragmentActivity;
         } else {
-            throw new IllegalArgumentException(fragmentActivity.getClass().getSimpleName() + " should implement ListWithDetailsActivity");
+            throw new IllegalArgumentException(fragmentActivity.getClass().getSimpleName() + " should implement OnConnectionFailedListener");
         }
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

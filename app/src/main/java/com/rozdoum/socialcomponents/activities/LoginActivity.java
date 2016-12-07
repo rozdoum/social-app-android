@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
@@ -37,7 +38,6 @@ import com.rozdoum.socialcomponents.utils.LogUtil;
 public class LoginActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int SIGN_IN_GOOGLE = 9001;
-    public static final int MAX_PERMISSIBLE_PROFILE_PHOTO_SIZE = 1280;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -155,7 +155,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
                 profilePhotoUrlLarge = String.format(getString(R.string.google_large_image_url_pattern),
-                        account.getPhotoUrl(), MAX_PERMISSIBLE_PROFILE_PHOTO_SIZE);
+                        account.getPhotoUrl(), Constants.Profile.MAX_AVATAR_SIZE);
                 firebaseAuthWithGoogle(account);
             } else {
                 LogUtil.logDebug(TAG, "SIGN_IN_GOOGLE failed :" + result);

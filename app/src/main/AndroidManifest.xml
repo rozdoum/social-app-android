@@ -50,6 +50,12 @@
             android:label="@string/title_activity_create_profile"/>
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
+        <activity
+            android:name=".activities.ProfileActivity"
+            android:label="@string/title_activity_profile" />
+        <activity
+            android:name=".activities.EditProfileActivity"
+            android:label="@string/title_activity_edit_profile" />
     </application>
 
 </manifest>

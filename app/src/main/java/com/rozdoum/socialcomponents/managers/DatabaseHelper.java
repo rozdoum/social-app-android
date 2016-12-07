@@ -19,6 +19,7 @@ import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Comment;
@@ -168,6 +169,23 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void getProfile(String id, final OnObjectChangedListener<Profile> listener) {
+        DatabaseReference databaseReference = getDatabaseReference().child("profiles").child(id);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Profile profile = dataSnapshot.getValue(Profile.class);
+                listener.onObjectChanged(profile);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
 
             }
         });

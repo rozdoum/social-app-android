@@ -4,28 +4,24 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
-import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
-public class CreateProfileActivity extends PickImageActivity implements OnProfileCreatedListener {
-    private static final String TAG = CreateProfileActivity.class.getSimpleName();
-    public static final String PROFILE_EXTRA_KEY = "CreateProfileActivity.PROFILE_EXTRA_KEY";
+public class EditProfileActivity extends PickImageActivity implements OnProfileCreatedListener {
+    private static final String TAG = EditProfileActivity.class.getSimpleName();
 
     // UI references.
     private EditText nameEditText;
@@ -37,7 +33,7 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_profile);
+        setContentView(R.layout.activity_edit_profile);
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -47,31 +43,19 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
         imageView = (ImageView) findViewById(R.id.imageView);
         nameEditText = (EditText) findViewById(R.id.nameEditText);
 
+        showProgress();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        profile = ProfileManager.getInstance(this).buildProfile(firebaseUser);
-
-        nameEditText.setText(profile.getUsername());
-
-        if (profile.getPhotoUrl() != null) {
-            ImageUtil.getInstance(this).getImage(profile.getPhotoUrl(), imageView, R.drawable.ic_stub, R.drawable.ic_stub);
-        }
-
-        nameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.createProdile || id == EditorInfo.IME_NULL) {
-                    attemptCreateProfile();
-                    return true;
-                }
-                return false;
-            }
-        });
+        ProfileManager.getInstance(this).getProfile(firebaseUser.getUid(), createOnProfileChangedListener());
 
         Button createProfileButton = (Button) findViewById(R.id.createProfileButton);
         createProfileButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptCreateProfile();
+                if (hasInternetConnection(EditProfileActivity.this)) {
+                    attemptCreateProfile();
+                } else {
+                    showWarningDialog(R.string.error_internet_unavailable);
+                }
             }
         });
 
@@ -96,6 +80,28 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
     @Override
     public void onImagePikedAction() {
         startCropImageActivity();
+    }
+
+    private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
+        return new OnObjectChangedListener<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                profile = obj;
+                fillUIFields();
+            }
+        };
+    }
+
+    private void fillUIFields() {
+        if (profile != null) {
+            nameEditText.setText(profile.getUsername());
+
+            if (profile.getPhotoUrl() != null) {
+                ImageUtil.getInstance(this).getImage(profile.getPhotoUrl(), imageView, progressBar,
+                        R.drawable.ic_stub, R.drawable.ic_stub);
+            }
+        }
+        hideProgress();
     }
 
     private void attemptCreateProfile() {
@@ -136,15 +142,16 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
         handleCropImageResult(requestCode, resultCode, data);
     }
 
+
+
     @Override
     public void onProfileCreated(boolean success) {
         hideProgress();
 
         if (success) {
             finish();
-            PreferencesUtil.setProfileCreated(this, success);
         } else {
-            showSnackBar(R.string.error_fail_create_profile);
+            showSnackBar(R.string.error_fail_update_profile);
         }
     }
 }

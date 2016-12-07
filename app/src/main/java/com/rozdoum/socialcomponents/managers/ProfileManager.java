@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
@@ -103,6 +104,10 @@ public class ProfileManager {
             onProfileCreatedListener.onProfileCreated(false);
             LogUtil.logDebug(TAG, "fail to upload image");
         }
+    }
+
+    public void getProfile(String id, final OnObjectChangedListener<Profile> listener) {
+        databaseHelper.getProfile(id, listener);
     }
 
     public ProfileStatus checkProfile() {

@@ -3,6 +3,8 @@ package com.rozdoum.socialcomponents.activities;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -96,6 +98,18 @@ public class BaseActivity extends AppCompatActivity {
         builder.setMessage(messageId);
         builder.setPositiveButton(R.string.button_ok, null);
         builder.show();
+    }
+
+    public static boolean hasInternetConnection(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public void checkInternetConnection() {
+        if (!hasInternetConnection(this)) {
+            showWarningDialog(R.string.error_internet_unavailable);
+        }
     }
 
     @Override
