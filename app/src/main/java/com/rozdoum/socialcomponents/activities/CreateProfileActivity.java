@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
@@ -50,7 +52,8 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
         imageView = (ImageView) findViewById(R.id.imageView);
         nameEditText = (EditText) findViewById(R.id.nameEditText);
 
-        profile = (Profile) getIntent().getSerializableExtra(PROFILE_EXTRA_KEY);
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        profile = ProfileManager.getInstance(this).buildProfile(firebaseUser);
 
         nameEditText.setText(profile.getUsername());
 

@@ -41,7 +41,7 @@ public class BaseActivity extends AppCompatActivity {
             startLoginActivity();
         } else if (status.equals(ProfileStatus.NO_PROFILE)) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            Profile profile = ProfileManager.getInstance(this).buildProfile(user, null);
+            Profile profile = ProfileManager.getInstance(this).buildProfile(user);
             startCreateProfileActivity(profile);
         }
     }
@@ -58,13 +58,13 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void showProgress() {
-        showProgress(-1);
+        showProgress(R.string.loading);
     }
 
     public void showProgress(int message) {
         hideProgress();
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(message != -1 ? message : R.string.loading));
+        progressDialog.setMessage(getString(message));
         progressDialog.setCancelable(false);
         progressDialog.show();
     }
