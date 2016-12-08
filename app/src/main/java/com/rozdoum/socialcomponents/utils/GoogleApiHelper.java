@@ -24,7 +24,7 @@ public class GoogleApiHelper {
                 .build();
 
         return new GoogleApiClient.Builder(fragmentActivity)
-                .enableAutoManage(fragmentActivity /* FragmentActivity */, failedListener /* OnConnectionFailedListener */)
+                .enableAutoManage(fragmentActivity, failedListener)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
     }
