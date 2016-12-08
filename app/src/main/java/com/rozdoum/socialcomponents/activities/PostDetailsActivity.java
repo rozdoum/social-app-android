@@ -34,7 +34,6 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Comment;
@@ -93,7 +92,7 @@ public class PostDetailsActivity extends BaseActivity {
         String imageUrl = post.getImagePath();
 
         ImageUtil imageUtil = ImageUtil.getInstance(this);
-        imageUtil.getImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub, R.drawable.ic_stub);
+        imageUtil.getFullImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override

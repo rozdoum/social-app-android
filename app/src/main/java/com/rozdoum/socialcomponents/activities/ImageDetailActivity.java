@@ -48,7 +48,7 @@ public class ImageDetailActivity extends BaseActivity {
         String imageUrl = getIntent().getStringExtra(IMAGE_URL_EXTRA_KEY);
 
         ImageUtil imageUtil = ImageUtil.getInstance(this);
-        imageUtil.getImage(imageUrl, touchImageView, progressBar, R.drawable.ic_stub, R.drawable.ic_stub);
+        imageUtil.getFullImage(imageUrl, touchImageView, progressBar, R.drawable.ic_stub);
 
         touchImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,14 +61,5 @@ public class ImageDetailActivity extends BaseActivity {
                 }
             }
         });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-        }
-        return (super.onOptionsItemSelected(menuItem));
     }
 }
