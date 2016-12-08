@@ -11,6 +11,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
@@ -63,6 +65,7 @@ public class DatabaseHelper {
 
     public void init() {
         database = FirebaseDatabase.getInstance();
+        database.setPersistenceEnabled(true);
         storage = FirebaseStorage.getInstance();
     }
 
@@ -97,21 +100,51 @@ public class DatabaseHelper {
         }
     }
 
-    public void createOrUpdateComment(String commentText, String postId) {
+    public void createOrUpdateComment(String commentText, final String postId) {
         try {
-            DatabaseReference mCommentsReference = database.getReference().child("post-comments").child(postId);
-            mCommentsReference.push();
-            String commentId = mCommentsReference.getKey();
+            DatabaseReference mCommentsReference = database.getReference().child("post-comments/" + postId);
+            String commentId = mCommentsReference.push().getKey();
             Comment comment = new Comment(commentText);
             comment.setId(commentId);
 
-            mCommentsReference.child(commentId).setValue(comment);
+            mCommentsReference.child(commentId).setValue(comment, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        incrementCommentsCount(postId);
+                    } else {
+                        LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
+                    }
+                }
+
+                private void incrementCommentsCount(String postId) {
+                    DatabaseReference postRef = database.getReference("posts/" + postId + "/commentsCount");
+                    postRef.runTransaction(new Transaction.Handler() {
+                        @Override
+                        public Transaction.Result doTransaction(MutableData mutableData) {
+                            Integer currentValue = mutableData.getValue(Integer.class);
+                            if (currentValue == null) {
+                                mutableData.setValue(1);
+                            } else {
+                                mutableData.setValue(currentValue + 1);
+                            }
+
+                            return Transaction.success(mutableData);
+                        }
+
+                        @Override
+                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                            LogUtil.logInfo(TAG, "Updating comments count transaction is completed.");
+                        }
+                    });
+                }
+            });
         } catch (Exception e) {
             LogUtil.logError(TAG, "createOrUpdateComment()", e);
         }
     }
 
-    public void createOrUpdateLike(String postId, String authorId) {
+    public void createOrUpdateLike(final String postId, String authorId) {
         try {
             DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
             mLikesReference.push();
@@ -119,16 +152,79 @@ public class DatabaseHelper {
             Like like = new Like(authorId);
             like.setId(id);
 
-            mLikesReference.child(id).setValue(like);
+            mLikesReference.child(id).setValue(like, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        incrementLikesCount(postId);
+                    } else {
+                        LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
+                    }
+                }
+
+                private void incrementLikesCount(String postId) {
+                    DatabaseReference postRef = database.getReference("posts/" + postId + "/likesCount");
+                    postRef.runTransaction(new Transaction.Handler() {
+                        @Override
+                        public Transaction.Result doTransaction(MutableData mutableData) {
+                            Integer currentValue = mutableData.getValue(Integer.class);
+                            if (currentValue == null) {
+                                mutableData.setValue(1);
+                            } else {
+                                mutableData.setValue(currentValue + 1);
+                            }
+
+                            return Transaction.success(mutableData);
+                        }
+
+                        @Override
+                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                            LogUtil.logInfo(TAG, "Updating likes count transaction is completed.");
+                        }
+                    });
+                }
+
+            });
         } catch (Exception e) {
             LogUtil.logError(TAG, "createOrUpdateLike()", e);
         }
 
     }
 
-    public void removeLike(String postId, String authorId) {
+    public void removeLike(final String postId, String authorId) {
         DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
-        mLikesReference.removeValue();
+        mLikesReference.removeValue(new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    decrementLikesCount(postId);
+                } else {
+                    LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
+                }
+            }
+
+            private void decrementLikesCount(String postId) {
+                DatabaseReference postRef = database.getReference("posts/" + postId + "/likesCount");
+                postRef.runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Integer currentValue = mutableData.getValue(Integer.class);
+                        if (currentValue == null) {
+                            mutableData.setValue(0);
+                        } else {
+                            mutableData.setValue(currentValue - 1);
+                        }
+
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                        LogUtil.logInfo(TAG, "Updating likes count transaction is completed.");
+                    }
+                });
+            }
+        });
     }
 
     public UploadTask uploadImage(Uri uri) {
@@ -144,6 +240,7 @@ public class DatabaseHelper {
 
     public void getPostList(final OnDataChangedListener<Post> onDataChangedListener) {
         DatabaseReference databaseReference = database.getReference("posts");
+        databaseReference.keepSynced(true);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -160,6 +257,12 @@ public class DatabaseHelper {
                         post.setDescription((String) mapObj.get("description"));
                         post.setImagePath((String) mapObj.get("imagePath"));
                         post.setCreatedDate((long) mapObj.get("createdDate"));
+                        if (mapObj.containsValue("commentsCount")) {
+                            post.setCommentsCount((int) mapObj.get("commentsCount"));
+                        }
+                        if (mapObj.containsValue("likesCount")) {
+                            post.setLikesCount((int) mapObj.get("likesCount"));
+                        }
                         list.add(post);
                     }
                 }
@@ -211,22 +314,6 @@ public class DatabaseHelper {
 
                 onDataChangedListener.onListChanged(list);
 
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    public void getLikesCount(String postId, final OnCountChangedListener<Like> onCountChangedListener) {
-        DatabaseReference databaseReference = database.getReference("post-likes").child(postId);
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                long count = dataSnapshot.getChildrenCount();
-                onCountChangedListener.onCountChanged(count);
             }
 
             @Override

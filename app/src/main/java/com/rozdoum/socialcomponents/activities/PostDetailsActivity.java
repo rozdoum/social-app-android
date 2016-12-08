@@ -23,13 +23,17 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.Bootstrap;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Comment;
@@ -56,6 +60,8 @@ public class PostDetailsActivity extends BaseActivity {
     private boolean isLiked = false;
     private boolean likeIconInitialized = false;
 
+    private String postId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +71,11 @@ public class PostDetailsActivity extends BaseActivity {
         }
 
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
+        postId = post.getId();
 
         TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
         TextView descriptionEditText = (TextView) findViewById(R.id.descriptionEditText);
-        ImageView postImageView = (ImageView) findViewById(R.id.postImageView);
+        final ImageView postImageView = (ImageView) findViewById(R.id.postImageView);
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
         LinearLayout commentsContainer = (LinearLayout) findViewById(R.id.commentsContainer);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
@@ -79,14 +86,13 @@ public class PostDetailsActivity extends BaseActivity {
         likesImageView = (ImageView) findViewById(R.id.likesImageView);
         likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
 
-
         titleTextView.setText(post.getTitle());
         descriptionEditText.setText(post.getDescription());
 
         String imageUrl = post.getImagePath();
 
         ImageUtil imageUtil = ImageUtil.getInstance(this);
-        imageUtil.getImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub, R.drawable.ic_stub);
+        imageUtil.getFullImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +118,30 @@ public class PostDetailsActivity extends BaseActivity {
         });
 
         initLikes();
+
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                post = dataSnapshot.getValue(Post.class);
+                post.setId(postId);
+                updateValues();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        DatabaseReference postReference = FirebaseDatabase.getInstance().getReference().child("posts").child(postId);
+        postReference.addValueEventListener(valueEventListener);
+    }
+
+    private void updateValues() {
+        commentsLabel.setVisibility(View.VISIBLE);
+        commentsLabel.setText(String.format(getString(R.string.label_comments), post.getCommentsCount()));
+
+        String likeTextFormat = getString(R.string.label_likes);
+        likeCounterTextView.setText(String.format(likeTextFormat, post.getLikesCount()));
     }
 
     private OnDataChangedListener<Comment> createOnPostChangedDataListener(final CommentsAdapter commentsAdapter) {
@@ -119,22 +149,6 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onListChanged(List<Comment> list) {
                 commentsAdapter.setList(list);
-                if (list.size() > 0) {
-                    commentsLabel.setVisibility(View.VISIBLE);
-                    commentsLabel.setText(String.format(getString(R.string.label_comments), list.size()));
-                } else {
-                    commentsLabel.setVisibility(View.GONE);
-                }
-            }
-        };
-    }
-
-    private OnCountChangedListener<Like> createOnLikeCountChangedListener() {
-        return new OnCountChangedListener<Like>() {
-            @Override
-            public void onCountChanged(long count) {
-                String likeTextFormat = getString(R.string.label_likes);
-                likeCounterTextView.setText(String.format(likeTextFormat, count));
             }
         };
     }
@@ -164,8 +178,6 @@ public class PostDetailsActivity extends BaseActivity {
 
         //set default animation type
         likeAnimationType = AnimationType.BOUNCE_ANIM;
-
-        ApplicationHelper.getDatabaseHelper().getLikesCount(post.getId(), createOnLikeCountChangedListener());
 
         likesContainer.setOnClickListener(new View.OnClickListener() {
             @Override
