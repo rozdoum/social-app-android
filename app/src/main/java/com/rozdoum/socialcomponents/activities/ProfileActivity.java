@@ -96,8 +96,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             nameEditText.setText(profile.getUsername());
 
             if (profile.getPhotoUrl() != null) {
-                ImageUtil.getInstance(this).getImage(profile.getPhotoUrl(), imageView, progressBar,
-                        R.drawable.ic_stub, R.drawable.ic_stub);
+                ImageUtil.getInstance(this).getFullImage(profile.getPhotoUrl(), imageView, progressBar,
+                        R.drawable.ic_stub);
             }
         }
         hideProgress();

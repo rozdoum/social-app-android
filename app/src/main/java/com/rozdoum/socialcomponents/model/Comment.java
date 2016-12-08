@@ -12,6 +12,7 @@ public class Comment {
 
     private String id;
     private String text;
+    private String authorId;
     private long createdDate;
 
 
@@ -39,6 +40,14 @@ public class Comment {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public long getCreatedDate() {
