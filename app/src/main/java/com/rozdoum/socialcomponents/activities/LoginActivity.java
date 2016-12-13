@@ -32,8 +32,12 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
+import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
 public class LoginActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -68,7 +72,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // Profile is signed in
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
@@ -79,9 +83,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                     user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            hideProgress();
-                            startCreateProfileActivity();
-                            finish();
+                            checkIsProfileExist(user.getUid());
                         }
                     });
                 } else {
@@ -162,6 +164,21 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                 // Google Sign In failed, update UI appropriately
             }
         }
+    }
+
+    private void checkIsProfileExist(String userId) {
+        ProfileManager.getInstance(this).isProfileExist(userId, new OnObjectExistListener<Profile>() {
+            @Override
+            public void onDataChanged(boolean exist) {
+                if (!exist) {
+                    startCreateProfileActivity();
+                } else {
+                    PreferencesUtil.setProfileCreated(LoginActivity.this, true);
+                }
+                hideProgress();
+                finish();
+            }
+        });
     }
 
     private void startCreateProfileActivity() {
