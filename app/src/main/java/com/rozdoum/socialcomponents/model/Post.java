@@ -18,6 +18,7 @@ public class Post implements Serializable{
     private String description;
     private long createdDate;
     private String imagePath;
+    private String authorId;
     private int commentsCount;
     private int likesCount;
 
@@ -55,6 +56,14 @@ public class Post implements Serializable{
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public long getCreatedDate() {

@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
@@ -88,6 +89,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             Post post = new Post();
             post.setTitle(title);
             post.setDescription(description);
+            post.setAuthorId(FirebaseAuth.getInstance().getCurrentUser().getUid());
             postManager.createPostWithImage(imageUri.getPath(), CreatePostActivity.this, post);
         } else {
             showWarningDialog(warningMessageRes);

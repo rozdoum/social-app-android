@@ -23,13 +23,14 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rozdoum.socialcomponents.ApplicationHelper;
-import com.rozdoum.socialcomponents.Bootstrap;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
@@ -136,6 +137,12 @@ public class PostDetailsActivity extends BaseActivity {
         postReference.addValueEventListener(valueEventListener);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initLikeButtonState();
+    }
+
     private void updateValues() {
         commentsLabel.setVisibility(View.VISIBLE);
         commentsLabel.setText(String.format(getString(R.string.label_comments), post.getCommentsCount()));
@@ -173,9 +180,14 @@ public class PostDetailsActivity extends BaseActivity {
         };
     }
 
-    private void initLikes() {
-        ApplicationHelper.getDatabaseHelper().hasCurrentUserLike(post.getId(), Bootstrap.USER_ID, createOnLikeObjectExistListener());
+    private void initLikeButtonState() {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            ApplicationHelper.getDatabaseHelper().hasCurrentUserLike(post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
+        }
+    }
 
+    private void initLikes() {
         //set default animation type
         likeAnimationType = AnimationType.BOUNCE_ANIM;
 
@@ -290,11 +302,11 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void addLike() {
-        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId(), Bootstrap.USER_ID);
+        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId());
     }
 
     private void removeLike() {
-        ApplicationHelper.getDatabaseHelper().removeLike(post.getId(), Bootstrap.USER_ID);
+        ApplicationHelper.getDatabaseHelper().removeLike(post.getId());
     }
 
     private void sendComment() {
