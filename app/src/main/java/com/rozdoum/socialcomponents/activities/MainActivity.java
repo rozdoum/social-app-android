@@ -3,6 +3,7 @@ package com.rozdoum.socialcomponents.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,11 +13,7 @@ import android.view.View;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
-import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
+            SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            postsAdapter = new PostsAdapter(this);
+            postsAdapter = new PostsAdapter(this, swipeContainer);
 
             postsAdapter.setOnItemClickListener(new PostsAdapter.OnItemClickListener() {
 
@@ -76,17 +74,8 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setAdapter(postsAdapter);
-
             recyclerView.setAdapter(postsAdapter);
-
-            OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
-                @Override
-                public void onListChanged(List<Post> list) {
-                    postsAdapter.setList(list);
-                }
-            };
-
-            PostManager.getInstance(getApplicationContext()).getPosts(onPostsDataChangedListener);
+            postsAdapter.loadFirstPage();
         }
     }
 

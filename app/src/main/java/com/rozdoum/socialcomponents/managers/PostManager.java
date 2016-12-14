@@ -47,8 +47,8 @@ public class PostManager {
         }
     }
 
-    public void getPosts(OnDataChangedListener<Post> onDataChangedListener) {
-        ApplicationHelper.getDatabaseHelper().getPostList(onDataChangedListener);
+    public void getPosts(OnDataChangedListener<Post> onDataChangedListener, long date) {
+        ApplicationHelper.getDatabaseHelper().getPostList(onDataChangedListener, date);
     }
 
     public void createPostWithImage(String filePath, final OnPostCreatedListener onPostCreatedListener, final Post post) {

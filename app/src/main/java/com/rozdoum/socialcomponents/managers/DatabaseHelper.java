@@ -9,6 +9,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -38,6 +39,7 @@ public class DatabaseHelper {
     public static final String TAG = DatabaseHelper.class.getSimpleName();
 
     private static DatabaseHelper instance;
+    private static final int POST_AMOUNT_ON_PAGE = 10;
 
     private Context context;
     private FirebaseDatabase database;
@@ -214,36 +216,20 @@ public class DatabaseHelper {
         return riversRef.putFile(uri, metadata);
     }
 
-    public void getPostList(final OnDataChangedListener<Post> onDataChangedListener) {
+    public void getPostList(final OnDataChangedListener<Post> onDataChangedListener, long date) {
         DatabaseReference databaseReference = database.getReference("posts");
-        databaseReference.keepSynced(true);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        Query postsQuery;
+        if (date == 0) {
+            postsQuery = databaseReference.limitToLast(POST_AMOUNT_ON_PAGE).orderByChild("createdDate");
+        } else {
+            postsQuery = databaseReference.limitToLast(POST_AMOUNT_ON_PAGE).endAt(date).orderByChild("createdDate");
+        }
+
+        postsQuery.keepSynced(true);
+        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Object> objectMap = (HashMap<String, Object>)
-                        dataSnapshot.getValue();
-                List<Post> list = new ArrayList<Post>();
-                for (String key : objectMap.keySet()) {
-                    Object obj = objectMap.get(key);
-                    if (obj instanceof Map) {
-                        Map<String, Object> mapObj = (Map<String, Object>) obj;
-                        Post post = new Post();
-                        post.setId(key);
-                        post.setTitle((String) mapObj.get("title"));
-                        post.setDescription((String) mapObj.get("description"));
-                        post.setImagePath((String) mapObj.get("imagePath"));
-                        post.setCreatedDate((long) mapObj.get("createdDate"));
-                        if (mapObj.containsValue("commentsCount")) {
-                            post.setCommentsCount((int) mapObj.get("commentsCount"));
-                        }
-                        if (mapObj.containsValue("likesCount")) {
-                            post.setLikesCount((int) mapObj.get("likesCount"));
-                        }
-                        list.add(post);
-                    }
-                }
-
-                onDataChangedListener.onListChanged(list);
+                onDataChangedListener.onListChanged(parsePostList(dataSnapshot));
             }
 
             @Override
@@ -251,6 +237,42 @@ public class DatabaseHelper {
 
             }
         });
+    }
+
+    private List<Post> parsePostList(DataSnapshot dataSnapshot) {
+        Map<String, Object> objectMap = (HashMap<String, Object>)
+                dataSnapshot.getValue();
+        List<Post> list = new ArrayList<Post>();
+        if (objectMap != null) {
+            for (String key : objectMap.keySet()) {
+                Object obj = objectMap.get(key);
+                if (obj instanceof Map) {
+                    Map<String, Object> mapObj = (Map<String, Object>) obj;
+                    Post post = new Post();
+                    post.setId(key);
+                    post.setTitle((String) mapObj.get("title"));
+                    post.setDescription((String) mapObj.get("description"));
+                    post.setImagePath((String) mapObj.get("imagePath"));
+                    post.setCreatedDate((long) mapObj.get("createdDate"));
+                    if (mapObj.containsValue("commentsCount")) {
+                        post.setCommentsCount((int) mapObj.get("commentsCount"));
+                    }
+                    if (mapObj.containsValue("likesCount")) {
+                        post.setLikesCount((int) mapObj.get("likesCount"));
+                    }
+                    list.add(post);
+                }
+            }
+
+            Collections.sort(list, new Comparator<Post>() {
+                @Override
+                public int compare(Post lhs, Post rhs) {
+                    return ((Long) rhs.getCreatedDate()).compareTo(lhs.getCreatedDate());
+                }
+            });
+        }
+
+        return list;
     }
 
     public void getCommentsList(String postId, final OnDataChangedListener<Comment> onDataChangedListener) {
