@@ -40,11 +40,11 @@ import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = LoginActivity.class.getSimpleName();
-public class MainActivity extends AppCompatActivity {
 
     private PostsAdapter postsAdapter;
     private RecyclerView recyclerView;
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void  initContentView() {
+    private void initContentView() {
         if (recyclerView == null) {
             FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
 
@@ -106,8 +106,7 @@ public class MainActivity extends AppCompatActivity {
             SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             postsAdapter = new PostsAdapter(this, swipeContainer);
-
-            OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
+            postsAdapter.setOnItemClickListener(new PostsAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
@@ -155,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
     private void logoutFirebase() {
         mAuth.signOut();
         PreferencesUtil.setProfileCreated(this, false);
-//        startMainActivity();
     }
 
     private void logoutFacebook() {
