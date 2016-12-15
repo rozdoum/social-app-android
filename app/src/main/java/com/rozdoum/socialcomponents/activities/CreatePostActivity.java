@@ -1,71 +1,32 @@
 package com.rozdoum.socialcomponents.activities;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.kbeanie.imagechooser.api.ChooserType;
-import com.kbeanie.imagechooser.api.ChosenImage;
-import com.kbeanie.imagechooser.api.ChosenImages;
-import com.kbeanie.imagechooser.api.ImageChooserListener;
-import com.kbeanie.imagechooser.api.ImageChooserManager;
+import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.dialogs.ChoseWayLoadImageDialog;
-import com.rozdoum.socialcomponents.enums.TakePictureMenu;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
-import com.rozdoum.socialcomponents.utils.LogUtil;
-import com.rozdoum.socialcomponents.utils.ValidationUtil;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
-public class CreatePostActivity extends AppCompatActivity implements OnPostCreatedListener, ChoseWayLoadImageDialog.OnChooseWayLoadImageListener {
+public class CreatePostActivity extends PickImageActivity implements OnPostCreatedListener {
 
     private static final String TAG = CreatePostActivity.class.getSimpleName();
 
-    private static final int HANDLE_CAMERA_PERM = 2;
-    private static final int WRITE_EXTERNAL_STORAGE_PERM = 3;
-
-    private static final String SAVED_STATE_ACTIVITY_RESULT_OVER = "MainActivity.activity_result_over";
-    private static final String SAVED_STATE_CHOOSER_TYPE = "MainActivity.chooserType";
-    private static final String SAVED_STATE_FILE_PATH = "MainActivity.filePath";
-
-    public static final int MAX_FILE_SIZE_IN_BYTES = 10485760;   //10 Mb
-
     private ImageView imageView;
-    private int chooserType;
-
-    private ImageChooserManager imageChooserManager;
-
-    private ProgressDialog progressDialog;
     private ProgressBar progressBar;
-    private String filePath;
-
     private EditText titleEditText;
     private EditText descriptionEditText;
-
-    private boolean isActivityResultOver = false;
 
     private PostManager postManager;
 
@@ -73,6 +34,9 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_post_activity);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         postManager = PostManager.getInstance(CreatePostActivity.this);
 
@@ -85,10 +49,24 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChoseWayLoadImageDialog chooserDialog = new ChoseWayLoadImageDialog();
-                chooserDialog.show(getFragmentManager(), TAG);
+                onSelectImageClick(v);
             }
         });
+    }
+
+    @Override
+    public ProgressBar getProgressView() {
+        return progressBar;
+    }
+
+    @Override
+    public ImageView getImageView() {
+        return imageView;
+    }
+
+    @Override
+    public void onImagePikedAction() {
+        loadImageToImageView();
     }
 
     private void attemptCreatePost() {
@@ -96,7 +74,7 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         String title = titleEditText.getText().toString();
         String description = descriptionEditText.getText().toString();
 
-        if (filePath == null || !(new File(filePath).exists())) {
+        if (imageUri == null || !(new File(imageUri.getPath()).exists())) {
             warningMessageRes = R.string.warning_empty_image;
         } else if (TextUtils.isEmpty(title)) {
             warningMessageRes = R.string.warning_empty_title;
@@ -111,286 +89,11 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
             Post post = new Post();
             post.setTitle(title);
             post.setDescription(description);
-            postManager.createPostWithImage(filePath, CreatePostActivity.this, post);
+            post.setAuthorId(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            postManager.createPostWithImage(imageUri.getPath(), CreatePostActivity.this, post);
         } else {
             showWarningDialog(warningMessageRes);
         }
-    }
-
-    private void chooseImage() {
-        chooserType = ChooserType.REQUEST_PICK_PICTURE;
-        imageChooserManager = new ImageChooserManager(this,
-                ChooserType.REQUEST_PICK_PICTURE, true);
-        Bundle bundle = new Bundle();
-        imageChooserManager.setExtras(bundle);
-        imageChooserManager.setImageChooserListener(createImageChooserListener());
-        imageChooserManager.clearOldFiles();
-        try {
-            filePath = imageChooserManager.choose();
-        } catch (Exception e) {
-            LogUtil.logError(TAG, "chooseImage()", e);
-        }
-    }
-
-    private boolean hasPermissionForTakePhoto() {
-        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        return rc == PackageManager.PERMISSION_GRANTED && hasStoragePermission();
-    }
-
-    private boolean hasStoragePermission() {
-        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        return rc == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestWriteExternalStoragePermission() {
-        LogUtil.logDebug(TAG, "WriteExternalStoragePermission permission is not granted. Requesting permission");
-
-        final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        final Activity thisActivity = this;
-        ActivityCompat.requestPermissions(thisActivity, permissions,
-                WRITE_EXTERNAL_STORAGE_PERM);
-    }
-
-    private void requestCameraPermission() {
-        LogUtil.logDebug(TAG, "Camera permission is not granted. Requesting permission");
-
-        final String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        ActivityCompat.requestPermissions(this, permissions,
-                HANDLE_CAMERA_PERM);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case WRITE_EXTERNAL_STORAGE_PERM: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    chooseImage();
-                }
-                break;
-            }
-
-            case HANDLE_CAMERA_PERM: {
-                if (grantResults.length == permissions.length) {
-                    for (int i = 0; i < grantResults.length; i++) {
-                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            return;
-                        }
-                    }
-
-                    takePicture();
-                }
-                break;
-            }
-        }
-    }
-
-    private void takePicture() {
-        chooserType = ChooserType.REQUEST_CAPTURE_PICTURE;
-        imageChooserManager = new ImageChooserManager(this,
-                ChooserType.REQUEST_CAPTURE_PICTURE, true);
-        imageChooserManager.setImageChooserListener(createImageChooserListener());
-        try {
-            filePath = imageChooserManager.choose();
-        } catch (Exception e) {
-            LogUtil.logError(TAG, "takePicture()", e);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        LogUtil.logDebug(TAG, "OnActivityResult");
-        LogUtil.logDebug(TAG, "File Path : " + filePath);
-        if (resultCode == RESULT_OK
-                && (requestCode == ChooserType.REQUEST_PICK_PICTURE
-                || requestCode == ChooserType.REQUEST_CAPTURE_PICTURE)) {
-            if (imageChooserManager == null) {
-                reinitializeImageChooser();
-            }
-            progressBar.setVisibility(View.VISIBLE);
-            imageChooserManager.submit(requestCode, data);
-        } else {
-            progressBar.setVisibility(View.GONE);
-        }
-    }
-
-    private ImageChooserListener createImageChooserListener() {
-
-        return new ImageChooserListener() {
-            @Override
-            public void onImageChosen(final ChosenImage image) {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if (image != null) {
-                            LogUtil.logDebug(TAG, "Chosen Image: O - " + image.getFilePathOriginal());
-                            isActivityResultOver = true;
-                            filePath = image.getFilePathOriginal();
-
-
-                            LogUtil.logDebug(TAG, "Chosen Image: Is not null");
-                            loadImage(imageView, filePath);
-                        } else {
-                            LogUtil.logDebug(TAG, "Chosen Image: Is null");
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onError(final String reason) {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        LogUtil.logDebug(TAG, "OnError: " + reason);
-                        progressBar.setVisibility(View.GONE);
-
-                        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
-                                R.string.error_fail_load_image, Snackbar.LENGTH_LONG);
-                        snackbar.show();
-                    }
-                });
-            }
-
-            @Override
-            public void onImagesChosen(ChosenImages chosenImages) {
-
-            }
-        };
-    }
-
-    public boolean isImageFileValid(String filePath) {
-        int message = -1;
-        boolean result = false;
-
-        if (filePath != null) {
-            if (ValidationUtil.isImage(filePath)) {
-                File imageFile = new File(filePath);
-                if (imageFile.length() > MAX_FILE_SIZE_IN_BYTES) {
-                    message = R.string.error_bigger_file;
-                } else {
-                    result = true;
-                }
-            } else {
-                message = R.string.error_incorrect_file_type;
-            }
-        }
-
-        if (!result) {
-            showSnackBar(message);
-            progressBar.setVisibility(View.GONE);
-        }
-
-        return result;
-    }
-
-    private void loadImage(ImageView iv, final String path) {
-        if (isImageFileValid(path)) {
-            Picasso.with(CreatePostActivity.this)
-                    .load(Uri.fromFile(new File(path)))
-                    .fit()
-                    .centerInside()
-                    .into(iv, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            LogUtil.logDebug(TAG, "Picasso Success Loading image - " + path);
-                            progressBar.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onError() {
-                            LogUtil.logDebug(TAG, "Picasso Error Loading image - " + path);
-                            progressBar.setVisibility(View.GONE);
-                            imageView.setImageResource(R.drawable.ic_stub);
-
-                            showSnackBar(R.string.error_fail_load_image);
-                        }
-                    });
-        }
-    }
-
-    // Should be called if for some reason the ImageChooserManager is null (Due
-    // to destroying of activity for low memory situations)
-    private void reinitializeImageChooser() {
-        imageChooserManager = new ImageChooserManager(this, chooserType, true);
-        Bundle bundle = new Bundle();
-        imageChooserManager.setExtras(bundle);
-        imageChooserManager.setImageChooserListener(createImageChooserListener());
-        imageChooserManager.reinitialize(filePath);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(SAVED_STATE_ACTIVITY_RESULT_OVER, isActivityResultOver);
-        outState.putInt(SAVED_STATE_CHOOSER_TYPE, chooserType);
-        outState.putString(SAVED_STATE_FILE_PATH, filePath);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(SAVED_STATE_CHOOSER_TYPE)) {
-                chooserType = savedInstanceState.getInt(SAVED_STATE_CHOOSER_TYPE);
-            }
-            if (savedInstanceState.containsKey(SAVED_STATE_FILE_PATH)) {
-                filePath = savedInstanceState.getString(SAVED_STATE_FILE_PATH);
-            }
-
-            if (savedInstanceState.containsKey(SAVED_STATE_ACTIVITY_RESULT_OVER)) {
-                isActivityResultOver = savedInstanceState.getBoolean(SAVED_STATE_ACTIVITY_RESULT_OVER);
-            }
-        }
-
-        if (isActivityResultOver) {
-            populateData();
-        }
-        super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    private void populateData() {
-        LogUtil.logDebug(TAG, "Populating Data");
-        loadImage(imageView, filePath);
-    }
-
-    public void showProgress(int message) {
-        hideProgress();
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(message));
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-    }
-
-    public void hideProgress() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
-    }
-
-    private void hideKeyboard() {
-        // Check if no view has focus:
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
-    private void showSnackBar(int messageId) {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
-                messageId, Snackbar.LENGTH_LONG);
-        snackbar.show();
-    }
-
-    private void showWarningDialog(int messageId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.button_ok, null);
-        builder.show();
     }
 
     @Override
@@ -415,26 +118,6 @@ public class CreatePostActivity extends AppCompatActivity implements OnPostCreat
         }
 
         snackbar.show();
-    }
-
-    @Override
-    public void onChooseWayLoadImage(TakePictureMenu choice) {
-        switch (choice) {
-            case TAKE_PHOTO:
-                if (hasPermissionForTakePhoto()) {
-                    takePicture();
-                } else {
-                    requestCameraPermission();
-                }
-                break;
-            case CHOOSE_PHOTO:
-                if (hasStoragePermission()) {
-                    chooseImage();
-                } else {
-                    requestWriteExternalStoragePermission();
-                }
-                break;
-        }
     }
 
     @Override

@@ -4,23 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -30,40 +24,44 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.adapters.PostsAdapter;
-import com.rozdoum.socialcomponents.enums.ProfileStatus;
-import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
-import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
-import java.util.List;
+public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
+    private static final String TAG = ProfileActivity.class.getSimpleName();
 
-public class MainActivity extends BaseActivity {
-    private static final String TAG = LoginActivity.class.getSimpleName();
-public class MainActivity extends AppCompatActivity {
-
-    private PostsAdapter postsAdapter;
-    private RecyclerView recyclerView;
+    // UI references.
+    private TextView nameEditText;
+    private ImageView imageView;
+    private ProgressBar progressBar;
 
     private FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
-    private ProfileManager profileManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        profileManager = ProfileManager.getInstance(this);
+        setContentView(R.layout.activity_profile);
+
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         mAuth = FirebaseAuth.getInstance();
-        initContentView();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // Set up the login form.
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        imageView = (ImageView) findViewById(R.id.imageView);
+        nameEditText = (TextView) findViewById(R.id.nameEditText);
+
+        showProgress();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        ProfileManager.getInstance(this).getProfile(firebaseUser.getUid(), createOnProfileChangedListener());
     }
 
     @Override
@@ -84,48 +82,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void  initContentView() {
-        if (recyclerView == null) {
-            FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
-
-            if (floatingActionButton != null) {
-                floatingActionButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ProfileStatus profileStatus = profileManager.checkProfile();
-
-                        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                            openCreatePostActivity();
-                        } else {
-                            doAuthorization(profileStatus);
-                        }
-                    }
-                });
+    private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
+        return new OnObjectChangedListener<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                fillUIFields(obj);
             }
-
-            SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            postsAdapter = new PostsAdapter(this, swipeContainer);
-
-            OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
-                @Override
-                public void onItemClick(Post post) {
-                    Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
-                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivity(intent);
-                }
-            });
-
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.setAdapter(postsAdapter);
-            recyclerView.setAdapter(postsAdapter);
-            postsAdapter.loadFirstPage();
-        }
+        };
     }
 
-    private void openCreatePostActivity() {
-        Intent intent = new Intent(this, CreatePostActivity.class);
+    private void fillUIFields(Profile profile) {
+        if (profile != null) {
+            nameEditText.setText(profile.getUsername());
+
+            if (profile.getPhotoUrl() != null) {
+                ImageUtil.getInstance(this).getFullImage(profile.getPhotoUrl(), imageView, progressBar,
+                        R.drawable.ic_stub);
+            }
+        }
+        hideProgress();
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    private void startEditProfileActivity() {
+        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
         startActivity(intent);
     }
 
@@ -155,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     private void logoutFirebase() {
         mAuth.signOut();
         PreferencesUtil.setProfileCreated(this, false);
-//        startMainActivity();
+        startMainActivity();
     }
 
     private void logoutFacebook() {
@@ -196,15 +181,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void openProfileActivity() {
-        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        startActivity(intent);
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        LogUtil.logDebug(TAG, "onConnectionFailed:" + connectionResult);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.profile_menu, menu);
         return true;
     }
 
@@ -212,15 +197,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.profile:
-                ProfileStatus profileStatus = profileManager.checkProfile();
-
-                if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                    openProfileActivity();
-                } else {
-                    doAuthorization(profileStatus);
-                }
-
+            case R.id.editProfile:
+                startEditProfileActivity();
+                return true;
+            case R.id.signOut:
+                signOut();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

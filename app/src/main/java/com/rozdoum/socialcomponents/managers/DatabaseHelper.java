@@ -2,8 +2,12 @@ package com.rozdoum.socialcomponents.managers;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,11 +20,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -44,6 +52,7 @@ public class DatabaseHelper {
     private Context context;
     private FirebaseDatabase database;
     FirebaseStorage storage;
+    FirebaseAuth firebaseAuth;
 
     public static DatabaseHelper getInstance(Context context) {
         if (instance == null) {
@@ -55,12 +64,29 @@ public class DatabaseHelper {
 
     public DatabaseHelper(Context context) {
         this.context = context;
+        firebaseAuth = FirebaseAuth.getInstance();
     }
 
     public void init() {
         database = FirebaseDatabase.getInstance();
         database.setPersistenceEnabled(true);
         storage = FirebaseStorage.getInstance();
+    }
+
+    public DatabaseReference getDatabaseReference() {
+        return database.getReference();
+    }
+
+    public void createOrUpdateProfile(Profile profile, final OnProfileCreatedListener onProfileCreatedListener) {
+        DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
+        Task<Void> task = databaseReference.child("profiles").child(profile.getId()).setValue(profile);
+        task.addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                onProfileCreatedListener.onProfileCreated(task.isSuccessful());
+                LogUtil.logDebug(TAG, "createOrUpdateProfile, success: " + task.isSuccessful());
+            }
+        });
     }
 
     public void createOrUpdatePost(Post post) {
@@ -80,10 +106,12 @@ public class DatabaseHelper {
 
     public void createOrUpdateComment(String commentText, final String postId) {
         try {
+            String authorId = firebaseAuth.getCurrentUser().getUid();
             DatabaseReference mCommentsReference = database.getReference().child("post-comments/" + postId);
             String commentId = mCommentsReference.push().getKey();
             Comment comment = new Comment(commentText);
             comment.setId(commentId);
+            comment.setAuthorId(authorId);
 
             mCommentsReference.child(commentId).setValue(comment, new DatabaseReference.CompletionListener() {
                 @Override
@@ -122,8 +150,9 @@ public class DatabaseHelper {
         }
     }
 
-    public void createOrUpdateLike(final String postId, String authorId) {
+    public void createOrUpdateLike(final String postId) {
         try {
+            String authorId = firebaseAuth.getCurrentUser().getUid();
             DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
             mLikesReference.push();
             String id = mLikesReference.push().getKey();
@@ -169,7 +198,8 @@ public class DatabaseHelper {
 
     }
 
-    public void removeLike(final String postId, String authorId) {
+    public void removeLike(final String postId) {
+        String authorId = firebaseAuth.getCurrentUser().getUid();
         DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
         mLikesReference.removeValue(new DatabaseReference.CompletionListener() {
             @Override
@@ -273,6 +303,23 @@ public class DatabaseHelper {
         }
 
         return list;
+    }
+
+    public void getProfile(String id, final OnObjectChangedListener<Profile> listener) {
+        DatabaseReference databaseReference = getDatabaseReference().child("profiles").child(id);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Profile profile = dataSnapshot.getValue(Profile.class);
+                listener.onObjectChanged(profile);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+
+            }
+        });
     }
 
     public void getCommentsList(String postId, final OnDataChangedListener<Comment> onDataChangedListener) {

@@ -9,7 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Comment;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.ArrayList;
@@ -26,12 +29,14 @@ public class CommentsAdapter {
     private List<Comment> commentList = new ArrayList<>();
     private ImageUtil imageUtil;
     private LayoutInflater inflater;
+    private ProfileManager profileManager;
 
 
     public CommentsAdapter(ViewGroup parent) {
         this.parent = parent;
         imageUtil = ImageUtil.getInstance(parent.getContext().getApplicationContext());
         inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        profileManager = ProfileManager.getInstance(parent.getContext().getApplicationContext());
     }
 
     private void initListView() {
@@ -51,6 +56,10 @@ public class CommentsAdapter {
         TextView commentTextView = (TextView) convertView.findViewById(R.id.commentTextView);
         TextView dateTextView = (TextView) convertView.findViewById(R.id.dateTextView);
 
+        String authorId = comment.getAuthorId();
+        if (authorId != null)
+            profileManager.getProfile(authorId, createOnProfileChangeListener(nameTextView, avatarImageView));
+
         commentTextView.setText(comment.getText());
 
         long now = System.currentTimeMillis();
@@ -58,6 +67,18 @@ public class CommentsAdapter {
         dateTextView.setText(date);
 
         return convertView;
+    }
+
+    private OnObjectChangedListener<Profile> createOnProfileChangeListener(final TextView nameTextView, final ImageView avatarImageView) {
+        return new OnObjectChangedListener<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                nameTextView.setText(obj.getUsername());
+                if (obj.getPhotoUrl() != null) {
+                    imageUtil.getImageThumb(obj.getPhotoUrl(), avatarImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+                }
+            }
+        };
     }
 
     public void setList(List<Comment> commentList) {

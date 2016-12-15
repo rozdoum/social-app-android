@@ -19,6 +19,7 @@ public class Post implements Serializable, LazyLoading{
     private String description;
     private long createdDate;
     private String imagePath;
+    private String authorId;
     private int commentsCount;
     private int likesCount;
     private ItemType itemType;
@@ -62,6 +63,14 @@ public class Post implements Serializable, LazyLoading{
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public long getCreatedDate() {
