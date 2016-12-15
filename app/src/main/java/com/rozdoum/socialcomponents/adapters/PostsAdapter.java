@@ -33,6 +33,9 @@ public class PostsAdapter extends BaseAdapter {
         ImageView postImageView;
         TextView titleTextView;
         TextView detailsTextView;
+        TextView likeCounterTextView;
+        TextView commentsCountTextView;
+
         ImageLoader.ImageContainer imageRequest;
     }
 
@@ -59,6 +62,8 @@ public class PostsAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item_list_view, parent, false);
 
             holder.postImageView = (ImageView) convertView.findViewById(R.id.postImageView);
+            holder.likeCounterTextView = (TextView) convertView.findViewById(R.id.likesCountTextView);
+            holder.commentsCountTextView = (TextView) convertView.findViewById(R.id.commentsCountTextView);
             holder.titleTextView = (TextView) convertView.findViewById(R.id.titleTextView);
             holder.detailsTextView = (TextView) convertView.findViewById(R.id.detailsTextView);
 
@@ -71,6 +76,8 @@ public class PostsAdapter extends BaseAdapter {
 
         holder.titleTextView.setText(post.getTitle());
         holder.detailsTextView.setText(post.getDescription());
+        holder.likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
+        holder.commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
         if (holder.imageRequest != null) {
             holder.imageRequest.cancelRequest();

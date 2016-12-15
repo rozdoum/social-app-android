@@ -214,7 +214,7 @@ public class DatabaseHelper {
                 postRef.runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
-                        Integer currentValue = mutableData.getValue(Integer.class);
+                        Long currentValue = mutableData.getValue(Long.class);
                         if (currentValue == null) {
                             mutableData.setValue(0);
                         } else {
@@ -263,11 +263,11 @@ public class DatabaseHelper {
                         post.setDescription((String) mapObj.get("description"));
                         post.setImagePath((String) mapObj.get("imagePath"));
                         post.setCreatedDate((long) mapObj.get("createdDate"));
-                        if (mapObj.containsValue("commentsCount")) {
-                            post.setCommentsCount((int) mapObj.get("commentsCount"));
+                        if (mapObj.containsKey("commentsCount")) {
+                            post.setCommentsCount((long) mapObj.get("commentsCount"));
                         }
-                        if (mapObj.containsValue("likesCount")) {
-                            post.setLikesCount((int) mapObj.get("likesCount"));
+                        if (mapObj.containsKey("likesCount")) {
+                            post.setLikesCount((long) mapObj.get("likesCount"));
                         }
                         list.add(post);
                     }
