@@ -263,11 +263,11 @@ public class DatabaseHelper {
                         post.setDescription((String) mapObj.get("description"));
                         post.setImagePath((String) mapObj.get("imagePath"));
                         post.setCreatedDate((long) mapObj.get("createdDate"));
-                        if (mapObj.containsValue("commentsCount")) {
-                            post.setCommentsCount((int) mapObj.get("commentsCount"));
+                        if (mapObj.containsKey("commentsCount")) {
+                            post.setCommentsCount((int)(long) mapObj.get("commentsCount"));
                         }
-                        if (mapObj.containsValue("likesCount")) {
-                            post.setLikesCount((int) mapObj.get("likesCount"));
+                        if (mapObj.containsKey("likesCount")) {
+                            post.setLikesCount((int)(long) mapObj.get("likesCount"));
                         }
                         list.add(post);
                     }
