@@ -70,19 +70,30 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
     }
 
     private void attemptCreatePost() {
-        int warningMessageRes = 0;
+        // Reset errors.
+        titleEditText.setError(null);
+        descriptionEditText.setError(null);
+
         String title = titleEditText.getText().toString();
         String description = descriptionEditText.getText().toString();
 
-        if (imageUri == null || !(new File(imageUri.getPath()).exists())) {
-            warningMessageRes = R.string.warning_empty_image;
+        View focusView = null;
+        boolean cancel = false;
+
+        if (imageUri == null) {
+            showWarningDialog(R.string.warning_empty_image);
+            cancel = true;
         } else if (TextUtils.isEmpty(title)) {
-            warningMessageRes = R.string.warning_empty_title;
+            titleEditText.setError(getString(R.string.warning_empty_title));
+            focusView = titleEditText;
+            cancel = true;
         } else if (TextUtils.isEmpty(description)) {
-            warningMessageRes = R.string.warning_empty_description;
+            descriptionEditText.setError(getString(R.string.warning_empty_description));
+            focusView = descriptionEditText;
+            cancel = true;
         }
 
-        if (warningMessageRes == 0) {
+        if (!cancel) {
             showProgress(R.string.message_creating_post);
             hideKeyboard();
 
@@ -90,9 +101,9 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             post.setTitle(title);
             post.setDescription(description);
             post.setAuthorId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            postManager.createPostWithImage(imageUri.getPath(), CreatePostActivity.this, post);
-        } else {
-            showWarningDialog(warningMessageRes);
+            postManager.createPostWithImage(imageUri, CreatePostActivity.this, post);
+        } else if (focusView != null) {
+            focusView.requestFocus();
         }
     }
 
