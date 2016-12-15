@@ -180,6 +180,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 if (!list.isEmpty()) {
                     addList(list);
+                    isMoreDataAvailable = true;
                 } else {
                     isMoreDataAvailable = false;
                 }
