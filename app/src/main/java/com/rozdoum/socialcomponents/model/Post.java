@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by Kristina on 10/28/16.
  */
 
-public class Post implements Serializable, LazyLoading{
+public class Post implements Serializable, LazyLoading {
 
     private String id;
     private String title;
@@ -97,7 +97,7 @@ public class Post implements Serializable, LazyLoading{
         this.likesCount = likesCount;
     }
 
-    public Map<String,Object> toMap() {
+    public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
 
         result.put("title", title);

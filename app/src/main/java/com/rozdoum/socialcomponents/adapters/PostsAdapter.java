@@ -121,7 +121,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             });
 
-            loadMore(nextItemCreatedDate);
+            loadNext(nextItemCreatedDate);
         }
 
         if (getItemViewType(position) != ItemType.LOAD.getTypeCode()) {
@@ -159,10 +159,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void loadFirstPage() {
-        loadMore(0);
+        loadNext(0);
     }
 
-    private void loadMore(final long nextItemCreatedDate) {
+    private void loadNext(final long nextItemCreatedDate) {
         OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
             @Override
             public void onListChanged(List<Post> list) {
@@ -172,11 +172,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     swipeContainer.setRefreshing(false);
                 }
 
-                //remove loading view
-                if (!postList.isEmpty() && getItemViewType(postList.size() - 1) == ItemType.LOAD.getTypeCode()) {
-                    postList.remove(postList.size() - 1);
-                    notifyItemRemoved(postList.size() - 1);
-                }
+                hideProgress();
 
                 if (!list.isEmpty()) {
                     addList(list);
@@ -184,11 +180,16 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 } else {
                     isMoreDataAvailable = false;
                 }
-
-
             }
         };
 
         PostManager.getInstance(activity).getPosts(onPostsDataChangedListener, nextItemCreatedDate);
+    }
+
+    private void hideProgress() {
+        if (!postList.isEmpty() && getItemViewType(postList.size() - 1) == ItemType.LOAD.getTypeCode()) {
+            postList.remove(postList.size() - 1);
+            notifyItemRemoved(postList.size() - 1);
+        }
     }
 }
