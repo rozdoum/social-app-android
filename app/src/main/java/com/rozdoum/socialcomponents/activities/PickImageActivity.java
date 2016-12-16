@@ -16,6 +16,7 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 import com.squareup.picasso.Callback;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -65,6 +66,7 @@ public abstract class PickImageActivity extends BaseActivity {
     protected void loadImageToImageView() {
         Picasso.with(PickImageActivity.this)
                 .load(imageUri)
+                .memoryPolicy(MemoryPolicy.NO_CACHE)
                 .fit()
                 .centerInside()
                 .into(getImageView(), new Callback() {
@@ -116,6 +118,7 @@ public abstract class PickImageActivity extends BaseActivity {
         // handle result of pick image chooser
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Uri imageUri = CropImage.getPickImageResultUri(this, data);
+
             this.imageUri = imageUri;
             // For API >= 23 we need to check specifically that we have permissions to read external storage.
             if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {

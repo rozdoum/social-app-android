@@ -34,6 +34,7 @@ import com.rozdoum.socialcomponents.utils.LogUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -237,7 +238,7 @@ public class DatabaseHelper {
 
     public UploadTask uploadImage(Uri uri) {
         StorageReference storageRef = storage.getReferenceFromUrl("gs://socialcomponents.appspot.com");
-        StorageReference riversRef = storageRef.child("images/" + uri.getLastPathSegment());
+        StorageReference riversRef = storageRef.child("images/" + new Date().getTime() + "_" + uri.getLastPathSegment());
         // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
                 .setCacheControl("max-age=7776000, Expires=7776000, public, must-revalidate")
