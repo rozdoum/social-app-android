@@ -51,11 +51,10 @@ public class PostManager {
         ApplicationHelper.getDatabaseHelper().getPostList(onDataChangedListener, date);
     }
 
-    public void createPostWithImage(String filePath, final OnPostCreatedListener onPostCreatedListener, final Post post) {
-        Uri localImageUri = Uri.fromFile(new File(filePath));
+    public void createPostWithImage(Uri imageUri, final OnPostCreatedListener onPostCreatedListener, final Post post) {
         // Register observers to listen for when the download is done or if it fails
         DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
-        UploadTask uploadTask = databaseHelper.uploadImage(localImageUri);
+        UploadTask uploadTask = databaseHelper.uploadImage(imageUri);
 
         if (uploadTask != null) {
             uploadTask.addOnFailureListener(new OnFailureListener() {
