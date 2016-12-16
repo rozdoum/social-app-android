@@ -1,5 +1,6 @@
 package com.rozdoum.socialcomponents.model;
 
+import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.Map;
  * Created by Kristina on 10/28/16.
  */
 
-public class Post implements Serializable{
+public class Post implements Serializable, LazyLoading {
 
     private String id;
     private String title;
@@ -21,9 +22,15 @@ public class Post implements Serializable{
     private String authorId;
     private int commentsCount;
     private int likesCount;
+    private ItemType itemType;
 
     public Post() {
         this.createdDate = new Date().getTime();
+        itemType = ItemType.ITEM;
+    }
+
+    public Post(ItemType itemType) {
+        this.itemType = itemType;
     }
 
     public String getId() {
@@ -90,7 +97,7 @@ public class Post implements Serializable{
         this.likesCount = likesCount;
     }
 
-    public Map<String,Object> toMap() {
+    public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
 
         result.put("title", title);
@@ -100,5 +107,15 @@ public class Post implements Serializable{
         result.put("createdDateText", FormatterUtil.getFirebaseDateFormat().format(new Date(createdDate)));
 
         return result;
+    }
+
+    @Override
+    public ItemType getItemType() {
+        return itemType;
+    }
+
+    @Override
+    public void setItemType(ItemType itemType) {
+
     }
 }

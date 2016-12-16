@@ -8,9 +8,15 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
@@ -34,13 +40,14 @@ import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = LoginActivity.class.getSimpleName();
 
-    private ListView postsListView;
     private PostsAdapter postsAdapter;
+    private RecyclerView recyclerView;
 
     private FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
@@ -54,6 +61,9 @@ public class MainActivity extends BaseActivity {
 
         mAuth = FirebaseAuth.getInstance();
         initContentView();
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -75,7 +85,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initContentView() {
-        if (postsListView == null) {
+        if (recyclerView == null) {
             FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
 
             if (floatingActionButton != null) {
@@ -93,29 +103,23 @@ public class MainActivity extends BaseActivity {
                 });
             }
 
-            postsListView = (ListView) findViewById(R.id.postsListView);
-            postsAdapter = new PostsAdapter(this);
-            postsListView.setAdapter(postsAdapter);
-
-            OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
+            SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            postsAdapter = new PostsAdapter(this, swipeContainer);
+            postsAdapter.setOnItemClickListener(new PostsAdapter.OnItemClickListener() {
                 @Override
-                public void onListChanged(List<Post> list) {
-                    postsAdapter.setList(list);
-                }
-            };
-
-            PostManager.getInstance(getApplicationContext()).getPosts(onPostsDataChangedListener);
-
-            postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Post post = (Post) postsAdapter.getItem(position);
-
+                public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
                     startActivity(intent);
                 }
             });
+
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(postsAdapter);
+            recyclerView.setAdapter(postsAdapter);
+            postsAdapter.loadFirstPage();
         }
     }
 
@@ -150,7 +154,6 @@ public class MainActivity extends BaseActivity {
     private void logoutFirebase() {
         mAuth.signOut();
         PreferencesUtil.setProfileCreated(this, false);
-//        startMainActivity();
     }
 
     private void logoutFacebook() {
