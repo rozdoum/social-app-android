@@ -10,7 +10,10 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.ArrayList;
@@ -24,9 +27,11 @@ public class PostsAdapter extends BaseAdapter {
 
     private List<Post> list = new ArrayList<>();
     private ImageUtil imageUtil;
+    private ProfileManager profileManager;
 
     public PostsAdapter(Context context) {
         imageUtil = ImageUtil.getInstance(context.getApplicationContext());
+        profileManager = ProfileManager.getInstance(context);
     }
 
     private class ViewHolder {
@@ -35,8 +40,10 @@ public class PostsAdapter extends BaseAdapter {
         TextView detailsTextView;
         TextView likeCounterTextView;
         TextView commentsCountTextView;
+        ImageView authorImageView;
 
         ImageLoader.ImageContainer imageRequest;
+        ImageLoader.ImageContainer authorImageRequest;
     }
 
     @Override
@@ -66,6 +73,7 @@ public class PostsAdapter extends BaseAdapter {
             holder.commentsCountTextView = (TextView) convertView.findViewById(R.id.commentsCountTextView);
             holder.titleTextView = (TextView) convertView.findViewById(R.id.titleTextView);
             holder.detailsTextView = (TextView) convertView.findViewById(R.id.detailsTextView);
+            holder.authorImageView = (ImageView) convertView.findViewById(R.id.authorImageView);
 
             convertView.setTag(holder);
         } else {
@@ -86,7 +94,36 @@ public class PostsAdapter extends BaseAdapter {
         String imageUrl = post.getImagePath();
         holder.imageRequest = imageUtil.getImageThumb(imageUrl, holder.postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
 
+        if (post.getAuthorId() != null) {
+            holder.authorImageView.setVisibility(View.VISIBLE);
+            Object imageViewTag = holder.authorImageView.getTag();
+
+            if (!post.getAuthorId().equals(imageViewTag)) {
+                cancelLoadingAuthorImage(holder);
+                holder.authorImageView.setTag(post.getAuthorId());
+                profileManager.getProfile(post.getAuthorId(), createProfileChangeListener(holder));
+            }
+        }
+
         return convertView;
+    }
+
+    private void cancelLoadingAuthorImage(ViewHolder holder) {
+        if (holder.authorImageRequest != null) {
+            holder.authorImageRequest.cancelRequest();
+        }
+    }
+
+    private OnObjectChangedListener<Profile> createProfileChangeListener(final ViewHolder holder) {
+        return new OnObjectChangedListener<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                if (obj.getPhotoUrl() != null) {
+                    imageUtil.getImageThumb(obj.getPhotoUrl(),
+                            holder.authorImageView, R.drawable.ic_stub, R.drawable.ic_stub, true);
+                }
+            }
+        };
     }
 
     public void setList(List<Post> list) {

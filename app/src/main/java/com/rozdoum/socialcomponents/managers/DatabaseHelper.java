@@ -253,23 +253,26 @@ public class DatabaseHelper {
                 Map<String, Object> objectMap = (HashMap<String, Object>)
                         dataSnapshot.getValue();
                 List<Post> list = new ArrayList<Post>();
-                for (String key : objectMap.keySet()) {
-                    Object obj = objectMap.get(key);
-                    if (obj instanceof Map) {
-                        Map<String, Object> mapObj = (Map<String, Object>) obj;
-                        Post post = new Post();
-                        post.setId(key);
-                        post.setTitle((String) mapObj.get("title"));
-                        post.setDescription((String) mapObj.get("description"));
-                        post.setImagePath((String) mapObj.get("imagePath"));
-                        post.setCreatedDate((long) mapObj.get("createdDate"));
-                        if (mapObj.containsKey("commentsCount")) {
-                            post.setCommentsCount((int)(long) mapObj.get("commentsCount"));
+                if (objectMap != null) {
+                    for (String key : objectMap.keySet()) {
+                        Object obj = objectMap.get(key);
+                        if (obj instanceof Map) {
+                            Map<String, Object> mapObj = (Map<String, Object>) obj;
+                            Post post = new Post();
+                            post.setId(key);
+                            post.setTitle((String) mapObj.get("title"));
+                            post.setDescription((String) mapObj.get("description"));
+                            post.setImagePath((String) mapObj.get("imagePath"));
+                            post.setAuthorId((String) mapObj.get("authorId"));
+                            post.setCreatedDate((long) mapObj.get("createdDate"));
+                            if (mapObj.containsKey("commentsCount")) {
+                                post.setCommentsCount((int) (long) mapObj.get("commentsCount"));
+                            }
+                            if (mapObj.containsKey("likesCount")) {
+                                post.setLikesCount((int) (long) mapObj.get("likesCount"));
+                            }
+                            list.add(post);
                         }
-                        if (mapObj.containsKey("likesCount")) {
-                            post.setLikesCount((int)(long) mapObj.get("likesCount"));
-                        }
-                        list.add(post);
                     }
                 }
 
