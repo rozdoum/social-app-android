@@ -209,7 +209,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         };
 
-        PostManager.getInstance(activity).getPosts(onPostsDataChangedListener, nextItemCreatedDate);
+        PostManager.getInstance(activity).getPostsList(onPostsDataChangedListener, nextItemCreatedDate);
     }
 
     private void hideProgress() {

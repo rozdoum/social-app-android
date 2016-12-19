@@ -5,17 +5,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.facebook.FacebookSdk;
@@ -32,16 +29,11 @@ import com.google.firebase.auth.UserInfo;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
-import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
-
-import java.io.ByteArrayInputStream;
-import java.util.List;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -110,7 +102,7 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
-                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+                    intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
                     startActivity(intent);
                 }
             });

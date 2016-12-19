@@ -10,11 +10,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.LogUtil;
-
-import java.io.File;
 
 /**
  * Created by Kristina on 10/28/16.
@@ -47,8 +46,12 @@ public class PostManager {
         }
     }
 
-    public void getPosts(OnDataChangedListener<Post> onDataChangedListener, long date) {
+    public void getPostsList(OnDataChangedListener<Post> onDataChangedListener, long date) {
         ApplicationHelper.getDatabaseHelper().getPostList(onDataChangedListener, date);
+    }
+
+    public void getPost(String postId, OnObjectChangedListener<Post> onObjectChangedListener) {
+        ApplicationHelper.getDatabaseHelper().getPost(postId, onObjectChangedListener);
     }
 
     public void createPostWithImage(Uri imageUri, final OnPostCreatedListener onPostCreatedListener, final Post post) {
