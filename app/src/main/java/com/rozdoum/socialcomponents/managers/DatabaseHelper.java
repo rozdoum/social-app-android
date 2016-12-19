@@ -269,6 +269,24 @@ public class DatabaseHelper {
         });
     }
 
+    public void getPost(final String id, final OnObjectChangedListener<Post> listener) {
+        DatabaseReference databaseReference = getDatabaseReference().child("posts").child(id);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Post post = dataSnapshot.getValue(Post.class);
+                post.setId(id);
+                listener.onObjectChanged(post);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+
+            }
+        });
+    }
+
     private List<Post> parsePostList(DataSnapshot dataSnapshot) {
         Map<String, Object> objectMap = (HashMap<String, Object>)
                 dataSnapshot.getValue();

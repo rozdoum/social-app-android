@@ -25,17 +25,14 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
@@ -46,7 +43,7 @@ import java.util.List;
 
 public class PostDetailsActivity extends BaseActivity {
 
-    public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
+    public static final String POST_ID_EXTRA_KEY = "PostDetailsActivity.POST_ID_EXTRA_KEY";
     private static final int ANIMATION_DURATION = 300;
 
     private EditText commentEditText;
@@ -56,6 +53,10 @@ public class PostDetailsActivity extends BaseActivity {
     private ImageView likesImageView;
     private TextView commentsLabel;
     private TextView likeCounterTextView;
+    private ProgressBar progressBar;
+    private ImageView postImageView;
+    private TextView titleTextView;
+    private TextView descriptionEditText;
 
     private AnimationType likeAnimationType;
     private boolean isLiked = false;
@@ -71,13 +72,12 @@ public class PostDetailsActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
-        postId = post.getId();
+        postId = getIntent().getStringExtra(POST_ID_EXTRA_KEY);
 
-        TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
-        TextView descriptionEditText = (TextView) findViewById(R.id.descriptionEditText);
-        final ImageView postImageView = (ImageView) findViewById(R.id.postImageView);
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        titleTextView = (TextView) findViewById(R.id.titleTextView);
+        descriptionEditText = (TextView) findViewById(R.id.descriptionEditText);
+        postImageView = (ImageView) findViewById(R.id.postImageView);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         LinearLayout commentsContainer = (LinearLayout) findViewById(R.id.commentsContainer);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         commentsLabel = (TextView) findViewById(R.id.commentsLabel);
@@ -87,13 +87,19 @@ public class PostDetailsActivity extends BaseActivity {
         likesImageView = (ImageView) findViewById(R.id.likesImageView);
         likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
 
-        titleTextView.setText(post.getTitle());
-        descriptionEditText.setText(post.getDescription());
+        initLikes();
 
-        String imageUrl = post.getImagePath();
+        PostManager.getInstance(this).getPost(postId, createOnPostChangeListener());
 
-        ImageUtil imageUtil = ImageUtil.getInstance(this);
-        imageUtil.getFullImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub);
+        CommentsAdapter commentsAdapter = new CommentsAdapter(commentsContainer);
+        ApplicationHelper.getDatabaseHelper().getCommentsList(postId, createOnPostChangedDataListener(commentsAdapter));
+
+        postImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openImageDetailScreen();
+            }
+        });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,43 +113,34 @@ public class PostDetailsActivity extends BaseActivity {
                 }
             }
         });
+    }
 
-        CommentsAdapter commentsAdapter = new CommentsAdapter(commentsContainer);
-        ApplicationHelper.getDatabaseHelper().getCommentsList(post.getId(), createOnPostChangedDataListener(commentsAdapter));
-
-        postImageView.setOnClickListener(new View.OnClickListener() {
+    private OnObjectChangedListener<Post> createOnPostChangeListener() {
+        return new OnObjectChangedListener<Post>() {
             @Override
-            public void onClick(View v) {
-                openImageDetailScreen();
-            }
-        });
-
-        initLikes();
-
-        ValueEventListener valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                post = dataSnapshot.getValue(Post.class);
-                post.setId(postId);
-                updateValues();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onObjectChanged(Post obj) {
+                post = obj;
+                fillPostFields();
+                updateCounters();
+                initLikeButtonState();
             }
         };
-        DatabaseReference postReference = FirebaseDatabase.getInstance().getReference().child("posts").child(postId);
-        postReference.addValueEventListener(valueEventListener);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        initLikeButtonState();
+    private void fillPostFields() {
+        titleTextView.setText(post.getTitle());
+        descriptionEditText.setText(post.getDescription());
+        loadPostDetailsImage();
     }
 
-    private void updateValues() {
+    private void loadPostDetailsImage() {
+        String imageUrl = post.getImagePath();
+
+        ImageUtil imageUtil = ImageUtil.getInstance(this);
+        imageUtil.getFullImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub);
+    }
+
+    private void updateCounters() {
         commentsLabel.setVisibility(View.VISIBLE);
         commentsLabel.setText(String.format(getString(R.string.label_comments), post.getCommentsCount()));
 
