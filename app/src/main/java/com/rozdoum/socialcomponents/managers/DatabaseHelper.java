@@ -217,7 +217,7 @@ public class DatabaseHelper {
                 postRef.runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {
-                        Integer currentValue = mutableData.getValue(Integer.class);
+                        Long currentValue = mutableData.getValue(Long.class);
                         if (currentValue == null) {
                             mutableData.setValue(0);
                         } else {

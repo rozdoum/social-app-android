@@ -52,12 +52,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         ImageView postImageView;
         TextView titleTextView;
         TextView detailsTextView;
+        TextView likeCounterTextView;
+        TextView commentsCountTextView;
+
         ImageLoader.ImageContainer imageRequest;
 
         PostViewHolder(View view) {
             super(view);
 
             postImageView = (ImageView) view.findViewById(R.id.postImageView);
+            likeCounterTextView = (TextView) convertView.findViewById(R.id.likesCountTextView);
+            commentsCountTextView = (TextView) convertView.findViewById(R.id.commentsCountTextView);
             titleTextView = (TextView) view.findViewById(R.id.titleTextView);
             detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
 
@@ -74,7 +79,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         void bindData(Post post) {
             titleTextView.setText(post.getTitle());
             detailsTextView.setText(post.getDescription());
-
+            likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
+            commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
             if (imageRequest != null) {
                 imageRequest.cancelRequest();
