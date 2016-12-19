@@ -284,6 +284,7 @@ public class DatabaseHelper {
                     post.setTitle((String) mapObj.get("title"));
                     post.setDescription((String) mapObj.get("description"));
                     post.setImagePath((String) mapObj.get("imagePath"));
+                    post.setAuthorId((String) mapObj.get("authorId"));
                     post.setCreatedDate((long) mapObj.get("createdDate"));
                     if (mapObj.containsKey("commentsCount")) {
                         post.setCommentsCount((long) mapObj.get("commentsCount"));

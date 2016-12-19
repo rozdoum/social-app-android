@@ -157,7 +157,10 @@ public class PostDetailsActivity extends BaseActivity {
 
         String likeTextFormat = getString(R.string.label_likes);
         likeCounterTextView.setText(String.format(likeTextFormat, post.getLikesCount()));
-        profileManager.getProfile(post.getAuthorId(), createProfileChangeListener());
+
+        if (post.getAuthorId() != null) {
+            profileManager.getProfile(post.getAuthorId(), createProfileChangeListener());
+        }
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener() {

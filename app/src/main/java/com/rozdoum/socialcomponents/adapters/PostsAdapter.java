@@ -11,11 +11,11 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -43,7 +43,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.activity = activity;
         this.swipeContainer = swipeContainer;
         imageUtil = ImageUtil.getInstance(activity.getApplicationContext());
-        profileManager = ProfileManager.getInstance(context);
+        profileManager = ProfileManager.getInstance(activity.getApplicationContext());
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -103,9 +103,9 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 Object imageViewTag = authorImageView.getTag();
 
                 if (!post.getAuthorId().equals(imageViewTag)) {
-                    cancelLoadingAuthorImage(holder);
+                    cancelLoadingAuthorImage(authorImageRequest);
                     authorImageView.setTag(post.getAuthorId());
-                    profileManager.getProfile(post.getAuthorId(), createProfileChangeListener(holder));
+                    profileManager.getProfile(post.getAuthorId(), createProfileChangeListener(authorImageView));
                 }
             }
         }
