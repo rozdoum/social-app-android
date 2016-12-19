@@ -102,6 +102,14 @@
                 android:layout_marginTop="@dimen/intrinsic_padding"
                 android:orientation="vertical" />
 
+            <ImageView
+                android:id="@+id/authorImageView"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:padding="@dimen/intrinsic_padding"
+                android:scaleType="centerCrop"
+                android:layout_below="@+id/imageContainer"
+                android:layout_alignParentEnd="true" />
 
         </RelativeLayout>
     </ScrollView>

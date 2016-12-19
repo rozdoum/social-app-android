@@ -5,6 +5,8 @@ package com.rozdoum.socialcomponents.utils;
  */
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
@@ -71,39 +73,55 @@ public class ImageUtil {
         return displaymetrics;
     }
 
-    public ImageLoader.ImageContainer getImageThumb(final String imageUrl, final ImageView imageView, int defaultImageResId, final int errorImageResId) {
+    public ImageLoader.ImageContainer getImageThumb(final String imageUrl, final ImageView imageView,
+                                                    int defaultImageResId, final int errorImageResId) {
+        return getImageThumb(imageUrl, imageView, defaultImageResId, errorImageResId, false);
+    }
+
+    public ImageLoader.ImageContainer getImageThumb(final String imageUrl, final ImageView imageView,
+                                                    int defaultImageResId, final int errorImageResId, boolean rounded) {
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), defaultImageResId);
+        setBitmapToImageView(imageView, bitmap, rounded);
         imageView.setImageResource(defaultImageResId);
-        return getImage(imageUrl, imageView, null, errorImageResId);
+        return getImage(imageUrl, imageView, null, errorImageResId, rounded);
     }
 
     public ImageLoader.ImageContainer getFullImage(final String imageUrl, final ImageView imageView,
-                             final ProgressBar progressBarView, final int errorImageResId) {
+                                                   final ProgressBar progressBarView, final int errorImageResId) {
+        return getFullImage(imageUrl, imageView, progressBarView, errorImageResId, false);
+    }
+
+    public ImageLoader.ImageContainer getFullImage(final String imageUrl, final ImageView imageView,
+                                                   final ProgressBar progressBarView, final int errorImageResId, boolean rounded) {
 
         if (progressBarView != null) {
             setProgressBarVisible(imageView, progressBarView, true);
         }
 
-        return getImage(imageUrl, imageView, progressBarView, errorImageResId);
+        return getImage(imageUrl, imageView, progressBarView, errorImageResId, rounded);
     }
 
     /* *
     * load image to disc cash and memory cash
     * set to image view scaled bitmap with max width and max height
     * */
-    private ImageLoader.ImageContainer getImage(final String imageUrl, final ImageView imageView, final ProgressBar progressBarView, final int errorImageResId) {
+    private ImageLoader.ImageContainer getImage(final String imageUrl, final ImageView imageView,
+                                                final ProgressBar progressBarView, final int errorImageResId,
+                                                boolean rounded) {
         int maxImageWidth = (int) (calcMaxWidth(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
         int maxImageHeight = (int) (calcMaxHeight(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
 
-        return getImage(imageUrl, imageView, progressBarView, errorImageResId, maxImageWidth, maxImageHeight);
+        return getImage(imageUrl, imageView, progressBarView, errorImageResId, maxImageWidth, maxImageHeight, rounded);
     }
 
-    private ImageLoader.ImageContainer getImage(final String imageUrl, final ImageView imageView, final ProgressBar progressBarView, final int errorImageResId,
-                          int maxImageWidth, int maxImageHeight) {
+    private ImageLoader.ImageContainer getImage(final String imageUrl, final ImageView imageView,
+                                                final ProgressBar progressBarView, final int errorImageResId,
+                                                int maxImageWidth, int maxImageHeight, final boolean rounded) {
 
         ImageLoader.ImageListener listener = new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                imageView.setImageBitmap(response.getBitmap());
+                setBitmapToImageView(imageView, response.getBitmap(), rounded);
                 if (progressBarView != null) {
                     setProgressBarVisible(imageView, progressBarView, false);
                 }
@@ -111,6 +129,8 @@ public class ImageUtil {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), errorImageResId);
+                setBitmapToImageView(imageView, bitmap, rounded);
                 imageView.setImageResource(errorImageResId);
                 if (progressBarView != null) {
                     setProgressBarVisible(imageView, progressBarView, false);
@@ -120,6 +140,16 @@ public class ImageUtil {
         };
 
         return imageLoader.get(imageUrl, listener, maxImageWidth, maxImageHeight);
+    }
+
+    private void setBitmapToImageView(ImageView imageView, Bitmap bitmap, boolean rounded) {
+        if (bitmap != null) {
+            if (rounded) {
+                imageView.setImageDrawable(new RoundImage(bitmap));
+            } else {
+                imageView.setImageBitmap(bitmap);
+            }
+        }
     }
 
     private void setProgressBarVisible(ImageView imageView, ProgressBar progressBar, boolean visible) {

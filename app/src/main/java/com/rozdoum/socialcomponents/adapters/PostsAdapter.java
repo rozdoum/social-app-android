@@ -11,10 +11,13 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.LinkedList;
@@ -34,11 +37,13 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private boolean isLoading = false;
     private boolean isMoreDataAvailable = true;
     private SwipeRefreshLayout swipeContainer;
+    private ProfileManager profileManager;
 
     public PostsAdapter(Activity activity, SwipeRefreshLayout swipeContainer) {
         this.activity = activity;
-        imageUtil = ImageUtil.getInstance(activity.getApplicationContext());
         this.swipeContainer = swipeContainer;
+        imageUtil = ImageUtil.getInstance(activity.getApplicationContext());
+        profileManager = ProfileManager.getInstance(context);
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -54,8 +59,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         TextView detailsTextView;
         TextView likeCounterTextView;
         TextView commentsCountTextView;
+        ImageView authorImageView;
 
         ImageLoader.ImageContainer imageRequest;
+        ImageLoader.ImageContainer authorImageRequest;
 
         PostViewHolder(View view) {
             super(view);
@@ -65,6 +72,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
             titleTextView = (TextView) view.findViewById(R.id.titleTextView);
             detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
+            authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
+
 
             if (onItemClickListener != null) {
                 view.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +97,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
             String imageUrl = post.getImagePath();
             imageRequest = imageUtil.getImageThumb(imageUrl, postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+
+            if (post.getAuthorId() != null) {
+                authorImageView.setVisibility(View.VISIBLE);
+                Object imageViewTag = authorImageView.getTag();
+
+                if (!post.getAuthorId().equals(imageViewTag)) {
+                    cancelLoadingAuthorImage(holder);
+                    authorImageView.setTag(post.getAuthorId());
+                    profileManager.getProfile(post.getAuthorId(), createProfileChangeListener(holder));
+                }
+            }
         }
     }
 
@@ -197,5 +217,23 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             postList.remove(postList.size() - 1);
             notifyItemRemoved(postList.size() - 1);
         }
+    }
+
+    private void cancelLoadingAuthorImage(ImageLoader.ImageContainer authorImageRequest) {
+        if (authorImageRequest != null) {
+            authorImageRequest.cancelRequest();
+        }
+    }
+
+    private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
+        return new OnObjectChangedListener<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                if (obj.getPhotoUrl() != null) {
+                    imageUtil.getImageThumb(obj.getPhotoUrl(),
+                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub, true);
+                }
+            }
+        };
     }
 }

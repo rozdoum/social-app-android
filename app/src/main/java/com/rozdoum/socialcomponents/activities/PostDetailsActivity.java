@@ -36,10 +36,12 @@ import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.List;
@@ -56,12 +58,16 @@ public class PostDetailsActivity extends BaseActivity {
     private ImageView likesImageView;
     private TextView commentsLabel;
     private TextView likeCounterTextView;
+    private ImageView authorImageView;
 
     private AnimationType likeAnimationType;
     private boolean isLiked = false;
     private boolean likeIconInitialized = false;
 
     private String postId;
+
+    private ProfileManager profileManager;
+    private ImageUtil imageUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,9 @@ public class PostDetailsActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        profileManager = ProfileManager.getInstance(this);
+        imageUtil = ImageUtil.getInstance(this);
 
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
         postId = post.getId();
@@ -85,14 +94,13 @@ public class PostDetailsActivity extends BaseActivity {
         ImageButton sendButton = (ImageButton) findViewById(R.id.sendButton);
         likesContainer = (ViewGroup) findViewById(R.id.likesContainer);
         likesImageView = (ImageView) findViewById(R.id.likesImageView);
+        authorImageView = (ImageView) findViewById(R.id.authorImageView);
         likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
 
         titleTextView.setText(post.getTitle());
         descriptionEditText.setText(post.getDescription());
 
         String imageUrl = post.getImagePath();
-
-        ImageUtil imageUtil = ImageUtil.getInstance(this);
         imageUtil.getFullImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -149,6 +157,19 @@ public class PostDetailsActivity extends BaseActivity {
 
         String likeTextFormat = getString(R.string.label_likes);
         likeCounterTextView.setText(String.format(likeTextFormat, post.getLikesCount()));
+        profileManager.getProfile(post.getAuthorId(), createProfileChangeListener());
+    }
+
+    private OnObjectChangedListener<Profile> createProfileChangeListener() {
+        return new OnObjectChangedListener<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                if (obj.getPhotoUrl() != null) {
+                    imageUtil.getImageThumb(obj.getPhotoUrl(),
+                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub, true);
+                }
+            }
+        };
     }
 
     private OnDataChangedListener<Comment> createOnPostChangedDataListener(final CommentsAdapter commentsAdapter) {
