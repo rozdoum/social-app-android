@@ -54,6 +54,7 @@ public class DatabaseHelper {
     private FirebaseDatabase database;
     FirebaseStorage storage;
     FirebaseAuth firebaseAuth;
+    private Map<ValueEventListener, DatabaseReference> activeListeners = new HashMap<>();
 
     public static DatabaseHelper getInstance(Context context) {
         if (instance == null) {
@@ -76,6 +77,23 @@ public class DatabaseHelper {
 
     public DatabaseReference getDatabaseReference() {
         return database.getReference();
+    }
+
+    public void closeListener(ValueEventListener listener) {
+        if (activeListeners.containsKey(listener)) {
+            DatabaseReference reference = activeListeners.get(listener);
+            reference.removeEventListener(listener);
+            LogUtil.logDebug(TAG, "closeListener(), listener was removed: " + listener);
+        } else {
+            LogUtil.logDebug(TAG, "closeListener(), listener not found :" + listener);
+        }
+    }
+
+    public void closeAllActiveListeners() {
+        for (ValueEventListener listener : activeListeners.keySet()) {
+            DatabaseReference reference = activeListeners.get(listener);
+            reference.removeEventListener(listener);
+        }
     }
 
     public void createOrUpdateProfile(Profile profile, final OnProfileCreatedListener onProfileCreatedListener) {
@@ -270,9 +288,9 @@ public class DatabaseHelper {
         });
     }
 
-    public void getPost(final String id, final OnObjectChangedListener<Post> listener) {
+    public ValueEventListener getPost(final String id, final OnObjectChangedListener<Post> listener) {
         DatabaseReference databaseReference = getDatabaseReference().child("posts").child(id);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Post post = dataSnapshot.getValue(Post.class);
@@ -286,6 +304,9 @@ public class DatabaseHelper {
 
             }
         });
+
+        activeListeners.put(valueEventListener, databaseReference);
+        return valueEventListener;
     }
 
     private List<Post> parsePostList(DataSnapshot dataSnapshot) {
@@ -325,9 +346,9 @@ public class DatabaseHelper {
         return list;
     }
 
-    public void getProfile(String id, final OnObjectChangedListener<Profile> listener) {
+    public void getProfileSingleValue(String id, final OnObjectChangedListener<Profile> listener) {
         DatabaseReference databaseReference = getDatabaseReference().child("profiles").child(id);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Profile profile = dataSnapshot.getValue(Profile.class);
@@ -342,9 +363,28 @@ public class DatabaseHelper {
         });
     }
 
-    public void getCommentsList(String postId, final OnDataChangedListener<Comment> onDataChangedListener) {
+    public ValueEventListener getProfile(String id, final OnObjectChangedListener<Profile> listener) {
+        DatabaseReference databaseReference = getDatabaseReference().child("profiles").child(id);
+        ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Profile profile = dataSnapshot.getValue(Profile.class);
+                listener.onObjectChanged(profile);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+
+            }
+        });
+        activeListeners.put(valueEventListener, databaseReference);
+        return valueEventListener;
+    }
+
+    public ValueEventListener getCommentsList(String postId, final OnDataChangedListener<Comment> onDataChangedListener) {
         DatabaseReference databaseReference = database.getReference("post-comments").child(postId);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Comment> list = new ArrayList<>();
@@ -369,11 +409,14 @@ public class DatabaseHelper {
 
             }
         });
+
+        activeListeners.put(valueEventListener, databaseReference);
+        return valueEventListener;
     }
 
     public void hasCurrentUserLike(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
         DatabaseReference databaseReference = database.getReference("post-likes").child(postId).child(userId);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 onObjectExistListener.onDataChanged(dataSnapshot.exists());

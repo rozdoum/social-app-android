@@ -22,17 +22,23 @@ import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by Kristina on 10/28/16.
  */
 
-public class ProfileManager {
+public class ProfileManager extends FirebaseListenersManager {
 
     private static final String TAG = ProfileManager.class.getSimpleName();
     private static ProfileManager instance;
 
     private Context context;
     private DatabaseHelper databaseHelper;
+    private Map<Context, List<ValueEventListener>> activeListeners = new HashMap<>();
+
 
     public static ProfileManager getInstance(Context context) {
         if (instance == null) {
@@ -106,8 +112,13 @@ public class ProfileManager {
         }
     }
 
-    public void getProfile(String id, final OnObjectChangedListener<Profile> listener) {
-        databaseHelper.getProfile(id, listener);
+    public void getProfileSingleValue(String id, final OnObjectChangedListener<Profile> listener) {
+        databaseHelper.getProfileSingleValue(id, listener);
+    }
+
+    public void getProfile(Context context, String id, final OnObjectChangedListener<Profile> listener) {
+        ValueEventListener valueEventListener = databaseHelper.getProfile(id, listener);
+        addListenerToMap(context, valueEventListener);
     }
 
     public ProfileStatus checkProfile() {

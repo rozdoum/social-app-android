@@ -61,7 +61,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
         showProgress();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        ProfileManager.getInstance(this).getProfile(firebaseUser.getUid(), createOnProfileChangedListener());
+        ProfileManager.getInstance(this).getProfileSingleValue(firebaseUser.getUid(), createOnProfileChangedListener());
     }
 
     @Override

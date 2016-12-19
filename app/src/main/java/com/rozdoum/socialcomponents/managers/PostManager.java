@@ -7,11 +7,13 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
+import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
@@ -19,7 +21,7 @@ import com.rozdoum.socialcomponents.utils.LogUtil;
  * Created by Kristina on 10/28/16.
  */
 
-public class PostManager {
+public class PostManager extends FirebaseListenersManager {
 
     private static final String TAG = PostManager.class.getSimpleName();
     private static PostManager instance;
@@ -50,8 +52,14 @@ public class PostManager {
         ApplicationHelper.getDatabaseHelper().getPostList(onDataChangedListener, date);
     }
 
-    public void getPost(String postId, OnObjectChangedListener<Post> onObjectChangedListener) {
-        ApplicationHelper.getDatabaseHelper().getPost(postId, onObjectChangedListener);
+    public void getPost(Context context, String postId, OnObjectChangedListener<Post> onObjectChangedListener) {
+        ValueEventListener valueEventListener = ApplicationHelper.getDatabaseHelper().getPost(postId, onObjectChangedListener);
+        addListenerToMap(context, valueEventListener);
+    }
+
+    public void getCommentsList(Context context, String postId, OnDataChangedListener<Comment> onDataChangedListener) {
+        ValueEventListener valueEventListener = ApplicationHelper.getDatabaseHelper().getCommentsList(postId, onDataChangedListener);
+        addListenerToMap(context, valueEventListener);
     }
 
     public void createPostWithImage(Uri imageUri, final OnPostCreatedListener onPostCreatedListener, final Post post) {
