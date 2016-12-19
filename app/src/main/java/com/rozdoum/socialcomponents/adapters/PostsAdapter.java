@@ -61,8 +61,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             super(view);
 
             postImageView = (ImageView) view.findViewById(R.id.postImageView);
-            likeCounterTextView = (TextView) convertView.findViewById(R.id.likesCountTextView);
-            commentsCountTextView = (TextView) convertView.findViewById(R.id.commentsCountTextView);
+            likeCounterTextView = (TextView) view.findViewById(R.id.likesCountTextView);
+            commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
             titleTextView = (TextView) view.findViewById(R.id.titleTextView);
             detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
 
