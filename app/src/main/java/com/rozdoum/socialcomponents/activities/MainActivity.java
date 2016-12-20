@@ -40,6 +40,7 @@ public class MainActivity extends BaseActivity {
 
     private PostsAdapter postsAdapter;
     private RecyclerView recyclerView;
+    private FloatingActionButton floatingActionButton;
 
     private FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
@@ -78,18 +79,16 @@ public class MainActivity extends BaseActivity {
 
     private void initContentView() {
         if (recyclerView == null) {
-            FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
+            floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
 
             if (floatingActionButton != null) {
                 floatingActionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ProfileStatus profileStatus = profileManager.checkProfile();
-
-                        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                            openCreatePostActivity();
+                        if (hasInternetConnection()) {
+                            addPostClickAction();
                         } else {
-                            doAuthorization(profileStatus);
+                            showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
                         }
                     }
                 });
@@ -112,6 +111,20 @@ public class MainActivity extends BaseActivity {
             recyclerView.setAdapter(postsAdapter);
             recyclerView.setAdapter(postsAdapter);
             postsAdapter.loadFirstPage();
+        }
+    }
+
+    public void showFloatButtonRelatedSnackBar(int messageId) {
+        showSnackBar(floatingActionButton, messageId);
+    }
+
+    private void addPostClickAction() {
+        ProfileStatus profileStatus = profileManager.checkProfile();
+
+        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+            openCreatePostActivity();
+        } else {
+            doAuthorization(profileStatus);
         }
     }
 

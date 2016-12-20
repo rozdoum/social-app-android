@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.activities.BaseActivity;
+import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -33,24 +35,33 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<Post> postList = new LinkedList<>();
     private ImageUtil imageUtil;
     private OnItemClickListener onItemClickListener;
-    private Activity activity;
+    private MainActivity activity;
     private boolean isLoading = false;
     private boolean isMoreDataAvailable = true;
     private SwipeRefreshLayout swipeContainer;
     private ProfileManager profileManager;
 
-    public PostsAdapter(Activity activity, SwipeRefreshLayout swipeContainer) {
+    public PostsAdapter(final MainActivity activity, SwipeRefreshLayout swipeContainer) {
         this.activity = activity;
         this.swipeContainer = swipeContainer;
         imageUtil = ImageUtil.getInstance(activity.getApplicationContext());
         profileManager = ProfileManager.getInstance(activity.getApplicationContext());
 
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        this.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadFirstPage();
+                onRefreshAction();
             }
         });
+    }
+
+    private void onRefreshAction() {
+        if (activity.hasInternetConnection()) {
+            loadFirstPage();
+        } else {
+            swipeContainer.setRefreshing(false);
+            activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
+        }
     }
 
     private class PostViewHolder extends RecyclerView.ViewHolder {
@@ -189,6 +200,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     private void loadNext(final long nextItemCreatedDate) {
+        if (!activity.hasInternetConnection()) {
+            activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
+            hideProgress();
+            return;
+        }
+
         OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
             @Override
             public void onListChanged(List<Post> list) {

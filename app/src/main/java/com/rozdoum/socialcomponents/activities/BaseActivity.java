@@ -93,6 +93,11 @@ public class BaseActivity extends AppCompatActivity {
         snackbar.show();
     }
 
+    public void showSnackBar(View view, int messageId) {
+        Snackbar snackbar = Snackbar.make(view, messageId, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
     public void showWarningDialog(int messageId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(messageId);
@@ -100,16 +105,19 @@ public class BaseActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public static boolean hasInternetConnection(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public boolean hasInternetConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    public void checkInternetConnection() {
-        if (!hasInternetConnection(this)) {
-            showWarningDialog(R.string.error_internet_unavailable);
+    public boolean checkInternetConnection() {
+        boolean hasInternetConnection = hasInternetConnection();
+        if (!hasInternetConnection) {
+            showWarningDialog(R.string.internet_connection_failed);
         }
+
+        return hasInternetConnection;
     }
 
     @Override

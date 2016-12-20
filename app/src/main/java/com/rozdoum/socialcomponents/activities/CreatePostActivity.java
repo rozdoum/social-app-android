@@ -143,7 +143,12 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.post:
-                attemptCreatePost();
+                if (hasInternetConnection()) {
+                    attemptCreatePost();
+                } else {
+                    showSnackBar(R.string.internet_connection_failed);
+                }
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
