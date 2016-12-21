@@ -131,7 +131,7 @@
                     android:layout_height="wrap_content"
                     android:padding="@dimen/intrinsic_padding"
                     android:gravity="center"
-                    android:text="@string/error_internet_unavailable"
+                    android:text="@string/internet_connection_failed"
                     android:visibility="gone" />
 
             </RelativeLayout>
