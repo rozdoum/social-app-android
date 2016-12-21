@@ -3,6 +3,7 @@ package com.rozdoum.socialcomponents.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -13,8 +14,12 @@ import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 
 public class RoundImage extends Drawable {
+    private final static float BORDER_WIDTH = 12; //px
+    private final static String BORDER_COLOR = "#ffffff";
+
     private final Bitmap mBitmap;
-    private final Paint mPaint;
+    private final Paint mPaintBitmap;
+    private final Paint mPaintBorder;
     private final RectF mRectF;
     private final int mBitmapWidth;
     private final int mBitmapHeight;
@@ -22,11 +27,17 @@ public class RoundImage extends Drawable {
     public RoundImage(Bitmap bitmap) {
         mBitmap = centerCropBitmap(bitmap);
         mRectF = new RectF();
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
+        mPaintBitmap = new Paint();
+        mPaintBitmap.setAntiAlias(true);
+        mPaintBitmap.setDither(true);
         final BitmapShader shader = new BitmapShader(mBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        mPaint.setShader(shader);
+        mPaintBitmap.setShader(shader);
+
+        mPaintBorder = new Paint();
+        mPaintBorder.setStyle(Paint.Style.STROKE);
+        mPaintBorder.setAntiAlias(true);
+        mPaintBorder.setColor(Color.parseColor(BORDER_COLOR));
+        mPaintBorder.setStrokeWidth(BORDER_WIDTH);
 
         mBitmapWidth = mBitmap.getWidth();
         mBitmapHeight = mBitmap.getHeight();
@@ -48,7 +59,10 @@ public class RoundImage extends Drawable {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawOval(mRectF, mPaint);
+        float borderRadius = mRectF.height() / 2 - BORDER_WIDTH / 2;
+        float bitmapRadius = mRectF.height() / 2 - BORDER_WIDTH;
+        canvas.drawCircle(mRectF.centerX(), mRectF.centerY(), bitmapRadius, mPaintBitmap);
+        canvas.drawCircle(mRectF.centerX(), mRectF.centerY(), borderRadius, mPaintBorder);
     }
 
     @Override
@@ -59,15 +73,15 @@ public class RoundImage extends Drawable {
 
     @Override
     public void setAlpha(int alpha) {
-        if (mPaint.getAlpha() != alpha) {
-            mPaint.setAlpha(alpha);
+        if (mPaintBitmap.getAlpha() != alpha) {
+            mPaintBitmap.setAlpha(alpha);
             invalidateSelf();
         }
     }
 
     @Override
     public void setColorFilter(ColorFilter cf) {
-        mPaint.setColorFilter(cf);
+        mPaintBitmap.setColorFilter(cf);
     }
 
     @Override
@@ -86,19 +100,19 @@ public class RoundImage extends Drawable {
     }
 
     public void setAntiAlias(boolean aa) {
-        mPaint.setAntiAlias(aa);
+        mPaintBitmap.setAntiAlias(aa);
         invalidateSelf();
     }
 
     @Override
     public void setFilterBitmap(boolean filter) {
-        mPaint.setFilterBitmap(filter);
+        mPaintBitmap.setFilterBitmap(filter);
         invalidateSelf();
     }
 
     @Override
     public void setDither(boolean dither) {
-        mPaint.setDither(dither);
+        mPaintBitmap.setDither(dither);
         invalidateSelf();
     }
 

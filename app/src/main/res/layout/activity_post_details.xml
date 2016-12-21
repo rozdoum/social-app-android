@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -16,21 +16,19 @@
             android:id="@+id/activity_post_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusableInTouchMode="true"
-            android:paddingLeft="@dimen/post_detail_screen_padding"
-            android:paddingRight="@dimen/post_detail_screen_padding"
-            android:paddingTop="@dimen/post_detail_screen_padding">
+            android:focusableInTouchMode="true">
 
             <RelativeLayout
                 android:id="@+id/imageContainer"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="@dimen/post_detail_image_height"
                 android:layout_alignParentTop="true">
 
                 <ImageView
                     android:id="@+id/postImageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
                     android:visibility="invisible" />
 
                 <ProgressBar
@@ -44,10 +42,14 @@
 
             <TextView
                 android:id="@+id/titleTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
                 android:layout_below="@+id/imageContainer"
                 android:layout_marginTop="@dimen/intrinsic_padding"
+                android:layout_toStartOf="@+id/authorImageView"
+                android:paddingLeft="@dimen/post_detail_screen_padding"
+                android:paddingRight="@dimen/post_detail_screen_padding"
                 android:text="Title"
                 android:textAppearance="@style/TextAppearance.Title" />
 
@@ -57,6 +59,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/titleTextView"
                 android:layout_marginTop="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/post_detail_screen_padding"
+                android:paddingRight="@dimen/post_detail_screen_padding"
                 android:text="description"
                 android:textAppearance="@style/TextAppearance.Second" />
 
@@ -65,7 +69,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/descriptionEditText"
-                android:layout_marginTop="@dimen/intrinsic_padding">
+                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/post_detail_screen_padding"
+                android:paddingRight="@dimen/post_detail_screen_padding">
 
                 <ImageView
                     android:id="@+id/likesImageView"
@@ -90,6 +96,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/likesContainer"
                 android:layout_marginTop="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/post_detail_screen_padding"
+                android:paddingRight="@dimen/post_detail_screen_padding"
                 android:text="Comments"
                 android:textColor="@android:color/black"
                 android:visibility="gone" />
@@ -100,16 +108,19 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/commentsLabel"
                 android:layout_marginTop="@dimen/intrinsic_padding"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/post_detail_screen_padding"
+                android:paddingRight="@dimen/post_detail_screen_padding" />
 
             <ImageView
                 android:id="@+id/authorImageView"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:padding="@dimen/intrinsic_padding"
-                android:scaleType="centerCrop"
-                android:layout_below="@+id/imageContainer"
-                android:layout_alignParentEnd="true" />
+                android:layout_width="@dimen/post_author_image_side"
+                android:layout_height="@dimen/post_author_image_side"
+                android:layout_alignTop="@+id/imageContainer"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="@dimen/post_author_image_margin"
+                android:layout_marginRight="@dimen/intrinsic_padding"
+                android:scaleType="centerInside" />
 
         </RelativeLayout>
     </ScrollView>

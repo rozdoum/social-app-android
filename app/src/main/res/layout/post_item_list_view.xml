@@ -27,7 +27,6 @@
                 android:id="@+id/postImageView"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_alignParentTop="true"
                 android:scaleType="centerCrop" />
 
             <RelativeLayout
@@ -35,13 +34,42 @@
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:id="@+id/countersContainer"
+                    android:id="@+id/textContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_toStartOf="@+id/authorImageView"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:padding="@dimen/intrinsic_padding">
+
+                    <TextView
+                        android:id="@+id/titleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.Title" />
+
+                    <TextView
+                        android:id="@+id/detailsTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:textAppearance="@style/TextAppearance.Second" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/countersContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textContainer"
+                    android:layout_toStartOf="@+id/authorImageView"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/intrinsic_padding"
+                    android:paddingLeft="@dimen/intrinsic_padding"
+                    android:paddingRight="@dimen/intrinsic_padding">
 
                     <TextView
                         android:id="@+id/likesCountTextView"
@@ -62,48 +90,14 @@
 
                 </LinearLayout>
 
-                <View
-                    android:id="@+id/divider"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/countersContainer"
-                    android:layout_toStartOf="@+id/authorImageView"
-                    android:background="@color/custom_divider_color" />
-
-                <LinearLayout
-                    android:id="@+id/textContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/divider"
-                    android:layout_toStartOf="@+id/authorImageView"
-                    android:orientation="vertical"
-                    android:padding="@dimen/intrinsic_padding">
-
-                    <TextView
-                        android:id="@+id/titleTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearance.Title" />
-
-                    <TextView
-                        android:id="@+id/detailsTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:textAppearance="@style/TextAppearance.Second" />
-
-                </LinearLayout>
-
                 <ImageView
                     android:id="@+id/authorImageView"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:padding="@dimen/intrinsic_padding"
-                    android:scaleType="centerCrop"
-                    android:layout_centerVertical="true"
+                    android:layout_width="@dimen/post_author_image_side"
+                    android:layout_height="@dimen/post_author_image_side"
+                    android:layout_margin="@dimen/intrinsic_padding"
                     android:layout_alignParentEnd="true"
-                    android:visibility="gone" />
+                    android:layout_centerVertical="true"
+                    android:scaleType="centerCrop" />
 
             </RelativeLayout>
 

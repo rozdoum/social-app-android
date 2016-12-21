@@ -17,4 +17,8 @@
 
     <dimen name="profile_photo_side">200dp</dimen>
 
+    <dimen name="post_detail_image_height">250dp</dimen>
+    <dimen name="post_author_image_side">80dp</dimen>
+    <dimen name="post_author_image_margin">210dp</dimen> <!-- (post_detail_image_height - post_author_image_side / 2), for centering by post image bottom line-->
+
 </resources>
