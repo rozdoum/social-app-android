@@ -1,13 +1,17 @@
 package com.rozdoum.socialcomponents.adapters;
 
 import android.content.Context;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.rozdoum.socialcomponents.ExpandableTextView;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
@@ -51,16 +55,13 @@ public class CommentsAdapter {
     private View getView(Comment comment) {
         final View convertView = inflater.inflate(R.layout.comment_list_item, parent, false);
 
-        TextView nameTextView = (TextView) convertView.findViewById(R.id.nameTextView);
         ImageView avatarImageView = (ImageView) convertView.findViewById(R.id.avatarImageView);
-        TextView commentTextView = (TextView) convertView.findViewById(R.id.commentTextView);
+        ExpandableTextView commentTextView = (ExpandableTextView) convertView.findViewById(R.id.commentText);
         TextView dateTextView = (TextView) convertView.findViewById(R.id.dateTextView);
 
         String authorId = comment.getAuthorId();
         if (authorId != null)
-            profileManager.getProfile(authorId, createOnProfileChangeListener(nameTextView, avatarImageView));
-
-        commentTextView.setText(comment.getText());
+            profileManager.getProfile(authorId, createOnProfileChangeListener(commentTextView, avatarImageView, comment.getText()));
 
         long now = System.currentTimeMillis();
         CharSequence date = DateUtils.getRelativeTimeSpanString(comment.getCreatedDate(), now, DateUtils.MINUTE_IN_MILLIS);
@@ -69,16 +70,26 @@ public class CommentsAdapter {
         return convertView;
     }
 
-    private OnObjectChangedListener<Profile> createOnProfileChangeListener(final TextView nameTextView, final ImageView avatarImageView) {
+    private OnObjectChangedListener<Profile> createOnProfileChangeListener(final ExpandableTextView expandableTextView, final ImageView avatarImageView, final String comment) {
         return new OnObjectChangedListener<Profile>() {
             @Override
             public void onObjectChanged(Profile obj) {
-                nameTextView.setText(obj.getUsername());
+                String userName = obj.getUsername();
+                fillComment(userName, comment, expandableTextView);
+
                 if (obj.getPhotoUrl() != null) {
                     imageUtil.getImageThumb(obj.getPhotoUrl(), avatarImageView, R.drawable.ic_stub, R.drawable.ic_stub);
                 }
             }
         };
+    }
+
+    private void fillComment(String userName, String comment, ExpandableTextView commentTextView) {
+        Spannable contentString = new SpannableStringBuilder(userName + " " + comment);
+        contentString.setSpan(new ForegroundColorSpan(parent.getResources().getColor(R.color.highlight_text)),
+                0, userName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        commentTextView.setText(contentString);
     }
 
     public void setList(List<Comment> commentList) {

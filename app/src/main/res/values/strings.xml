@@ -68,6 +68,8 @@
     </string>
 
     <string name="profile_menu_item">Profile</string>
+    <string name="collapse_text_label">show less</string>
+    <string name="expand_text_label">show more</string>
 
 
 </resources>
