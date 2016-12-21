@@ -61,7 +61,8 @@ public class CommentsAdapter {
 
         String authorId = comment.getAuthorId();
         if (authorId != null)
-            profileManager.getProfileSingleValue(authorId, createOnProfileChangeListener(nameTextView, avatarImageView));
+            profileManager.getProfileSingleValue(authorId, createOnProfileChangeListener(commentTextView,
+                    avatarImageView, comment.getText()));
 
         commentTextView.setText(comment.getText());
 
