@@ -138,12 +138,13 @@
 
             <ImageView
                 android:id="@+id/authorImageView"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="@dimen/post_author_image_side"
+                android:layout_height="@dimen/post_author_image_side"
+                android:layout_alignTop="@+id/imageContainer"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@+id/imageContainer"
-                android:padding="@dimen/intrinsic_padding"
-                android:scaleType="centerCrop" />
+                android:layout_marginTop="@dimen/post_author_image_margin"
+                android:layout_marginRight="@dimen/intrinsic_padding"
+                android:scaleType="centerInside" />
 
         </RelativeLayout>
     </ScrollView>

@@ -218,8 +218,8 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onListChanged(List<Comment> list) {
                 attemptToLoadComments = false;
+                commentsProgressBar.setVisibility(View.GONE);
                 if (list.size() > 0) {
-                    commentsProgressBar.setVisibility(View.GONE);
                     commentsContainer.setVisibility(View.VISIBLE);
                     warningCommentsTextView.setVisibility(View.GONE);
                     commentsAdapter.setList(list);
