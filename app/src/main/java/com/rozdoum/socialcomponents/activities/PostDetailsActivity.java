@@ -69,9 +69,11 @@ public class PostDetailsActivity extends BaseActivity {
     private boolean isLiked = false;
     private boolean likeIconInitialized = false;
     private boolean attemptToLoadComments = false;
+    private CommentsAdapter commentsAdapter;
 
     private String postId;
 
+    private PostManager postManager;
     private ProfileManager profileManager;
     private ImageUtil imageUtil;
 
@@ -84,6 +86,7 @@ public class PostDetailsActivity extends BaseActivity {
         }
 
         profileManager = ProfileManager.getInstance(this);
+        postManager = PostManager.getInstance(this);
         imageUtil = ImageUtil.getInstance(this);
 
         postId = getIntent().getStringExtra(POST_ID_EXTRA_KEY);
@@ -104,12 +107,11 @@ public class PostDetailsActivity extends BaseActivity {
         commentsProgressBar = (ProgressBar) findViewById(R.id.commentsProgressBar);
         warningCommentsTextView = (TextView) findViewById(R.id.warningCommentsTextView);
 
+        commentsAdapter = new CommentsAdapter(commentsContainer);
         initLikes();
 
-        PostManager.getInstance(this).getPost(postId, createOnPostChangeListener());
-
-        CommentsAdapter commentsAdapter = new CommentsAdapter(commentsContainer);
-        ApplicationHelper.getDatabaseHelper().getCommentsList(postId, createOnCommentsChangedDataListener(commentsAdapter));
+        postManager.getPost(this, postId, createOnPostChangeListener());
+        postManager.getCommentsList(this, postId, createOnCommentsChangedDataListener(commentsAdapter));
 
         postImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +136,12 @@ public class PostDetailsActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        postManager.closeListeners(this);
     }
 
     private OnObjectChangedListener<Post> createOnPostChangeListener() {
@@ -162,7 +170,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void loadAuthorImage() {
         if (post.getAuthorId() != null) {
-            profileManager.getProfile(post.getAuthorId(), createProfileChangeListener());
+            profileManager.getProfile(this, post.getAuthorId(), createProfileChangeListener());
         }
     }
 

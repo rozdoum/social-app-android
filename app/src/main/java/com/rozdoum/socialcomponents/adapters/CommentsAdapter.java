@@ -61,7 +61,9 @@ public class CommentsAdapter {
 
         String authorId = comment.getAuthorId();
         if (authorId != null)
-            profileManager.getProfile(authorId, createOnProfileChangeListener(commentTextView, avatarImageView, comment.getText()));
+            profileManager.getProfileSingleValue(authorId, createOnProfileChangeListener(nameTextView, avatarImageView));
+
+        commentTextView.setText(comment.getText());
 
         long now = System.currentTimeMillis();
         CharSequence date = DateUtils.getRelativeTimeSpanString(comment.getCreatedDate(), now, DateUtils.MINUTE_IN_MILLIS);

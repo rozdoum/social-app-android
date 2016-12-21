@@ -45,7 +45,7 @@ public class EditProfileActivity extends PickImageActivity implements OnProfileC
 
         showProgress();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        ProfileManager.getInstance(this).getProfile(firebaseUser.getUid(), createOnProfileChangedListener());
+        ProfileManager.getInstance(this).getProfileSingleValue(firebaseUser.getUid(), createOnProfileChangedListener());
 
         Button createProfileButton = (Button) findViewById(R.id.createProfileButton);
         createProfileButton.setOnClickListener(new OnClickListener() {

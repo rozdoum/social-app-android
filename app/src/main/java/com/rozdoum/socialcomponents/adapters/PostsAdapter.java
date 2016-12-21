@@ -116,7 +116,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 if (!post.getAuthorId().equals(imageViewTag)) {
                     cancelLoadingAuthorImage(authorImageRequest);
                     authorImageView.setTag(post.getAuthorId());
-                    profileManager.getProfile(post.getAuthorId(), createProfileChangeListener(authorImageView));
+                    profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
                 }
             }
         }
