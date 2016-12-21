@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     public static final String POST_ID_EXTRA_KEY = "PostDetailsActivity.POST_ID_EXTRA_KEY";
     private static final int ANIMATION_DURATION = 300;
+    private static final int TIME_OUT_LOADING_COMMENTS = 30000;
 
     private EditText commentEditText;
     private Post post;
@@ -59,10 +61,14 @@ public class PostDetailsActivity extends BaseActivity {
     private ImageView postImageView;
     private TextView titleTextView;
     private TextView descriptionEditText;
+    private ProgressBar commentsProgressBar;
+    private LinearLayout commentsContainer;
+    private TextView warningCommentsTextView;
 
     private AnimationType likeAnimationType;
     private boolean isLiked = false;
     private boolean likeIconInitialized = false;
+    private boolean attemptToLoadComments = false;
 
     private String postId;
 
@@ -86,7 +92,7 @@ public class PostDetailsActivity extends BaseActivity {
         descriptionEditText = (TextView) findViewById(R.id.descriptionEditText);
         postImageView = (ImageView) findViewById(R.id.postImageView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        LinearLayout commentsContainer = (LinearLayout) findViewById(R.id.commentsContainer);
+        commentsContainer = (LinearLayout) findViewById(R.id.commentsContainer);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         commentsLabel = (TextView) findViewById(R.id.commentsLabel);
         commentEditText = (EditText) findViewById(R.id.commentEditText);
@@ -95,13 +101,15 @@ public class PostDetailsActivity extends BaseActivity {
         likesImageView = (ImageView) findViewById(R.id.likesImageView);
         authorImageView = (ImageView) findViewById(R.id.authorImageView);
         likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
+        commentsProgressBar = (ProgressBar) findViewById(R.id.commentsProgressBar);
+        warningCommentsTextView = (TextView) findViewById(R.id.warningCommentsTextView);
 
         initLikes();
 
         PostManager.getInstance(this).getPost(postId, createOnPostChangeListener());
 
         CommentsAdapter commentsAdapter = new CommentsAdapter(commentsContainer);
-        ApplicationHelper.getDatabaseHelper().getCommentsList(postId, createOnPostChangedDataListener(commentsAdapter));
+        ApplicationHelper.getDatabaseHelper().getCommentsList(postId, createOnCommentsChangedDataListener(commentsAdapter));
 
         postImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +168,12 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void updateCounters() {
         commentsLabel.setVisibility(View.VISIBLE);
-        commentsLabel.setText(String.format(getString(R.string.label_comments), post.getCommentsCount()));
+        long commentsCount = post.getCommentsCount();
+        commentsLabel.setText(String.format(getString(R.string.label_comments), commentsCount));
+
+        if (commentsCount == 0) {
+            commentsProgressBar.setVisibility(View.GONE);
+        }
 
         String likeTextFormat = getString(R.string.label_likes);
         likeCounterTextView.setText(String.format(likeTextFormat, post.getLikesCount()));
@@ -178,11 +191,31 @@ public class PostDetailsActivity extends BaseActivity {
         };
     }
 
-    private OnDataChangedListener<Comment> createOnPostChangedDataListener(final CommentsAdapter commentsAdapter) {
+    private OnDataChangedListener<Comment> createOnCommentsChangedDataListener(final CommentsAdapter commentsAdapter) {
+        attemptToLoadComments = true;
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (attemptToLoadComments) {
+                    commentsProgressBar.setVisibility(View.GONE);
+                    warningCommentsTextView.setVisibility(View.VISIBLE);
+                }
+            }
+        }, TIME_OUT_LOADING_COMMENTS);
+
+
         return new OnDataChangedListener<Comment>() {
             @Override
             public void onListChanged(List<Comment> list) {
-                commentsAdapter.setList(list);
+                attemptToLoadComments = false;
+                if (list.size() > 0) {
+                    commentsProgressBar.setVisibility(View.GONE);
+                    commentsContainer.setVisibility(View.VISIBLE);
+                    warningCommentsTextView.setVisibility(View.GONE);
+                    commentsAdapter.setList(list);
+                }
             }
         };
     }
