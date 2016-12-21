@@ -51,10 +51,10 @@ public class EditProfileActivity extends PickImageActivity implements OnProfileC
         createProfileButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (hasInternetConnection(EditProfileActivity.this)) {
+                if (hasInternetConnection()) {
                     attemptCreateProfile();
                 } else {
-                    showWarningDialog(R.string.error_internet_unavailable);
+                    showSnackBar(R.string.internet_connection_failed);
                 }
             }
         });

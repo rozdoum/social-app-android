@@ -113,12 +113,16 @@ public class PostDetailsActivity extends BaseActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProfileStatus profileStatus = ProfileManager.getInstance(PostDetailsActivity.this).checkProfile();
+                if (hasInternetConnection()) {
+                    ProfileStatus profileStatus = ProfileManager.getInstance(PostDetailsActivity.this).checkProfile();
 
-                if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                    sendComment();
+                    if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+                        sendComment();
+                    } else {
+                        doAuthorization(profileStatus);
+                    }
                 } else {
-                    doAuthorization(profileStatus);
+                    showSnackBar(R.string.internet_connection_failed);
                 }
             }
         });
@@ -217,12 +221,16 @@ public class PostDetailsActivity extends BaseActivity {
         likesContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProfileStatus profileStatus = ProfileManager.getInstance(PostDetailsActivity.this).checkProfile();
+                if (hasInternetConnection()) {
+                    ProfileStatus profileStatus = ProfileManager.getInstance(PostDetailsActivity.this).checkProfile();
 
-                if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                    likeClickAction();
+                    if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+                        likeClickAction();
+                    } else {
+                        doAuthorization(profileStatus);
+                    }
                 } else {
-                    doAuthorization(profileStatus);
+                    showSnackBar(R.string.internet_connection_failed);
                 }
             }
         });

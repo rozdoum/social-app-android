@@ -47,20 +47,15 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addNewPostFab"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/large_intrinsic_padding"
+        android:clickable="true"
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/addNewPostFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="@dimen/large_intrinsic_padding"
-            android:clickable="true"
-            android:src="@drawable/ic_add_white_48dp" />
+        android:src="@drawable/ic_add_white_48dp"
 
-    </RelativeLayout>
+        android:layout_gravity="bottom|right" />
 
 </android.support.design.widget.CoordinatorLayout>
