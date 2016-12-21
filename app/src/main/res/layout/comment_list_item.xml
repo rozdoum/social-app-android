@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="@dimen/intrinsic_padding"
@@ -11,39 +12,51 @@
         android:layout_height="50dp"
         android:src="@drawable/ic_stub" />
 
-    <TextView
-        android:id="@+id/nameTextView"
+    <com.rozdoum.socialcomponents.ExpandableTextView
+        android:id="@+id/commentText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/avatarImageView"
         android:paddingLeft="@dimen/intrinsic_padding"
         android:paddingRight="@dimen/intrinsic_padding"
-        android:text="Author name"
-        android:textColor="@color/highlight_text" />
+        expandableTextView:animDuration="200"
+        expandableTextView:collapseText="@string/collapse_text_label"
+        expandableTextView:expandText="@string/expand_text_label"
+        expandableTextView:maxCollapsedLines="3">
 
-    <TextView
-        android:id="@+id/commentTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/nameTextView"
-        android:layout_toEndOf="@+id/avatarImageView"
-        android:autoLink="web"
-        android:paddingLeft="@dimen/intrinsic_padding"
-        android:paddingRight="@dimen/intrinsic_padding"
-        android:textAppearance="@style/TextAppearance.Second.Black"
-        android:text="Comment" />
+        <TextView
+            android:id="@+id/expandable_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:ellipsize="end"
+            android:textAppearance="@style/TextAppearance.Second.Black" />
 
-    <TextView
-        android:id="@+id/dateTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/commentTextView"
-        android:layout_toEndOf="@+id/avatarImageView"
-        android:autoLink="web"
-        android:paddingLeft="@dimen/intrinsic_padding"
-        android:paddingRight="@dimen/intrinsic_padding"
-        android:textAppearance="@style/TextAppearance.Second"
-        android:text="day ago" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:autoLink="web"
+                android:text="day ago"
+                android:textAppearance="@style/TextAppearance.Second" />
+
+            <TextView
+                android:id="@+id/expand_collapse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:autoLink="web"
+                android:textAppearance="@style/TextAppearance.Second" />
+
+        </RelativeLayout>
+
+    </com.rozdoum.socialcomponents.ExpandableTextView>
 
 </RelativeLayout>
