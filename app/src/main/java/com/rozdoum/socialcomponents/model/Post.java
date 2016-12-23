@@ -22,6 +22,7 @@ public class Post implements Serializable, LazyLoading {
     private String authorId;
     private long commentsCount;
     private long likesCount;
+    private boolean hasComplain;
     private ItemType itemType;
 
     public Post() {
@@ -95,6 +96,14 @@ public class Post implements Serializable, LazyLoading {
 
     public void setLikesCount(long likesCount) {
         this.likesCount = likesCount;
+    }
+
+    public boolean isHasComplain() {
+        return hasComplain;
+    }
+
+    public void setHasComplain(boolean hasComplain) {
+        this.hasComplain = hasComplain;
     }
 
     public Map<String, Object> toMap() {

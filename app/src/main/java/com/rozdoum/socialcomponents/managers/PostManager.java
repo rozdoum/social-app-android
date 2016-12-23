@@ -91,4 +91,8 @@ public class PostManager extends FirebaseListenersManager {
         }
     }
 
+    public void addComplain(Post post) {
+        DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
+        databaseHelper.addComplainToPost(post);
+    }
 }
