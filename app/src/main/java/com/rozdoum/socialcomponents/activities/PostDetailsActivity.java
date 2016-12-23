@@ -193,7 +193,7 @@ public class PostDetailsActivity extends BaseActivity {
             public void onObjectChanged(Profile obj) {
                 if (obj.getPhotoUrl() != null) {
                     imageUtil.getImageThumb(obj.getPhotoUrl(),
-                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub, true);
+                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
                 }
             }
         };

@@ -7,4 +7,13 @@
         <attr name="expandText" format="string" />
         <attr name="collapseText" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="CircularImageView">
+        <attr name="border" format="boolean" />
+        <attr name="border_width" format="dimension" />
+        <attr name="border_color" format="color" />
+        <attr name="shadow" format="boolean" />
+        <attr name="shadow_color" format="color" />
+        <attr name="shadow_radius" format="float" />
+    </declare-styleable>
 </resources>

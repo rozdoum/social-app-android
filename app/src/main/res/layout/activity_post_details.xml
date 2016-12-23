@@ -136,7 +136,7 @@
 
             </RelativeLayout>
 
-            <ImageView
+            <com.rozdoum.socialcomponents.views.CircularImageView
                 android:id="@+id/authorImageView"
                 android:layout_width="@dimen/post_author_image_side"
                 android:layout_height="@dimen/post_author_image_side"
@@ -144,7 +144,10 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="@dimen/post_author_image_margin"
                 android:layout_marginRight="@dimen/intrinsic_padding"
-                android:scaleType="centerInside" />
+                app:border="false"
+                app:shadow="true"
+                app:shadow_radius="@dimen/circle_image_shadow_radius"
+                app:shadow_color="@color/circle_image_shadow" />
 
         </RelativeLayout>
     </ScrollView>

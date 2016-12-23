@@ -1,6 +1,5 @@
 package com.rozdoum.socialcomponents.adapters;
 
-import android.app.Activity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.BaseActivity;
 import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
@@ -248,7 +246,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             public void onObjectChanged(Profile obj) {
                 if (obj.getPhotoUrl() != null) {
                     imageUtil.getImageThumb(obj.getPhotoUrl(),
-                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub, true);
+                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
                 }
             }
         };
