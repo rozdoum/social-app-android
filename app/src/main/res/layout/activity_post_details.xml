@@ -69,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/descriptionEditText"
-                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:layout_marginTop="@dimen/large_intrinsic_padding"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/post_detail_screen_padding"
@@ -86,7 +86,7 @@
                         android:id="@+id/likesImageView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_favorite_24px_grey" />
+                        app:srcCompat="@drawable/ic_like" />
 
                     <TextView
                         android:id="@+id/likeCounterTextView"
@@ -111,7 +111,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/large_intrinsic_padding"
                     android:drawablePadding="@dimen/small_intrinsic_padding"
-                    android:drawableStart="@drawable/ic_insert_comment_black_24dp"
+                    android:drawableStart="@drawable/ic_time"
                     android:gravity="center_vertical" />
 
             </LinearLayout>

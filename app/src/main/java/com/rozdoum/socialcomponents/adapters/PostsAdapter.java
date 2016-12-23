@@ -2,6 +2,7 @@ package com.rozdoum.socialcomponents.adapters;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +69,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         TextView detailsTextView;
         TextView likeCounterTextView;
         TextView commentsCountTextView;
+        TextView dateTextView;
         ImageView authorImageView;
 
         ImageLoader.ImageContainer imageRequest;
@@ -79,10 +81,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             postImageView = (ImageView) view.findViewById(R.id.postImageView);
             likeCounterTextView = (TextView) view.findViewById(R.id.likesCountTextView);
             commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
+            dateTextView = (TextView) view.findViewById(R.id.dateTextView);
             titleTextView = (TextView) view.findViewById(R.id.titleTextView);
             detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
             authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
-
 
             if (onItemClickListener != null) {
                 view.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +101,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             detailsTextView.setText(post.getDescription());
             likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
             commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
+
+            long now = System.currentTimeMillis();
+            CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.HOUR_IN_MILLIS);
+            dateTextView.setText(date);
 
             if (imageRequest != null) {
                 imageRequest.cancelRequest();
