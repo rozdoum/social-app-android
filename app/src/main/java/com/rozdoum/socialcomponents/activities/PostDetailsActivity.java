@@ -6,12 +6,17 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
@@ -71,11 +76,17 @@ public class PostDetailsActivity extends BaseActivity {
     private boolean attemptToLoadComments = false;
     private CommentsAdapter commentsAdapter;
 
+    private MenuItem complainActionMenuItem;
+
     private String postId;
 
     private PostManager postManager;
     private ProfileManager profileManager;
     private ImageUtil imageUtil;
+
+    enum AnimationType {
+        COLOR_ANIM, BOUNCE_ANIM
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -402,7 +413,47 @@ public class PostDetailsActivity extends BaseActivity {
         }
     }
 
-    enum AnimationType {
-        COLOR_ANIM, BOUNCE_ANIM
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.post_details_menu, menu);
+        complainActionMenuItem = menu.findItem(R.id.complain_action);
+        if (post.isHasComplain()) {
+            complainActionMenuItem.setVisible(false);
+        }
+        return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.complain_action:
+                openComplainDialog();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void openComplainDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.add_complain)
+                .setMessage(R.string.complain_text)
+                .setNegativeButton(R.string.button_title_cancel, null)
+                .setPositiveButton(R.string.add_complain, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        addComplain();
+                    }
+                });
+
+        builder.create().show();
+    }
+
+    private void addComplain() {
+        postManager.addComplain(post);
+        complainActionMenuItem.setVisible(false);
+    }
+
 }

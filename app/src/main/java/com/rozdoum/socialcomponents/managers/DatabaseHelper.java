@@ -318,20 +318,25 @@ public class DatabaseHelper {
                 Object obj = objectMap.get(key);
                 if (obj instanceof Map) {
                     Map<String, Object> mapObj = (Map<String, Object>) obj;
-                    Post post = new Post();
-                    post.setId(key);
-                    post.setTitle((String) mapObj.get("title"));
-                    post.setDescription((String) mapObj.get("description"));
-                    post.setImagePath((String) mapObj.get("imagePath"));
-                    post.setAuthorId((String) mapObj.get("authorId"));
-                    post.setCreatedDate((long) mapObj.get("createdDate"));
-                    if (mapObj.containsKey("commentsCount")) {
-                        post.setCommentsCount((long) mapObj.get("commentsCount"));
+
+                    boolean hasComplain = mapObj.containsKey("hasComplain") && (boolean) mapObj.get("hasComplain");
+
+                    if (!hasComplain) {
+                        Post post = new Post();
+                        post.setId(key);
+                        post.setTitle((String) mapObj.get("title"));
+                        post.setDescription((String) mapObj.get("description"));
+                        post.setImagePath((String) mapObj.get("imagePath"));
+                        post.setAuthorId((String) mapObj.get("authorId"));
+                        post.setCreatedDate((long) mapObj.get("createdDate"));
+                        if (mapObj.containsKey("commentsCount")) {
+                            post.setCommentsCount((long) mapObj.get("commentsCount"));
+                        }
+                        if (mapObj.containsKey("likesCount")) {
+                            post.setLikesCount((long) mapObj.get("likesCount"));
+                        }
+                        list.add(post);
                     }
-                    if (mapObj.containsKey("likesCount")) {
-                        post.setLikesCount((long) mapObj.get("likesCount"));
-                    }
-                    list.add(post);
                 }
             }
 
@@ -427,6 +432,11 @@ public class DatabaseHelper {
 
             }
         });
+    }
+
+    public void addComplainToPost(Post post) {
+        DatabaseReference databaseReference = getDatabaseReference();
+        databaseReference.child("posts").child(post.getId()).child("hasComplain").setValue(true);
     }
 
 }
