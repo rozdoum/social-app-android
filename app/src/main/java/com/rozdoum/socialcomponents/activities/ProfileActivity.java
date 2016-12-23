@@ -58,15 +58,13 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         imageView = (ImageView) findViewById(R.id.imageView);
         nameEditText = (TextView) findViewById(R.id.nameEditText);
-
-        showProgress();
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        ProfileManager.getInstance(this).getProfileSingleValue(firebaseUser.getUid(), createOnProfileChangedListener());
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        loadProfile();
+
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
         }
@@ -80,6 +78,12 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             mGoogleApiClient.stopAutoManage(this);
             mGoogleApiClient.disconnect();
         }
+    }
+
+    private void loadProfile() {
+        showProgress();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        ProfileManager.getInstance(this).getProfileSingleValue(firebaseUser.getUid(), createOnProfileChangedListener());
     }
 
     private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
@@ -198,6 +202,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.editProfile:
+                imageView.setImageResource(R.drawable.ic_stub);
                 startEditProfileActivity();
                 return true;
             case R.id.signOut:
