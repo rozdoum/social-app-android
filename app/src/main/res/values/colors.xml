@@ -19,5 +19,6 @@
 
     <color name="like_icon_activated">@color/accent</color>
     <color name="like_icon_deactivated">#bdbdbd</color>
+    <color name="circle_image_shadow">#616161</color>
 
 </resources>
