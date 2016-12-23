@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="@dimen/intrinsic_padding"
     android:paddingTop="@dimen/intrinsic_padding">
 
-    <ImageView
+    <com.rozdoum.socialcomponents.views.CircularImageView
         android:id="@+id/avatarImageView"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_stub" />
+        android:src="@drawable/ic_stub"
+        app:shadow="false"
+        app:border="true"
+        app:border_width="0dp" />
 
     <com.rozdoum.socialcomponents.ExpandableTextView
         android:id="@+id/commentText"

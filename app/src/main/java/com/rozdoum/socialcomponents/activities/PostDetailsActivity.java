@@ -12,12 +12,15 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -56,6 +59,8 @@ public class PostDetailsActivity extends BaseActivity {
     private ImageView likesImageView;
     private TextView commentsLabel;
     private TextView likeCounterTextView;
+    private TextView commentsCountTextView;
+    private TextView dateTextView;
     private ImageView authorImageView;
     private ProgressBar progressBar;
     private ImageView postImageView;
@@ -99,11 +104,13 @@ public class PostDetailsActivity extends BaseActivity {
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         commentsLabel = (TextView) findViewById(R.id.commentsLabel);
         commentEditText = (EditText) findViewById(R.id.commentEditText);
-        ImageButton sendButton = (ImageButton) findViewById(R.id.sendButton);
+        final Button sendButton = (Button) findViewById(R.id.sendButton);
         likesContainer = (ViewGroup) findViewById(R.id.likesContainer);
         likesImageView = (ImageView) findViewById(R.id.likesImageView);
         authorImageView = (ImageView) findViewById(R.id.authorImageView);
         likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
+        commentsCountTextView = (TextView) findViewById(R.id.commentsCountTextView);
+        dateTextView = (TextView) findViewById(R.id.dateTextView);
         commentsProgressBar = (ProgressBar) findViewById(R.id.commentsProgressBar);
         warningCommentsTextView = (TextView) findViewById(R.id.warningCommentsTextView);
 
@@ -117,6 +124,23 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 openImageDetailScreen();
+            }
+        });
+
+        commentEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                sendButton.setEnabled(charSequence.length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
 
@@ -175,16 +199,19 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void updateCounters() {
-        commentsLabel.setVisibility(View.VISIBLE);
         long commentsCount = post.getCommentsCount();
-        commentsLabel.setText(String.format(getString(R.string.label_comments), commentsCount));
+        commentsCountTextView.setText(String.valueOf(commentsCount));
+        commentsLabel.setText(String.valueOf(commentsCount));
+        likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
+
+        long now = System.currentTimeMillis();
+        CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.HOUR_IN_MILLIS);
+        dateTextView.setText(date);
 
         if (commentsCount == 0) {
+            commentsLabel.setVisibility(View.VISIBLE);
             commentsProgressBar.setVisibility(View.GONE);
         }
-
-        String likeTextFormat = getString(R.string.label_likes);
-        likeCounterTextView.setText(String.format(likeTextFormat, post.getLikesCount()));
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener() {
@@ -239,7 +266,7 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onDataChanged(boolean exist) {
                 if (!likeIconInitialized) {
-                    likesImageView.setImageResource(exist ? R.drawable.ic_favorite_24px : R.drawable.ic_favorite_border_24px);
+                    likesImageView.setImageResource(exist ? R.drawable.ic_favorite_24px_red : R.drawable.ic_favorite_24px_grey);
                     likeIconInitialized = true;
                 }
 
@@ -350,8 +377,8 @@ public class PostDetailsActivity extends BaseActivity {
         bounceAnimY.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                likesImageView.setImageResource(!isLiked ? R.drawable.ic_favorite_24px
-                        : R.drawable.ic_favorite_border_24px);
+                likesImageView.setImageResource(!isLiked ? R.drawable.ic_favorite_24px_red
+                        : R.drawable.ic_favorite_24px_grey);
             }
         });
 
