@@ -3,8 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="post_detail_screen_padding">11dp</dimen>
-
     <dimen name="small_intrinsic_padding">4dp</dimen>
     <dimen name="intrinsic_padding">8dp</dimen>
     <dimen name="large_intrinsic_padding">16dp</dimen>
@@ -26,5 +24,5 @@
     <dimen name="post_list_item_author_image_margin">160dp
     </dimen> <!-- (post_list_item_image_height - post_list_item_author_image_side / 2), for centering by post image bottom line-->
 
-    <item name="circle_image_shadow_radius" format="float" type="dimen">12.0</item>
+    <item name="circle_image_shadow_radius" format="float" type="dimen">8.0</item>
 </resources>

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#795548</color>
-    <color name="primary_dark">#5D4037</color>
+    <color name="primary">#0097D3</color>
+    <color name="primary_dark">#005B7F</color>
     <color name="primary_light">#D7CCC8</color>
-    <color name="accent">#FF5252</color>
     <color name="dart_transparent">#81000000</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
@@ -11,14 +10,16 @@
     <color name="divider">#BDBDBD</color>
 
     <color name="custom_divider_color">#BDBDBD</color>
-    <color name="highlight_text">@color/primary</color>
+    <color name="highlight_text">#17a1d7</color>
 
     <color name="send_button_color">@color/primary</color>
 
     <color name="light_gray">#d8d6d5</color>
 
-    <color name="like_icon_activated">@color/accent</color>
-    <color name="like_icon_deactivated">#bdbdbd</color>
+    <color name="like_icon_activated">#FF5252</color>
+    <color name="icons_counter_color">#828181</color>
     <color name="circle_image_shadow">#616161</color>
 
+    <color name="send_comment_button_activated">#0097d3</color>
+    <color name="send_comment_button_deactivated">#7fcbe9</color>
 </resources>
