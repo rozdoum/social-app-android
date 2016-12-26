@@ -74,6 +74,7 @@ public class PostDetailsActivity extends BaseActivity {
     private boolean isLiked = false;
     private boolean likeIconInitialized = false;
     private boolean attemptToLoadComments = false;
+    private boolean updatingLikeCounter = true;
     private CommentsAdapter commentsAdapter;
 
     private MenuItem complainActionMenuItem;
@@ -196,6 +197,7 @@ public class PostDetailsActivity extends BaseActivity {
 
         String likeTextFormat = getString(R.string.label_likes);
         likeCounterTextView.setText(String.format(likeTextFormat, post.getLikesCount()));
+        updatingLikeCounter = false;
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener() {
@@ -252,9 +254,8 @@ public class PostDetailsActivity extends BaseActivity {
                 if (!likeIconInitialized) {
                     likesImageView.setImageResource(exist ? R.drawable.ic_favorite_24px : R.drawable.ic_favorite_border_24px);
                     likeIconInitialized = true;
+                    isLiked = exist;
                 }
-
-                isLiked = exist;
             }
         };
     }
@@ -307,12 +308,14 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void likeClickAction() {
-        startAnimateLikeButton(likeAnimationType);
+        if (!updatingLikeCounter) {
+            startAnimateLikeButton(likeAnimationType);
 
-        if (!isLiked) {
-            addLike();
-        } else {
-            removeLike();
+            if (!isLiked) {
+                addLike();
+            } else {
+                removeLike();
+            }
         }
     }
 
@@ -385,10 +388,16 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void addLike() {
+        updatingLikeCounter = true;
+        isLiked = true;
+        likeCounterTextView.setText(String.format(getString(R.string.label_likes), post.getLikesCount() + 1));
         ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId());
     }
 
     private void removeLike() {
+        updatingLikeCounter = true;
+        isLiked = false;
+        likeCounterTextView.setText(String.format(getString(R.string.label_likes), post.getLikesCount() - 1));
         ApplicationHelper.getDatabaseHelper().removeLike(post.getId());
     }
 
