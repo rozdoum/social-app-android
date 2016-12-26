@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -18,7 +19,7 @@
         card_view:cardElevation="3dp"
         card_view:cardUseCompatPadding="true">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -26,82 +27,82 @@
             <ImageView
                 android:id="@+id/postImageView"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="@dimen/post_list_item_image_height"
                 android:scaleType="centerCrop" />
 
-            <RelativeLayout
+            <com.rozdoum.socialcomponents.views.CircularImageView
+                android:id="@+id/authorImageView"
+                android:layout_width="@dimen/post_list_item_author_image_side"
+                android:layout_height="@dimen/post_list_item_author_image_side"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@+id/postImageView"
+                android:layout_marginRight="@dimen/intrinsic_padding"
+                android:layout_marginTop="@dimen/post_list_item_author_image_margin"
+                app:border="false"
+                app:shadow="true"
+                app:shadow_radius="@dimen/circle_image_shadow_radius"
+                app:shadow_color="@color/circle_image_shadow" />
+
+            <LinearLayout
+                android:id="@+id/textContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/intrinsic_padding"
+                android:layout_below="@+id/postImageView"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/authorImageView"
+                android:layout_alignEnd="@+id/countersContainer">
 
-                <LinearLayout
-                    android:id="@+id/textContainer"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/titleTextView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_toStartOf="@+id/authorImageView"
-                    android:orientation="vertical"
-                    android:padding="@dimen/intrinsic_padding">
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.Title" />
 
-                    <TextView
-                        android:id="@+id/titleTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:textAppearance="@style/TextAppearance.Title" />
-
-                    <TextView
-                        android:id="@+id/detailsTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:textAppearance="@style/TextAppearance.Second" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/countersContainer"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/detailsTextView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/textContainer"
-                    android:layout_toStartOf="@+id/authorImageView"
-                    android:orientation="horizontal"
-                    android:paddingBottom="@dimen/intrinsic_padding"
-                    android:paddingLeft="@dimen/intrinsic_padding"
-                    android:paddingRight="@dimen/intrinsic_padding">
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textAppearance="@style/TextAppearance.Second" />
 
-                    <TextView
-                        android:id="@+id/likesCountTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawablePadding="@dimen/small_intrinsic_padding"
-                        android:drawableStart="@drawable/ic_favorite_border_24px"
-                        android:gravity="center_vertical" />
+            </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/commentsCountTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/large_intrinsic_padding"
-                        android:drawablePadding="@dimen/small_intrinsic_padding"
-                        android:drawableStart="@drawable/ic_insert_comment_black_24dp"
-                        android:gravity="center_vertical" />
+            <LinearLayout
+                android:id="@+id/countersContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textContainer"
+                android:layout_toStartOf="@+id/authorImageView"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/intrinsic_padding"
+                android:paddingRight="@dimen/intrinsic_padding">
 
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/likesCountTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/small_intrinsic_padding"
+                    android:drawableStart="@drawable/ic_favorite_border_24px"
+                    android:gravity="center_vertical" />
 
-                <ImageView
-                    android:id="@+id/authorImageView"
-                    android:layout_width="@dimen/post_author_image_side"
-                    android:layout_height="@dimen/post_author_image_side"
-                    android:layout_margin="@dimen/intrinsic_padding"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:scaleType="centerCrop" />
+                <TextView
+                    android:id="@+id/commentsCountTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/large_intrinsic_padding"
+                    android:drawablePadding="@dimen/small_intrinsic_padding"
+                    android:drawableStart="@drawable/ic_insert_comment_black_24dp"
+                    android:gravity="center_vertical" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </android.support.v7.widget.CardView>
 
