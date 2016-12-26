@@ -104,7 +104,6 @@ public class PostDetailsActivity extends BaseActivity {
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         commentsLabel = (TextView) findViewById(R.id.commentsLabel);
         commentEditText = (EditText) findViewById(R.id.commentEditText);
-        final Button sendButton = (Button) findViewById(R.id.sendButton);
         likesContainer = (ViewGroup) findViewById(R.id.likesContainer);
         likesImageView = (ImageView) findViewById(R.id.likesImageView);
         authorImageView = (ImageView) findViewById(R.id.authorImageView);
@@ -113,6 +112,8 @@ public class PostDetailsActivity extends BaseActivity {
         dateTextView = (TextView) findViewById(R.id.dateTextView);
         commentsProgressBar = (ProgressBar) findViewById(R.id.commentsProgressBar);
         warningCommentsTextView = (TextView) findViewById(R.id.warningCommentsTextView);
+
+        final Button sendButton = (Button) findViewById(R.id.sendButton);
 
         commentsAdapter = new CommentsAdapter(commentsContainer);
         initLikes();
@@ -281,7 +282,7 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onDataChanged(boolean exist) {
                 if (!likeIconInitialized) {
-                    likesImageView.setImageResource(exist ? R.drawable.ic_favorite_24px_red : R.drawable.ic_favorite_24px_grey);
+                    likesImageView.setImageResource(exist ? R.drawable.ic_like_active : R.drawable.ic_like);
                     likeIconInitialized = true;
                 }
 
@@ -392,8 +393,8 @@ public class PostDetailsActivity extends BaseActivity {
         bounceAnimY.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                likesImageView.setImageResource(!isLiked ? R.drawable.ic_favorite_24px_red
-                        : R.drawable.ic_favorite_24px_grey);
+                likesImageView.setImageResource(!isLiked ? R.drawable.ic_like_active
+                        : R.drawable.ic_like);
             }
         });
 

@@ -79,16 +79,14 @@
                 android:layout_below="@+id/textContainer"
                 android:layout_toStartOf="@+id/authorImageView"
                 android:orientation="horizontal"
-                android:paddingBottom="@dimen/intrinsic_padding"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding">
+                android:padding="@dimen/intrinsic_padding">
 
                 <TextView
                     android:id="@+id/likesCountTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="@dimen/small_intrinsic_padding"
-                    android:drawableStart="@drawable/ic_favorite_border_24px"
+                    android:drawableStart="@drawable/ic_like"
                     android:gravity="center_vertical" />
 
                 <TextView
@@ -97,7 +95,16 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/large_intrinsic_padding"
                     android:drawablePadding="@dimen/small_intrinsic_padding"
-                    android:drawableStart="@drawable/ic_insert_comment_black_24dp"
+                    android:drawableStart="@drawable/ic_comments"
+                    android:gravity="center_vertical" />
+
+                <TextView
+                    android:id="@+id/dateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/large_intrinsic_padding"
+                    android:drawablePadding="@dimen/small_intrinsic_padding"
+                    android:drawableStart="@drawable/ic_time"
                     android:gravity="center_vertical" />
 
             </LinearLayout>
