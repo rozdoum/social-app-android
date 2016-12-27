@@ -4,9 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,8 +28,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -38,10 +44,16 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     // UI references.
     private TextView nameEditText;
     private ImageView imageView;
+    private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private TextView postsCounterTextView;
+    private TextView postsLabelTextView;
 
     private FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
+    private FirebaseUser firebaseUser;
+
+    private PostsByUserAdapter postsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +65,16 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         }
 
         mAuth = FirebaseAuth.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         // Set up the login form.
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         imageView = (ImageView) findViewById(R.id.imageView);
         nameEditText = (TextView) findViewById(R.id.nameEditText);
+        postsCounterTextView = (TextView) findViewById(R.id.postsCounterTextView);
+        postsLabelTextView = (TextView) findViewById(R.id.postsLabelTextView);
+
+        loadPostsList();
     }
 
     @Override
@@ -80,9 +97,39 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         }
     }
 
+    private void loadPostsList() {
+        if (recyclerView == null) {
+
+            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            postsAdapter = new PostsByUserAdapter(this, firebaseUser.getUid());
+            postsAdapter.setOnItemClickListener(new PostsByUserAdapter.CallBack() {
+                @Override
+                public void onItemClick(Post post) {
+                    Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
+                    intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onPostsLoaded(int postsCount) {
+                    postsCounterTextView.setText(String.format(getString(R.string.posts_counter_format), postsCount));
+
+                    if (postsCount > 0) {
+                        postsLabelTextView.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(postsAdapter);
+            recyclerView.setNestedScrollingEnabled(false);
+            postsAdapter.loadPosts();
+        }
+    }
+
     private void loadProfile() {
         showProgress();
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         ProfileManager.getInstance(this).getProfileSingleValue(firebaseUser.getUid(), createOnProfileChangedListener());
     }
 

@@ -72,7 +72,6 @@ public class MainActivity extends BaseActivity {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setAdapter(postsAdapter);
-            recyclerView.setAdapter(postsAdapter);
             postsAdapter.loadFirstPage();
         }
     }
