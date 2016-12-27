@@ -76,5 +76,6 @@
         Nobody will see the post if you complain to it. You can\'t delete your complain.</string>
 
     <string name="send_comment_button_label">Send</string>
+    <string name="posted_by_label">Posted by:</string>
 
 </resources>

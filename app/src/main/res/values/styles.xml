@@ -29,6 +29,16 @@
         <item name="android:textColor">@color/secondary_text</item>
     </style>
 
+    <style name="TextAppearance.Label" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/third_text</item>
+    </style>
+
+    <style name="TextAppearance.Highlight" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/highlight_text</item>
+    </style>
+
     <style name="TextAppearance.Second.Black" parent="@android:style/TextAppearance">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@android:color/black</item>

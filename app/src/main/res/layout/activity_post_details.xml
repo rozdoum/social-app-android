@@ -54,10 +54,37 @@
                 android:textAppearance="@style/TextAppearance.Title" />
 
             <LinearLayout
+                android:id="@+id/authorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/titleTextView"
+                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/intrinsic_padding"
+                android:paddingRight="@dimen/intrinsic_padding">
+
+                <TextView
+                    android:id="@+id/authorLabelTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/intrinsic_padding"
+                    android:text="@string/posted_by_label"
+                    android:textAppearance="@style/TextAppearance.Label" />
+
+                <TextView
+                    android:id="@+id/authorTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Highlight" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/countersContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/titleTextView"
+                android:layout_below="@+id/authorContainer"
                 android:layout_marginTop="@dimen/large_intrinsic_padding"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -209,13 +236,13 @@
             android:id="@+id/sendButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:paddingLeft="@dimen/large_intrinsic_padding"
-            android:paddingRight="@dimen/large_intrinsic_padding"
             android:layout_gravity="center_vertical"
             android:layout_margin="@dimen/intrinsic_padding"
             android:background="@drawable/send_comment_button_bg"
             android:enabled="false"
+            android:minWidth="0dp"
+            android:paddingLeft="@dimen/large_intrinsic_padding"
+            android:paddingRight="@dimen/large_intrinsic_padding"
             android:text="@string/send_comment_button_label"
             android:textColor="@android:color/white" />
     </LinearLayout>
