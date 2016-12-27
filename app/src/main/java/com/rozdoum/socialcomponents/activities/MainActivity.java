@@ -64,7 +64,7 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
-                    intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
+                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
                     startActivity(intent);
                 }
             });
