@@ -40,6 +40,12 @@ public class MainActivity extends BaseActivity {
         initContentView();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        postsAdapter.updateSelectedPost();
+    }
+
     private void initContentView() {
         if (recyclerView == null) {
             floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);

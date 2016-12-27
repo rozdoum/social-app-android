@@ -39,6 +39,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private boolean isMoreDataAvailable = true;
     private SwipeRefreshLayout swipeContainer;
     private ProfileManager profileManager;
+    private OnObjectChangedListener<Post> onSelectedPostChangeListener;
+    private int selectedPostPosition = -1;
 
     public PostsAdapter(final MainActivity activity, SwipeRefreshLayout swipeContainer) {
         this.activity = activity;
@@ -57,10 +59,16 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private void onRefreshAction() {
         if (activity.hasInternetConnection()) {
             loadFirstPage();
+            cleanSelectedPostInformation();
         } else {
             swipeContainer.setRefreshing(false);
             activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
         }
+    }
+
+    private void cleanSelectedPostInformation() {
+        onSelectedPostChangeListener = null;
+        selectedPostPosition = -1;
     }
 
     private class PostViewHolder extends RecyclerView.ViewHolder {
@@ -90,7 +98,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onItemClickListener.onItemClick(getItemByPosition(getAdapterPosition()));
+                        selectedPostPosition = getAdapterPosition();
+                        onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
+                        onItemClickListener.onItemClick(getItemByPosition(selectedPostPosition));
+
                     }
                 });
             }
@@ -123,6 +134,13 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
                 }
             }
+        }
+    }
+
+    public void updateSelectedPost() {
+        if (onSelectedPostChangeListener != null && selectedPostPosition != -1) {
+            Post selectedPost = getItemByPosition(selectedPostPosition);
+            PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
         }
     }
 
@@ -254,6 +272,16 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     imageUtil.getImageThumb(obj.getPhotoUrl(),
                             authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
                 }
+            }
+        };
+    }
+
+    private OnObjectChangedListener<Post> createOnPostChangeListener(final int postPosition) {
+        return new OnObjectChangedListener<Post>() {
+            @Override
+            public void onObjectChanged(Post obj) {
+                postList.set(postPosition, obj);
+                notifyItemChanged(postPosition);
             }
         };
     }

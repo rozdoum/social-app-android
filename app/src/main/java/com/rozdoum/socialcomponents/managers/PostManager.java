@@ -57,6 +57,10 @@ public class PostManager extends FirebaseListenersManager {
         addListenerToMap(context, valueEventListener);
     }
 
+    public void getSinglePostValue(String postId, OnObjectChangedListener<Post> onObjectChangedListener) {
+        ApplicationHelper.getDatabaseHelper().getSinglePost(postId, onObjectChangedListener);
+    }
+
     public void getCommentsList(Context context, String postId, OnDataChangedListener<Comment> onDataChangedListener) {
         ValueEventListener valueEventListener = ApplicationHelper.getDatabaseHelper().getCommentsList(postId, onDataChangedListener);
         addListenerToMap(context, valueEventListener);
