@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -46,18 +48,6 @@ public class EditProfileActivity extends PickImageActivity implements OnProfileC
         showProgress();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         ProfileManager.getInstance(this).getProfileSingleValue(firebaseUser.getUid(), createOnProfileChangedListener());
-
-        Button createProfileButton = (Button) findViewById(R.id.createProfileButton);
-        createProfileButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (hasInternetConnection()) {
-                    attemptCreateProfile();
-                } else {
-                    showSnackBar(R.string.internet_connection_failed);
-                }
-            }
-        });
 
         imageView.setOnClickListener(new OnClickListener() {
             @Override
@@ -152,6 +142,29 @@ public class EditProfileActivity extends PickImageActivity implements OnProfileC
             finish();
         } else {
             showSnackBar(R.string.error_fail_update_profile);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.edit_profile, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.save:
+                if (hasInternetConnection()) {
+                    attemptCreateProfile();
+                } else {
+                    showSnackBar(R.string.internet_connection_failed);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
