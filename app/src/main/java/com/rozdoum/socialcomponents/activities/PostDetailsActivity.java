@@ -65,6 +65,7 @@ public class PostDetailsActivity extends BaseActivity {
     private TextView commentsLabel;
     private TextView likeCounterTextView;
     private TextView commentsCountTextView;
+    private TextView authorTextView;
     private TextView dateTextView;
     private ImageView authorImageView;
     private ProgressBar progressBar;
@@ -120,6 +121,7 @@ public class PostDetailsActivity extends BaseActivity {
         likesContainer = (ViewGroup) findViewById(R.id.likesContainer);
         likesImageView = (ImageView) findViewById(R.id.likesImageView);
         authorImageView = (ImageView) findViewById(R.id.authorImageView);
+        authorTextView = (TextView) findViewById(R.id.authorTextView);
         likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
         commentsCountTextView = (TextView) findViewById(R.id.commentsCountTextView);
         dateTextView = (TextView) findViewById(R.id.dateTextView);
@@ -252,6 +254,8 @@ public class PostDetailsActivity extends BaseActivity {
                     imageUtil.getImageThumb(obj.getPhotoUrl(),
                             authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
                 }
+
+                authorTextView.setText(obj.getUsername());
             }
         };
     }
