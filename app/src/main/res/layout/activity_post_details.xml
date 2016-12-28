@@ -140,6 +140,7 @@
                 android:layout_marginTop="@dimen/large_intrinsic_padding"
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding"
+                android:autoLink="all"
                 android:text="description"
                 android:textAppearance="@style/TextAppearance.Second" />
 
