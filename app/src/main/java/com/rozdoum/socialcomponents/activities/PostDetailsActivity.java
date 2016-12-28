@@ -438,14 +438,14 @@ public class PostDetailsActivity extends BaseActivity {
     private void addLike() {
         updatingLikeCounter = true;
         isLiked = true;
-        likeCounterTextView.setText(String.format(getString(R.string.label_likes), post.getLikesCount() + 1));
+        likeCounterTextView.setText(String.valueOf(post.getLikesCount() + 1));
         ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId());
     }
 
     private void removeLike() {
         updatingLikeCounter = true;
         isLiked = false;
-        likeCounterTextView.setText(String.format(getString(R.string.label_likes), post.getLikesCount() - 1));
+        likeCounterTextView.setText(String.valueOf(post.getLikesCount() - 1));
         ApplicationHelper.getDatabaseHelper().removeLike(post.getId());
     }
 

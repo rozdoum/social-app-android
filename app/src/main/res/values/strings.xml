@@ -31,13 +31,11 @@
     <string name="button_post_comment">Post comment</string>
 
     <string name="label_comments">Comments(%1$d):</string>
-    <string name="label_likes">%1$d likes</string>
 
     <string name="create_post_menu_label">Post</string>
     <string name="sign_out_menu_label">Sign out</string>
     <string name="edit_profile_menu_label">Edit profile</string>
     <string name="button_title_save">Save</string>
-
 
     <!-- Strings related to registration and login -->
     <string name="prompt_email">Email</string>
