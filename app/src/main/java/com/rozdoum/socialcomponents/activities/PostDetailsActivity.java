@@ -14,12 +14,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
@@ -53,7 +53,7 @@ import java.util.List;
 
 public class PostDetailsActivity extends BaseActivity {
 
-    public static final String POST_ID_EXTRA_KEY = "PostDetailsActivity.POST_ID_EXTRA_KEY";
+    public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
     private static final int ANIMATION_DURATION = 300;
     private static final int TIME_OUT_LOADING_COMMENTS = 30000;
 
@@ -106,7 +106,8 @@ public class PostDetailsActivity extends BaseActivity {
         postManager = PostManager.getInstance(this);
         imageUtil = ImageUtil.getInstance(this);
 
-        postId = getIntent().getStringExtra(POST_ID_EXTRA_KEY);
+        post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
+        postId = post.getId();
 
         titleTextView = (TextView) findViewById(R.id.titleTextView);
         descriptionEditText = (TextView) findViewById(R.id.descriptionEditText);
