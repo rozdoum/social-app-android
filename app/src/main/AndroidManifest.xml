@@ -51,6 +51,10 @@
         <activity
             android:name=".activities.EditProfileActivity"
             android:label="@string/title_activity_edit_profile" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="84e05e27c9fcba7e1de6a47e355a1aa247264a46" />
     </application>
 
 </manifest>
