@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
+import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.enums.ItemType;
@@ -109,7 +110,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         void bindData(Post post) {
             titleTextView.setText(post.getTitle());
-            detailsTextView.setText(post.getDescription());
+            detailsTextView.setText(decorateDescription(post.getDescription()));
             likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
             commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
@@ -135,6 +136,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             }
         }
+    }
+
+    private String decorateDescription(String description) {
+        int decoratedDescriptionLength = description.length() < Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST ?
+                description.length() : Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST;
+        return description.trim().substring(0, decoratedDescriptionLength).replace("\n", " ");
     }
 
     public void updateSelectedPost() {
