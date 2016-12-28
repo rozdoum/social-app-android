@@ -119,16 +119,17 @@ public abstract class PickImageActivity extends BaseActivity {
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Uri imageUri = CropImage.getPickImageResultUri(this, data);
 
-            this.imageUri = imageUri;
+            if (isImageFileValid(imageUri)) {
+                this.imageUri = imageUri;
+            }
+
             // For API >= 23 we need to check specifically that we have permissions to read external storage.
             if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
                 // request permissions and handle the result in onRequestPermissionsResult()
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
             } else {
                 // no permissions required or already grunted
-                if (isImageFileValid(imageUri)) {
-                    onImagePikedAction();
-                }
+                onImagePikedAction();
             }
         }
     }
