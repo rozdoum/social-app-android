@@ -5,8 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.android.volley.toolbox.ImageLoader;
-import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.adapters.holders.LoadViewHolder;
@@ -14,6 +12,7 @@ import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
 import java.util.LinkedList;
@@ -88,6 +87,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             @Override
             public void onItemClick(int position) {
                 if (onItemClickListener != null) {
+                    selectedPostPosition = position;
+                    onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
                     onItemClickListener.onItemClick(getItemByPosition(position));
                 }
             }
@@ -196,5 +197,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 notifyItemChanged(postPosition);
             }
         };
+    }
+
+    public void updateSelectedPost() {
+        if (onSelectedPostChangeListener != null && selectedPostPosition != -1) {
+            Post selectedPost = getItemByPosition(selectedPostPosition);
+            PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
+        }
     }
 }

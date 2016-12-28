@@ -81,6 +81,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     public void onStart() {
         super.onStart();
         loadProfile();
+        postsAdapter.updateSelectedPost();
 
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
@@ -106,7 +107,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 @Override
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
-                    intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
+                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
                     startActivity(intent);
                 }
 

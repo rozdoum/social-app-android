@@ -10,6 +10,7 @@ import com.rozdoum.socialcomponents.activities.BaseActivity;
 import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
 import java.util.LinkedList;
@@ -23,6 +24,8 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private CallBack callBack;
     private BaseActivity activity;
     private String userId;
+    private OnObjectChangedListener<Post> onSelectedPostChangeListener;
+    private int selectedPostPosition = -1;
 
     public PostsByUserAdapter(final BaseActivity activity, String userId) {
         this.activity = activity;
@@ -46,6 +49,8 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             @Override
             public void onItemClick(int position) {
                 if (callBack != null) {
+                    selectedPostPosition = position;
+                    onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
                     callBack.onItemClick(getItemByPosition(position));
                 }
             }
@@ -92,5 +97,22 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void onItemClick(Post post);
 
         void onPostsLoaded(int postsCount);
+    }
+
+    private OnObjectChangedListener<Post> createOnPostChangeListener(final int postPosition) {
+        return new OnObjectChangedListener<Post>() {
+            @Override
+            public void onObjectChanged(Post obj) {
+                postList.set(postPosition, obj);
+                notifyItemChanged(postPosition);
+            }
+        };
+    }
+
+    public void updateSelectedPost() {
+        if (onSelectedPostChangeListener != null && selectedPostPosition != -1) {
+            Post selectedPost = getItemByPosition(selectedPostPosition);
+            PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
+        }
     }
 }
