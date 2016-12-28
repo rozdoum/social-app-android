@@ -288,6 +288,25 @@ public class DatabaseHelper {
         });
     }
 
+    public void getPostListByUser(final OnDataChangedListener<Post> onDataChangedListener, String userId) {
+        DatabaseReference databaseReference = database.getReference("posts");
+        Query postsQuery;
+        postsQuery = databaseReference.orderByChild("authorId").equalTo(userId);
+
+        postsQuery.keepSynced(true);
+        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onDataChangedListener.onListChanged(parsePostList(dataSnapshot));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public ValueEventListener getPost(final String id, final OnObjectChangedListener<Post> listener) {
         DatabaseReference databaseReference = getDatabaseReference().child("posts").child(id);
         ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {

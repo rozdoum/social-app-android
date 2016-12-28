@@ -77,5 +77,7 @@
 
     <string name="send_comment_button_label">Send</string>
     <string name="posted_by_label">Posted by:</string>
+    <string name="posts_counter_format">%1$d posts</string>
+    <string name="posts_label">Posts:</string>
 
 </resources>

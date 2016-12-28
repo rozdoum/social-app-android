@@ -2,25 +2,19 @@ package com.rozdoum.socialcomponents.adapters;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.activities.MainActivity;
+import com.rozdoum.socialcomponents.adapters.holders.LoadViewHolder;
+import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
-import com.rozdoum.socialcomponents.model.Profile;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,28 +27,29 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static final String TAG = PostsAdapter.class.getSimpleName();
 
     private List<Post> postList = new LinkedList<>();
-    private ImageUtil imageUtil;
     private OnItemClickListener onItemClickListener;
     private MainActivity activity;
     private boolean isLoading = false;
     private boolean isMoreDataAvailable = true;
     private SwipeRefreshLayout swipeContainer;
-    private ProfileManager profileManager;
     private OnObjectChangedListener<Post> onSelectedPostChangeListener;
     private int selectedPostPosition = -1;
 
     public PostsAdapter(final MainActivity activity, SwipeRefreshLayout swipeContainer) {
         this.activity = activity;
         this.swipeContainer = swipeContainer;
-        imageUtil = ImageUtil.getInstance(activity.getApplicationContext());
-        profileManager = ProfileManager.getInstance(activity.getApplicationContext());
+        initRefreshLayout();
+    }
 
-        this.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                onRefreshAction();
-            }
-        });
+    private void initRefreshLayout() {
+        if (swipeContainer != null) {
+            this.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    onRefreshAction();
+                }
+            });
+        }
     }
 
     private void onRefreshAction() {
@@ -72,90 +67,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         selectedPostPosition = -1;
     }
 
-    private class PostViewHolder extends RecyclerView.ViewHolder {
-        ImageView postImageView;
-        TextView titleTextView;
-        TextView detailsTextView;
-        TextView likeCounterTextView;
-        TextView commentsCountTextView;
-        TextView dateTextView;
-        ImageView authorImageView;
-
-        ImageLoader.ImageContainer imageRequest;
-        ImageLoader.ImageContainer authorImageRequest;
-
-        PostViewHolder(View view) {
-            super(view);
-
-            postImageView = (ImageView) view.findViewById(R.id.postImageView);
-            likeCounterTextView = (TextView) view.findViewById(R.id.likesCountTextView);
-            commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
-            dateTextView = (TextView) view.findViewById(R.id.dateTextView);
-            titleTextView = (TextView) view.findViewById(R.id.titleTextView);
-            detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
-            authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
-
-            if (onItemClickListener != null) {
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        selectedPostPosition = getAdapterPosition();
-                        onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
-                        onItemClickListener.onItemClick(getItemByPosition(selectedPostPosition));
-
-                    }
-                });
-            }
-        }
-
-        void bindData(Post post) {
-            titleTextView.setText(post.getTitle());
-            detailsTextView.setText(decorateDescription(post.getDescription()));
-            likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
-            commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
-
-            long now = System.currentTimeMillis();
-            CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.HOUR_IN_MILLIS);
-            dateTextView.setText(date);
-
-            if (imageRequest != null) {
-                imageRequest.cancelRequest();
-            }
-
-            String imageUrl = post.getImagePath();
-            imageRequest = imageUtil.getImageThumb(imageUrl, postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
-
-            if (post.getAuthorId() != null) {
-                authorImageView.setVisibility(View.VISIBLE);
-                Object imageViewTag = authorImageView.getTag();
-
-                if (!post.getAuthorId().equals(imageViewTag)) {
-                    cancelLoadingAuthorImage(authorImageRequest);
-                    authorImageView.setTag(post.getAuthorId());
-                    profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
-                }
-            }
-        }
-    }
-
-    private String decorateDescription(String description) {
-        int decoratedDescriptionLength = description.length() < Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST ?
-                description.length() : Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST;
-        return description.trim().substring(0, decoratedDescriptionLength).replace("\n", " ");
-    }
-
-    public void updateSelectedPost() {
-        if (onSelectedPostChangeListener != null && selectedPostPosition != -1) {
-            Post selectedPost = getItemByPosition(selectedPostPosition);
-            PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
-        }
-    }
-
-    private class LoadViewHolder extends RecyclerView.ViewHolder {
-        LoadViewHolder(View itemView) {
-            super(itemView);
-        }
-    }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
@@ -165,10 +76,22 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == ItemType.ITEM.getTypeCode()) {
-            return new PostViewHolder(inflater.inflate(R.layout.post_item_list_view, parent, false));
+            return new PostViewHolder(inflater.inflate(R.layout.post_item_list_view, parent, false),
+                    createOnItemClickListener());
         } else {
             return new LoadViewHolder(inflater.inflate(R.layout.loading_view, parent, false));
         }
+    }
+
+    private PostViewHolder.OnItemClickListener createOnItemClickListener() {
+        return new PostViewHolder.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClick(getItemByPosition(position));
+                }
+            }
+        };
     }
 
     @Override
@@ -263,24 +186,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             postList.remove(postList.size() - 1);
             notifyItemRemoved(postList.size() - 1);
         }
-    }
-
-    private void cancelLoadingAuthorImage(ImageLoader.ImageContainer authorImageRequest) {
-        if (authorImageRequest != null) {
-            authorImageRequest.cancelRequest();
-        }
-    }
-
-    private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
-        return new OnObjectChangedListener<Profile>() {
-            @Override
-            public void onObjectChanged(Profile obj) {
-                if (obj.getPhotoUrl() != null) {
-                    imageUtil.getImageThumb(obj.getPhotoUrl(),
-                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
-                }
-            }
-        };
     }
 
     private OnObjectChangedListener<Post> createOnPostChangeListener(final int postPosition) {
