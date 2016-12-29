@@ -79,7 +79,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
         long now = System.currentTimeMillis();
-        CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.HOUR_IN_MILLIS);
+        CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.MINUTE_IN_MILLIS);
         dateTextView.setText(date);
 
         if (imageRequest != null) {
