@@ -128,6 +128,8 @@ public abstract class PickImageActivity extends BaseActivity {
                 // no permissions required or already grunted
                 if (isImageFileValid(imageUri)) {
                     onImagePikedAction();
+                } else {
+                    this.imageUri = null;
                 }
             }
         }
