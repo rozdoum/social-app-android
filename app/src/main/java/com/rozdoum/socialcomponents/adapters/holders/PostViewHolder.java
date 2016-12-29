@@ -28,6 +28,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private TextView titleTextView;
     private TextView detailsTextView;
     private TextView likeCounterTextView;
+    private ImageView likesImageView;
     private TextView commentsCountTextView;
     private TextView dateTextView;
     private ImageView authorImageView;
@@ -51,7 +52,8 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         this.isAuthorNeeded = isAuthorNeeded;
 
         postImageView = (ImageView) view.findViewById(R.id.postImageView);
-        likeCounterTextView = (TextView) view.findViewById(R.id.likesCountTextView);
+        likeCounterTextView = (TextView) view.findViewById(R.id.likeCountTextView);
+        likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
         commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
         dateTextView = (TextView) view.findViewById(R.id.dateTextView);
         titleTextView = (TextView) view.findViewById(R.id.titleTextView);
@@ -128,7 +130,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         return new OnObjectExistListener<Like>() {
             @Override
             public void onDataChanged(boolean exist) {
-                likeCounterTextView.setCompoundDrawablesWithIntrinsicBounds(exist ? R.drawable.ic_like_active : R.drawable.ic_like, 0, 0, 0);
+                likesImageView.setImageResource(exist ? R.drawable.ic_like_active : R.drawable.ic_like);
             }
         };
     }
