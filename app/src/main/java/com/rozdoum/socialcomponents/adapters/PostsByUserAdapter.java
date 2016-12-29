@@ -71,8 +71,8 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return postList.get(position);
     }
 
-    private void addList(List<Post> list) {
-        this.postList.addAll(list);
+    private void setList(List<Post> list) {
+        postList = list;
         notifyDataSetChanged();
     }
 
@@ -85,7 +85,7 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
             @Override
             public void onListChanged(List<Post> list) {
-                addList(list);
+                setList(list);
                 callBack.onPostsLoaded(list.size());
             }
         };

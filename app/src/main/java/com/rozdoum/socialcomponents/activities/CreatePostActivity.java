@@ -17,11 +17,9 @@ import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
-import java.io.File;
-
 public class CreatePostActivity extends PickImageActivity implements OnPostCreatedListener {
-
     private static final String TAG = CreatePostActivity.class.getSimpleName();
+    public static final int CREATE_NEW_POST_REQUEST = 1;
 
     private ImageView imageView;
     private ProgressBar progressBar;
@@ -113,6 +111,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         Snackbar snackbar;
 
         if (success) {
+            setResult(RESULT_OK);
             snackbar = Snackbar
                     .make(findViewById(android.R.id.content), R.string.message_post_was_created, Snackbar.LENGTH_LONG)
                     .setCallback(new Snackbar.Callback() {
