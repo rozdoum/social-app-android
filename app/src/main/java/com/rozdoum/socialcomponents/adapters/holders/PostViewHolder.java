@@ -1,6 +1,7 @@
 package com.rozdoum.socialcomponents.adapters.holders;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import com.android.volley.toolbox.ImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -74,7 +76,8 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(Post post) {
         titleTextView.setText(post.getTitle());
-        detailsTextView.setText(post.getDescription());
+        String description = decorateDescription(post.getDescription());
+        detailsTextView.setText(Html.fromHtml(description));
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
@@ -110,6 +113,12 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         if (authorImageRequest != null) {
             authorImageRequest.cancelRequest();
         }
+    }
+
+    private String decorateDescription(String description) {
+        int decoratedDescriptionLength = description.length() < Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST ?
+                description.length() : Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST;
+        return description.trim().substring(0, decoratedDescriptionLength - 1).replaceAll("(\n|<br>)", " ");
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
