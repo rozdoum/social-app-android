@@ -311,7 +311,7 @@ public class PostDetailsActivity extends BaseActivity {
     private void initLikeButtonState() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
-            ApplicationHelper.getDatabaseHelper().hasCurrentUserLike(post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
+            postManager.hasCurrentUserLike(post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
         }
     }
 

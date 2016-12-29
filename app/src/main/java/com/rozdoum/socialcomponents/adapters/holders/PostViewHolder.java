@@ -7,9 +7,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -32,6 +37,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     private ImageUtil imageUtil;
     private ProfileManager profileManager;
+    private PostManager postManager;
 
     private boolean isAuthorNeeded;
 
@@ -54,6 +60,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
         imageUtil = ImageUtil.getInstance(view.getContext().getApplicationContext());
         profileManager = ProfileManager.getInstance(view.getContext().getApplicationContext());
+        postManager = PostManager.getInstance(view.getContext().getApplicationContext());
 
         if (onItemClickListener != null) {
             view.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +99,11 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
                 profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
             }
         }
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            postManager.hasCurrentUserLike(post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
+        }
     }
 
     private void cancelLoadingAuthorImage() {
@@ -108,6 +120,15 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
                     authorImageRequest = imageUtil.getImageThumb(obj.getPhotoUrl(),
                             authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
                 }
+            }
+        };
+    }
+
+    private OnObjectExistListener<Like> createOnLikeObjectExistListener() {
+        return new OnObjectExistListener<Like>() {
+            @Override
+            public void onDataChanged(boolean exist) {
+                likeCounterTextView.setCompoundDrawablesWithIntrinsicBounds(exist ? R.drawable.ic_like_active : R.drawable.ic_like, 0, 0, 0);
             }
         };
     }
