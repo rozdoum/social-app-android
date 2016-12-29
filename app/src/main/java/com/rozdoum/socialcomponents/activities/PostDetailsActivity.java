@@ -191,6 +191,12 @@ public class PostDetailsActivity extends BaseActivity {
         postManager.closeListeners(this);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getIntent().putExtra(POST_EXTRA_KEY, post);
+    }
+
     private OnObjectChangedListener<Post> createOnPostChangeListener() {
         return new OnObjectChangedListener<Post>() {
             @Override
