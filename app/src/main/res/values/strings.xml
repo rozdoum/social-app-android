@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SocialComponents</string>
+    <string name="app_name">Social App</string>
     <string name="label_create_post_activity">Create post</string>
     <string name="label_post_detail_activity">Post detail</string>
     <string name="label_image_detail_activity">Image</string>
