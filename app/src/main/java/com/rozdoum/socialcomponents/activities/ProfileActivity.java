@@ -238,6 +238,11 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         LogUtil.logDebug(TAG, "onConnectionFailed:" + connectionResult);
     }
 
+    private void openCreatePostActivity() {
+        Intent intent = new Intent(this, CreatePostActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -256,6 +261,12 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             case R.id.signOut:
                 signOut();
                 return true;
+            case R.id.createPost:
+                if (hasInternetConnection()) {
+                    openCreatePostActivity();
+                } else {
+                    showSnackBar(R.string.internet_connection_failed);
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }
