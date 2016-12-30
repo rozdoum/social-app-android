@@ -1,0 +1,14 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/base_login_button_corner_radius" />
+            <solid android:color="@color/facebook_button_color_pressed" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/base_login_button_corner_radius" />
+            <solid android:color="@color/facebook_button_color" />
+        </shape>
+    </item>
+</selector>
