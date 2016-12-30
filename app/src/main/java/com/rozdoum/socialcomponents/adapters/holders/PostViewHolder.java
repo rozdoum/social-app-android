@@ -1,7 +1,7 @@
 package com.rozdoum.socialcomponents.adapters.holders;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +17,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
+import com.rozdoum.socialcomponents.utils.FormatterUtil;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 /**
@@ -40,6 +41,8 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private ProfileManager profileManager;
     private PostManager postManager;
 
+    private Context context;
+
     private boolean isAuthorNeeded;
 
     public PostViewHolder(View view, final OnItemClickListener onItemClickListener) {
@@ -48,7 +51,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     public PostViewHolder(View view, final OnItemClickListener onItemClickListener, boolean isAuthorNeeded) {
         super(view);
-
+        this.context = view.getContext();
         this.isAuthorNeeded = isAuthorNeeded;
 
         postImageView = (ImageView) view.findViewById(R.id.postImageView);
@@ -60,9 +63,9 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
         authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
 
-        imageUtil = ImageUtil.getInstance(view.getContext().getApplicationContext());
-        profileManager = ProfileManager.getInstance(view.getContext().getApplicationContext());
-        postManager = PostManager.getInstance(view.getContext().getApplicationContext());
+        imageUtil = ImageUtil.getInstance(context.getApplicationContext());
+        profileManager = ProfileManager.getInstance(context.getApplicationContext());
+        postManager = PostManager.getInstance(context.getApplicationContext());
 
         if (onItemClickListener != null) {
             view.setOnClickListener(new View.OnClickListener() {
@@ -80,8 +83,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
-        long now = System.currentTimeMillis();
-        CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.HOUR_IN_MILLIS);
+        CharSequence date = FormatterUtil.getRelativeTimeSpanString(context, post.getCreatedDate());
         dateTextView.setText(date);
 
         if (imageRequest != null) {

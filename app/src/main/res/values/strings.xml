@@ -78,5 +78,6 @@
     <string name="posted_by_label">Posted by:</string>
     <string name="posts_counter_format">%1$d posts</string>
     <string name="posts_label">Posts:</string>
+    <string name="now_time_range">now</string>
 
 </resources>
