@@ -78,5 +78,6 @@
     <string name="posted_by_label">Posted by:</string>
     <string name="posts_counter_format">%1$d posts</string>
     <string name="posts_label">Posts:</string>
+    <string name="uncountable_time_label">now</string>
 
 </resources>

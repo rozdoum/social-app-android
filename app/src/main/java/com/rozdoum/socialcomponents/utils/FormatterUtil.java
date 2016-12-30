@@ -1,5 +1,10 @@
 package com.rozdoum.socialcomponents.utils;
 
+import android.content.Context;
+import android.text.format.DateUtils;
+
+import com.rozdoum.socialcomponents.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -12,6 +17,7 @@ public class FormatterUtil {
 
     public static String firebaseDBDate = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     public static String firebaseDBDay = "yyyy-MM-dd";
+    public static final long UNCOUNTABLE_TIME_LIMIT = DateUtils.MINUTE_IN_MILLIS * 5; // 5 minutes
 
     public static String dateTime = "yyyy-MM-dd HH:mm:ss";
 
@@ -31,5 +37,16 @@ public class FormatterUtil {
         SimpleDateFormat cbDateFormat = new SimpleDateFormat(dateTime);
         cbDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return cbDateFormat.format(date);
+    }
+
+    public static CharSequence getRelativeTimeSpanString(Context context, long time) {
+        long now = System.currentTimeMillis();
+        long range = Math.abs(now - time);
+
+        if (range < UNCOUNTABLE_TIME_LIMIT) {
+            return context.getString(R.string.uncountable_time_label);
+        }
+
+        return DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS);
     }
 }
