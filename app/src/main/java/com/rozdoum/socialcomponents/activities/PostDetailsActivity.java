@@ -486,7 +486,13 @@ public class PostDetailsActivity extends BaseActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.complain_action:
-                openComplainDialog();
+                ProfileStatus profileStatus = profileManager.checkProfile();
+
+                if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+                    openComplainDialog();
+                } else {
+                    doAuthorization(profileStatus);
+                }
                 return true;
         }
 
@@ -511,6 +517,7 @@ public class PostDetailsActivity extends BaseActivity {
     private void addComplain() {
         postManager.addComplain(post);
         complainActionMenuItem.setVisible(false);
+        showSnackBar(R.string.complain_sent);
     }
 
 }
