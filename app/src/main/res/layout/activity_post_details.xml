@@ -22,6 +22,7 @@
                 android:id="@+id/imageContainer"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/post_detail_image_height"
+                android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:layout_alignParentTop="true">
 
                 <ImageView
@@ -46,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/imageContainer"
-                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:layout_toStartOf="@+id/authorImageView"
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding"
@@ -59,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/titleTextView"
-                android:layout_marginTop="@dimen/intrinsic_padding"
+                android:layout_marginBottom="@dimen/large_intrinsic_padding"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding">
@@ -85,7 +86,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/authorContainer"
-                android:layout_marginTop="@dimen/large_intrinsic_padding"
+                android:layout_marginBottom="@dimen/large_intrinsic_padding"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/intrinsic_padding"
@@ -163,7 +164,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/countersContainer"
-                android:layout_marginTop="@dimen/large_intrinsic_padding"
+                android:layout_marginBottom="@dimen/large_intrinsic_padding"
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding"
                 android:autoLink="all"
@@ -175,7 +176,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/descriptionEditText"
-                android:layout_marginTop="@dimen/large_intrinsic_padding"
+                android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding"
                 android:text="Comments"
@@ -194,7 +195,6 @@
                     android:id="@+id/commentsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/intrinsic_padding"
                     android:orientation="vertical"
                     android:visibility="gone" />
 
