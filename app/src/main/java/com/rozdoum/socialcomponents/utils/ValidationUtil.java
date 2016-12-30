@@ -3,6 +3,8 @@ package com.rozdoum.socialcomponents.utils;
 import android.content.Context;
 import android.net.Uri;
 
+import com.rozdoum.socialcomponents.Constants;
+
 /**
  * Created by Kristina on 8/8/15.
  */
@@ -42,8 +44,8 @@ public class ValidationUtil {
         return false;
     }
 
-    public static boolean isPasswordValid(String password) {
-        return password.length() >= 6;
+    public static boolean isNameValid(String name) {
+        return name.length() <= Constants.Profile.MAX_NAME_LENGTH;
     }
 
     public static boolean isImage(Uri uri, Context context) {
