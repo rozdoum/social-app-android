@@ -79,16 +79,21 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         View focusView = null;
         boolean cancel = false;
 
-        if (imageUri == null) {
-            showWarningDialog(R.string.warning_empty_image);
+        if (TextUtils.isEmpty(description)) {
+            descriptionEditText.setError(getString(R.string.warning_empty_description));
+            focusView = descriptionEditText;
             cancel = true;
-        } else if (TextUtils.isEmpty(title)) {
+        }
+
+        if (TextUtils.isEmpty(title)) {
             titleEditText.setError(getString(R.string.warning_empty_title));
             focusView = titleEditText;
             cancel = true;
-        } else if (TextUtils.isEmpty(description)) {
-            descriptionEditText.setError(getString(R.string.warning_empty_description));
-            focusView = descriptionEditText;
+        }
+
+        if (imageUri == null) {
+            showWarningDialog(R.string.warning_empty_image);
+            focusView = imageView;
             cancel = true;
         }
 
