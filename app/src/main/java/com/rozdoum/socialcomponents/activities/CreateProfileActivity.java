@@ -22,6 +22,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
+import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
 public class CreateProfileActivity extends PickImageActivity implements OnProfileCreatedListener {
     private static final String TAG = CreateProfileActivity.class.getSimpleName();
@@ -111,6 +112,10 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
 
         if (TextUtils.isEmpty(name)) {
             nameEditText.setError(getString(R.string.error_field_required));
+            focusView = nameEditText;
+            cancel = true;
+        } else if (!ValidationUtil.isNameValid(name)) {
+            nameEditText.setError(getString(R.string.error_profile_name_length));
             focusView = nameEditText;
             cancel = true;
         }

@@ -47,6 +47,7 @@
     <string name="prompt_conf_password">Confirm password</string>
     <string name="action_create_profile">Continue</string>
     <string name="error_field_required">This field is required</string>
+    <string name="error_profile_name_length">Max length of the name should be less than 120 symbols</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_confirm_password">Wrong password confirmation</string>
     <string name="action_sign_in">Sign in</string>
