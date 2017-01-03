@@ -98,6 +98,16 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
+            postsAdapter.loadPosts();
+            setResult(RESULT_OK);
+        }
+    }
+
     private void loadPostsList() {
         if (recyclerView == null) {
 
@@ -240,7 +250,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     private void openCreatePostActivity() {
         Intent intent = new Intent(this, CreatePostActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
     }
 
     @Override

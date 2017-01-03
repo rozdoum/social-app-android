@@ -46,6 +46,15 @@ public class MainActivity extends BaseActivity {
         postsAdapter.updateSelectedPost();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
+            postsAdapter.loadFirstPage();
+        }
+    }
+
     private void initContentView() {
         if (recyclerView == null) {
             floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
@@ -98,12 +107,12 @@ public class MainActivity extends BaseActivity {
 
     private void openCreatePostActivity() {
         Intent intent = new Intent(this, CreatePostActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
     }
 
     private void openProfileActivity() {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
     }
 
     @Override
