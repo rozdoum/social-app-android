@@ -1,15 +1,22 @@
 package com.rozdoum.socialcomponents.adapters.holders;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -23,6 +30,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private TextView titleTextView;
     private TextView detailsTextView;
     private TextView likeCounterTextView;
+    private ImageView likesImageView;
     private TextView commentsCountTextView;
     private TextView dateTextView;
     private ImageView authorImageView;
@@ -32,6 +40,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     private ImageUtil imageUtil;
     private ProfileManager profileManager;
+    private PostManager postManager;
 
     private boolean isAuthorNeeded;
 
@@ -45,7 +54,8 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         this.isAuthorNeeded = isAuthorNeeded;
 
         postImageView = (ImageView) view.findViewById(R.id.postImageView);
-        likeCounterTextView = (TextView) view.findViewById(R.id.likesCountTextView);
+        likeCounterTextView = (TextView) view.findViewById(R.id.likeCountTextView);
+        likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
         commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
         dateTextView = (TextView) view.findViewById(R.id.dateTextView);
         titleTextView = (TextView) view.findViewById(R.id.titleTextView);
@@ -54,6 +64,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
         imageUtil = ImageUtil.getInstance(view.getContext().getApplicationContext());
         profileManager = ProfileManager.getInstance(view.getContext().getApplicationContext());
+        postManager = PostManager.getInstance(view.getContext().getApplicationContext());
 
         if (onItemClickListener != null) {
             view.setOnClickListener(new View.OnClickListener() {
@@ -67,12 +78,13 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(Post post) {
         titleTextView.setText(post.getTitle());
-        detailsTextView.setText(post.getDescription());
+        String description = decorateDescription(post.getDescription());
+        detailsTextView.setText(Html.fromHtml(description));
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
         long now = System.currentTimeMillis();
-        CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.HOUR_IN_MILLIS);
+        CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.MINUTE_IN_MILLIS);
         dateTextView.setText(date);
 
         if (imageRequest != null) {
@@ -92,12 +104,23 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
                 profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
             }
         }
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            postManager.hasCurrentUserLike(post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
+        }
     }
 
     private void cancelLoadingAuthorImage() {
         if (authorImageRequest != null) {
             authorImageRequest.cancelRequest();
         }
+    }
+
+    private String decorateDescription(String description) {
+        int decoratedDescriptionLength = description.length() < Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST ?
+                description.length() : Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST;
+        return description.trim().substring(0, decoratedDescriptionLength - 1).replaceAll("(\n|<br>)", " ");
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
@@ -108,6 +131,15 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
                     authorImageRequest = imageUtil.getImageThumb(obj.getPhotoUrl(),
                             authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
                 }
+            }
+        };
+    }
+
+    private OnObjectExistListener<Like> createOnLikeObjectExistListener() {
+        return new OnObjectExistListener<Like>() {
+            @Override
+            public void onDataChanged(boolean exist) {
+                likesImageView.setImageResource(exist ? R.drawable.ic_like_active : R.drawable.ic_like);
             }
         };
     }

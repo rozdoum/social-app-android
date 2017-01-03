@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.view.Menu;
@@ -211,7 +212,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void fillPostFields() {
         titleTextView.setText(post.getTitle());
-        descriptionEditText.setText(post.getDescription());
+        descriptionEditText.setText(Html.fromHtml(post.getDescription()));
         loadPostDetailsImage();
         loadAuthorImage();
     }
@@ -311,7 +312,7 @@ public class PostDetailsActivity extends BaseActivity {
     private void initLikeButtonState() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
-            ApplicationHelper.getDatabaseHelper().hasCurrentUserLike(post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
+            postManager.hasCurrentUserLike(post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
         }
     }
 
@@ -438,14 +439,14 @@ public class PostDetailsActivity extends BaseActivity {
     private void addLike() {
         updatingLikeCounter = true;
         isLiked = true;
-        likeCounterTextView.setText(String.format(getString(R.string.label_likes), post.getLikesCount() + 1));
+        likeCounterTextView.setText(String.valueOf(post.getLikesCount() + 1));
         ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId());
     }
 
     private void removeLike() {
         updatingLikeCounter = true;
         isLiked = false;
-        likeCounterTextView.setText(String.format(getString(R.string.label_likes), post.getLikesCount() - 1));
+        likeCounterTextView.setText(String.valueOf(post.getLikesCount() - 1));
         ApplicationHelper.getDatabaseHelper().removeLike(post.getId());
     }
 

@@ -98,6 +98,16 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
+            postsAdapter.loadPosts();
+            setResult(RESULT_OK);
+        }
+    }
+
     private void loadPostsList() {
         if (recyclerView == null) {
 
@@ -238,6 +248,11 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         LogUtil.logDebug(TAG, "onConnectionFailed:" + connectionResult);
     }
 
+    private void openCreatePostActivity() {
+        Intent intent = new Intent(this, CreatePostActivity.class);
+        startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -256,6 +271,12 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             case R.id.signOut:
                 signOut();
                 return true;
+            case R.id.createPost:
+                if (hasInternetConnection()) {
+                    openCreatePostActivity();
+                } else {
+                    showSnackBar(R.string.internet_connection_failed);
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }

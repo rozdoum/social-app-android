@@ -163,8 +163,12 @@ public abstract class PickImageActivity extends BaseActivity {
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                imageUri = result.getUri();
-                loadImageToImageView();
+                if (ValidationUtil.checkImageMinSize(result.getCropRect())) {
+                    imageUri = result.getUri();
+                    loadImageToImageView();
+                } else {
+                    showSnackBar(R.string.error_smaller_image);
+                }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 LogUtil.logError(TAG, "crop image error", result.getError());
                 showSnackBar(R.string.error_fail_crop_image);

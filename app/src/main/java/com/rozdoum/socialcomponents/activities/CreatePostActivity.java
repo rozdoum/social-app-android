@@ -16,12 +16,11 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
-
-import java.io.File;
+import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
 public class CreatePostActivity extends PickImageActivity implements OnPostCreatedListener {
-
     private static final String TAG = CreatePostActivity.class.getSimpleName();
+    public static final int CREATE_NEW_POST_REQUEST = 1;
 
     private ImageView imageView;
     private ProgressBar progressBar;
@@ -29,6 +28,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
     private EditText descriptionEditText;
 
     private PostManager postManager;
+    private boolean creatingPost = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +87,10 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             titleEditText.setError(getString(R.string.warning_empty_title));
             focusView = titleEditText;
             cancel = true;
+        } else if (!ValidationUtil.isPostTitleValid(title)) {
+            titleEditText.setError(getString(R.string.error_post_title_length));
+            focusView = titleEditText;
+            cancel = true;
         } else if (TextUtils.isEmpty(description)) {
             descriptionEditText.setError(getString(R.string.warning_empty_description));
             focusView = descriptionEditText;
@@ -94,6 +98,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         }
 
         if (!cancel) {
+            creatingPost = true;
             showProgress(R.string.message_creating_post);
             hideKeyboard();
 
@@ -113,6 +118,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         Snackbar snackbar;
 
         if (success) {
+            setResult(RESULT_OK);
             snackbar = Snackbar
                     .make(findViewById(android.R.id.content), R.string.message_post_was_created, Snackbar.LENGTH_LONG)
                     .setCallback(new Snackbar.Callback() {
@@ -124,6 +130,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
                     });
 
         } else {
+            creatingPost = false;
             snackbar = Snackbar.make(findViewById(android.R.id.content),
                     R.string.error_fail_create_post, Snackbar.LENGTH_LONG);
         }
@@ -143,10 +150,12 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.post:
-                if (hasInternetConnection()) {
-                    attemptCreatePost();
-                } else {
-                    showSnackBar(R.string.internet_connection_failed);
+                if (!creatingPost) {
+                    if (hasInternetConnection()) {
+                        attemptCreatePost();
+                    } else {
+                        showSnackBar(R.string.internet_connection_failed);
+                    }
                 }
 
                 return true;

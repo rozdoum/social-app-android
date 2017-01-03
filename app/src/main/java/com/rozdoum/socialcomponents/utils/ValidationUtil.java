@@ -1,7 +1,10 @@
 package com.rozdoum.socialcomponents.utils;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.net.Uri;
+
+import com.rozdoum.socialcomponents.Constants;
 
 /**
  * Created by Kristina on 8/8/15.
@@ -42,8 +45,12 @@ public class ValidationUtil {
         return false;
     }
 
-    public static boolean isPasswordValid(String password) {
-        return password.length() >= 6;
+    public static boolean isPostTitleValid(String name) {
+        return name.length() <= Constants.Post.MAX_POST_TITLE_LENGTH;
+    }
+
+    public static boolean isNameValid(String name) {
+        return name.length() <= Constants.Profile.MAX_NAME_LENGTH;
     }
 
     public static boolean isImage(Uri uri, Context context) {
@@ -85,4 +92,7 @@ public class ValidationUtil {
         return name.contains("@");
     }
 
+    public static boolean checkImageMinSize(Rect rect) {
+        return rect.height() > Constants.Profile.MIN_AVATAR_SIZE && rect.width() > Constants.Profile.MIN_AVATAR_SIZE;
+    }
 }

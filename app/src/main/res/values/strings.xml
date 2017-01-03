@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SocialComponents</string>
+    <string name="app_name">Social App</string>
     <string name="label_create_post_activity">Create post</string>
     <string name="label_post_detail_activity">Post detail</string>
     <string name="label_image_detail_activity">Image</string>
@@ -20,24 +20,25 @@
     <string name="error_fail_create_post">Fail to create post</string>
     <string name="error_fail_load_image">Fail to load image</string>
     <string name="error_fail_crop_image">Fail to crop image</string>
+    <string name="error_smaller_image">Image is too small. Required image size 100x100 px</string>
     <string name="error_incorrect_file_type">Incorrect file type</string>
     <string name="error_bigger_file">File size is bigger than 10Mb</string>
     <string name="message_creating_post">Creating post ..</string>
     <string name="warning_empty_image">Image is required</string>
     <string name="warning_empty_title">Title is required</string>
     <string name="warning_empty_description">Description is required</string>
+    <string name="error_post_title_length">Max length of the title should be less than 255 symbols</string>
 
     <string name="comment_text_hint">Enter your comment…</string>
     <string name="button_post_comment">Post comment</string>
 
-    <string name="label_comments">Comments(%1$d):</string>
-    <string name="label_likes">%1$d likes</string>
+    <string name="label_comments">Comments (%1$d):</string>
 
     <string name="create_post_menu_label">Post</string>
+    <string name="create_post_full_menu_label">Create post</string>
     <string name="sign_out_menu_label">Sign out</string>
     <string name="edit_profile_menu_label">Edit profile</string>
     <string name="button_title_save">Save</string>
-
 
     <!-- Strings related to registration and login -->
     <string name="prompt_email">Email</string>
@@ -46,6 +47,7 @@
     <string name="prompt_conf_password">Confirm password</string>
     <string name="action_create_profile">Continue</string>
     <string name="error_field_required">This field is required</string>
+    <string name="error_profile_name_length">Max length of the name should be less than 120 symbols</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_confirm_password">Wrong password confirmation</string>
     <string name="action_sign_in">Sign in</string>
