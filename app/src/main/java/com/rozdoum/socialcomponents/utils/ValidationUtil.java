@@ -45,6 +45,10 @@ public class ValidationUtil {
         return false;
     }
 
+    public static boolean isPostTitleValid(String name) {
+        return name.length() <= Constants.Post.MAX_POST_TITLE_LENGTH;
+    }
+
     public static boolean isPasswordValid(String password) {
         return password.length() >= 6;
     }
