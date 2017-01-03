@@ -1,6 +1,7 @@
 package com.rozdoum.socialcomponents.utils;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.net.Uri;
 
 import com.rozdoum.socialcomponents.Constants;
