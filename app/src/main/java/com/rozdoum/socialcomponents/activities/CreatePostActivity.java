@@ -16,6 +16,7 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
 public class CreatePostActivity extends PickImageActivity implements OnPostCreatedListener {
 
@@ -84,6 +85,10 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             cancel = true;
         } else if (TextUtils.isEmpty(title)) {
             titleEditText.setError(getString(R.string.warning_empty_title));
+            focusView = titleEditText;
+            cancel = true;
+        } else if (!ValidationUtil.isPostTitleValid(title)) {
+            titleEditText.setError(getString(R.string.error_post_title_length));
             focusView = titleEditText;
             cancel = true;
         } else if (TextUtils.isEmpty(description)) {
