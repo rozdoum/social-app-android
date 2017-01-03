@@ -20,6 +20,7 @@
     <string name="error_fail_create_post">Fail to create post</string>
     <string name="error_fail_load_image">Fail to load image</string>
     <string name="error_fail_crop_image">Fail to crop image</string>
+    <string name="error_smaller_image">Image is too small. Required image size 100x100 px</string>
     <string name="error_incorrect_file_type">Incorrect file type</string>
     <string name="error_bigger_file">File size is bigger than 10Mb</string>
     <string name="message_creating_post">Creating post ..</string>

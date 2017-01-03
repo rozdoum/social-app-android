@@ -1,7 +1,10 @@
 package com.rozdoum.socialcomponents.utils;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.net.Uri;
+
+import com.rozdoum.socialcomponents.Constants;
 
 /**
  * Created by Kristina on 8/8/15.
@@ -83,6 +86,11 @@ public class ValidationUtil {
 
     public static boolean containsInvalidSymbol(String name){
         return name.contains("@");
+    }
+
+
+    public static boolean checkImageMinSize(Rect rect) {
+        return rect.height() > Constants.Profile.MIN_AVATAR_SIZE && rect.width() > Constants.Profile.MIN_AVATAR_SIZE;
     }
 
 }
