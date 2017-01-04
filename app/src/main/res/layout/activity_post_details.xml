@@ -50,8 +50,8 @@
                 android:layout_below="@+id/imageContainer"
                 android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:layout_toStartOf="@+id/authorImageView"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding"
                 android:text="Title"
                 android:textAppearance="@style/TextAppearance.Title" />
 
@@ -63,8 +63,8 @@
                 android:layout_below="@+id/titleTextView"
                 android:layout_marginBottom="@dimen/large_intrinsic_padding"
                 android:orientation="horizontal"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding">
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding">
 
                 <TextView
                     android:id="@+id/authorLabelTextView"
@@ -82,16 +82,15 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/countersContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_below="@+id/authorContainer"
                 android:layout_marginBottom="@dimen/large_intrinsic_padding"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding">
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding">
 
                 <LinearLayout
                     android:id="@+id/likesContainer"
@@ -118,7 +117,8 @@
                     android:id="@+id/commentsCounterContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/large_intrinsic_padding"
+                    android:layout_alignStart="@+id/likesContainer"
+                    android:layout_marginStart="@dimen/post_counters_internal_padding"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -140,7 +140,8 @@
                     android:id="@+id/dateContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/large_intrinsic_padding"
+                    android:layout_alignStart="@+id/commentsCounterContainer"
+                    android:layout_marginStart="@dimen/post_counters_internal_padding"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -158,7 +159,7 @@
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/descriptionEditText"
@@ -166,8 +167,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/countersContainer"
                 android:layout_marginBottom="@dimen/large_intrinsic_padding"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding"
                 android:autoLink="all"
                 android:text="description"
                 android:textAppearance="@style/TextAppearance.Second" />
@@ -178,8 +179,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/descriptionEditText"
                 android:layout_marginBottom="@dimen/intrinsic_padding"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding"
                 android:text="Comments"
                 android:textColor="@android:color/black"
                 android:visibility="gone" />
@@ -189,8 +190,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/commentsLabel"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding">
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding">
 
                 <LinearLayout
                     android:id="@+id/commentsContainer"

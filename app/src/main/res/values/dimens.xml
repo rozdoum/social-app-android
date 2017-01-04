@@ -25,4 +25,6 @@
     </dimen> <!-- (post_list_item_image_height - post_list_item_author_image_side / 2), for centering by post image bottom line-->
 
     <item name="circle_image_shadow_radius" format="float" type="dimen">8.0</item>
+
+    <dimen name="post_counters_internal_padding">50dp</dimen>
 </resources>

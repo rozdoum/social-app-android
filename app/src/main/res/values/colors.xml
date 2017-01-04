@@ -10,7 +10,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
 
-    <color name="custom_divider_color">#BDBDBD</color>
+    <color name="custom_divider_color">#dfdfdf</color>
     <color name="highlight_text">#17a1d7</color>
 
     <color name="send_button_color">@color/primary</color>
@@ -19,7 +19,7 @@
 
     <color name="like_icon_activated">#FF5252</color>
     <color name="icons_counter_color">#828181</color>
-    <color name="circle_image_shadow">#616161</color>
+    <color name="circle_image_shadow">#8b8b8b</color>
 
     <color name="send_comment_button_activated">#0097d3</color>
     <color name="send_comment_button_deactivated">#7fcbe9</color>
