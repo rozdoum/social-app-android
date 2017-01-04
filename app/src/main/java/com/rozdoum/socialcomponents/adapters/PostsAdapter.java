@@ -9,6 +9,7 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.adapters.holders.LoadViewHolder;
 import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
+import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
@@ -82,8 +83,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    private PostViewHolder.OnItemClickListener createOnItemClickListener() {
-        return new PostViewHolder.OnItemClickListener() {
+    private PostViewHolder.OnClickListener createOnItemClickListener() {
+        return new PostViewHolder.OnClickListener() {
             @Override
             public void onItemClick(int position) {
                 if (onItemClickListener != null) {
@@ -91,6 +92,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
                     onItemClickListener.onItemClick(getItemByPosition(position));
                 }
+            }
+
+            @Override
+            public void onLikeClick(LikeController likeController, int position) {
+                Post post = getItemByPosition(position);
+                likeController.handleLikeClickAction(activity, post);
             }
         };
     }
