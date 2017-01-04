@@ -125,7 +125,7 @@ public class EditProfileActivity extends PickImageActivity implements OnProfileC
             // perform the user login attempt.
             showProgress();
             profile.setUsername(name);
-            ProfileManager.getInstance(this).createProfile(profile, imageUri, this);
+            ProfileManager.getInstance(this).createOrUpdateProfile(profile, imageUri, this);
         }
     }
 

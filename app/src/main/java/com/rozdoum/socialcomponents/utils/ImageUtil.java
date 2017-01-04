@@ -33,15 +33,18 @@ public class ImageUtil {
     private final RequestQueue mRequestQueue;
     private Context context;
     private ImageLoader imageLoader;
+    private Cache cache;
+    private LruBitmapCache lruCache;
 
     private ImageUtil(final Context context) {
         this.context = context;
 
-        Cache cache = new DiskBasedCache(ImagesDir.getTempImagesDir(context), MAX_CACHE_SIZE);
+        cache = new DiskBasedCache(ImagesDir.getTempImagesDir(context), MAX_CACHE_SIZE);
         Network network = new BasicNetwork(new HurlStack());
         mRequestQueue = new RequestQueue(cache, network, N_THREADS);
         mRequestQueue.start();
-        imageLoader = new ImageLoader(mRequestQueue, new LruBitmapCache(LruBitmapCache.getCacheSize(context)));
+        lruCache = new LruBitmapCache(LruBitmapCache.getCacheSize(context));
+        imageLoader = new ImageLoader(mRequestQueue, lruCache);
     }
 
     public static ImageUtil getInstance(Context context) {
@@ -145,6 +148,11 @@ public class ImageUtil {
         } else {
             return getDisplayMetrics().widthPixels;
         }
+    }
+
+    public void clearCache() {
+        cache.clear();
+        lruCache.evictAll();
     }
 
 }
