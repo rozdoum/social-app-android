@@ -4,6 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    android:focusable="true"
     android:background="@android:color/white">
 
     <ScrollView
@@ -16,8 +18,7 @@
         <RelativeLayout
             android:id="@+id/activity_post_details"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:focusableInTouchMode="true">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:id="@+id/imageContainer"
