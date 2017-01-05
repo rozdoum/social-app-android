@@ -120,7 +120,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private String decorateDescription(String description) {
         int decoratedDescriptionLength = description.length() < Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST ?
                 description.length() : Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST;
-        return description.trim().substring(0, decoratedDescriptionLength - 1).replaceAll("(\n|<br>)", " ");
+        return description.substring(0, decoratedDescriptionLength - 1).replaceAll("(\n|<br>)", " ").trim();
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
