@@ -4,18 +4,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -39,6 +37,8 @@ import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
+import java.util.Arrays;
+
 public class LoginActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int SIGN_IN_GOOGLE = 9001;
@@ -61,14 +61,6 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
 
         // Configure firebase auth
         mAuth = FirebaseAuth.getInstance();
-
-        findViewById(R.id.googleSignInButton).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signInWithGoogle();
-            }
-        });
-
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -95,12 +87,16 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
 
         // Configure Google Sign In
         mGoogleApiClient = GoogleApiHelper.createGoogleApiClient(this);
+        findViewById(R.id.googleSignInButton).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signInWithGoogle();
+            }
+        });
 
         // Configure Facebook  Sign In
         mCallbackManager = CallbackManager.Factory.create();
-        LoginButton loginButton = (LoginButton) findViewById(R.id.facebookSignInButton);
-        loginButton.setReadPermissions("email", "public_profile");
-        loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+        LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 LogUtil.logDebug(TAG, "facebook:onSuccess:" + loginResult);
@@ -117,6 +113,14 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
             @Override
             public void onError(FacebookException error) {
                 LogUtil.logError(TAG, "facebook:onError", error);
+                showSnackBar(error.getMessage());
+            }
+        });
+
+        findViewById(R.id.facebookSignInButton).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signInWithFacebook();
             }
         });
     }
@@ -162,6 +166,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
             } else {
                 LogUtil.logDebug(TAG, "SIGN_IN_GOOGLE failed :" + result);
                 // Google Sign In failed, update UI appropriately
+                hideProgress();
             }
         }
     }
@@ -202,8 +207,8 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             LogUtil.logError(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            showSnackBar(R.string.error_authentication);
+                            hideProgress();
                         }
                     }
                 });
@@ -218,15 +223,15 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                        LogUtil.logDebug(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            LogUtil.logError(TAG, "signInWithCredential", task.getException());
+                            showSnackBar(R.string.error_authentication);
+                            hideProgress();
                         }
                     }
                 });
@@ -237,12 +242,25 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         LogUtil.logDebug(TAG, "onConnectionFailed:" + connectionResult);
-        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+        showSnackBar(R.string.error_google_play_services);
+        hideProgress();
     }
 
     private void signInWithGoogle() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, SIGN_IN_GOOGLE);
+        if (hasInternetConnection()) {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, SIGN_IN_GOOGLE);
+        } else {
+            showSnackBar(R.string.internet_connection_failed);
+        }
+    }
+
+    private void signInWithFacebook() {
+        if (hasInternetConnection()) {
+            LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("email", "public_profile"));
+        } else {
+            showSnackBar(R.string.internet_connection_failed);
+        }
     }
 }
 

@@ -87,6 +87,12 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public void showSnackBar(String message) {
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
+                message, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
     public void showSnackBar(int messageId) {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
                 messageId, Snackbar.LENGTH_LONG);
