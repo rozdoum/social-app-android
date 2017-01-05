@@ -48,13 +48,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/imageContainer"
+                android:layout_below="@+id/authorImageView"
                 android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:layout_toStartOf="@+id/authorImageView"
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding"
                 android:text="Title"
-                android:textAppearance="@style/TextAppearance.Title" />
+                android:textAppearance="@style/TextAppearance.Title"
+                android:layout_alignEnd="@+id/authorImageView" />
 
             <LinearLayout
                 android:id="@+id/authorContainer"
