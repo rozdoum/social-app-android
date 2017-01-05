@@ -1,8 +1,8 @@
 package com.rozdoum.socialcomponents.adapters.holders;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,6 +19,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
+import com.rozdoum.socialcomponents.utils.FormatterUtil;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 /**
@@ -26,6 +27,7 @@ import com.rozdoum.socialcomponents.utils.ImageUtil;
  */
 
 public class PostViewHolder extends RecyclerView.ViewHolder {
+    private Context context;
     private ImageView postImageView;
     private TextView titleTextView;
     private TextView detailsTextView;
@@ -53,6 +55,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
         this.isAuthorNeeded = isAuthorNeeded;
 
+        this.context = view.getContext();
         postImageView = (ImageView) view.findViewById(R.id.postImageView);
         likeCounterTextView = (TextView) view.findViewById(R.id.likeCountTextView);
         likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
@@ -83,8 +86,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
-        long now = System.currentTimeMillis();
-        CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.MINUTE_IN_MILLIS);
+        CharSequence date = FormatterUtil.getRelativeTimeSpanStringShort(context, post.getCreatedDate());
         dateTextView.setText(date);
 
         if (imageRequest != null) {

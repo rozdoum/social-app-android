@@ -85,5 +85,11 @@
     <string name="posted_by_label">Posted by:</string>
     <string name="posts_counter_format">%1$d posts</string>
     <string name="posts_label">Posts:</string>
+    <string name="uncountable_time_label">now</string>
+
+    <string name="duration_minutes_shortest">%1$d m</string>
+    <string name="duration_hours_shortest">%1$d h</string>
+    <string name="duration_days_shortest">%1$d d</string>
+    <string name="duration_week_shortest">%1$d w</string>
 
 </resources>
