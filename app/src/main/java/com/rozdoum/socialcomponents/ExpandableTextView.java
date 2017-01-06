@@ -140,6 +140,10 @@ public class ExpandableTextView extends LinearLayout implements View.OnClickList
                 if (mListener != null) {
                     mListener.onExpandStateChanged(mTv, !mCollapsed);
                 }
+
+                if (mCollapsed) {
+                    mTv.setMaxLines(mMaxCollapsedLines);
+                }
             }
 
             @Override
@@ -192,7 +196,6 @@ public class ExpandableTextView extends LinearLayout implements View.OnClickList
         // button.
         if (mCollapsed) {
             mTv.setMaxLines(mMaxCollapsedLines);
-//            mTv.setEllipsize(TextUtils.TruncateAt.END);
         }
         mButton.setVisibility(View.VISIBLE);
 
@@ -316,10 +319,6 @@ public class ExpandableTextView extends LinearLayout implements View.OnClickList
 
             if (Float.compare(mAnimAlphaStart, 1.0f) != 0) {
                 applyAlphaAnimation(mTv, mAnimAlphaStart + interpolatedTime * (1.0f - mAnimAlphaStart));
-            }
-
-            if (mStartHeight > mEndHeight) {
-                mTv.setMaxLines(mMaxCollapsedLines);
             }
 
             mTargetView.getLayoutParams().height = newHeight;
