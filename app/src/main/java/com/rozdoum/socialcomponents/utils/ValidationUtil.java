@@ -93,6 +93,6 @@ public class ValidationUtil {
     }
 
     public static boolean checkImageMinSize(Rect rect) {
-        return rect.height() > Constants.Profile.MIN_AVATAR_SIZE && rect.width() > Constants.Profile.MIN_AVATAR_SIZE;
+        return rect.height() >= Constants.Profile.MIN_AVATAR_SIZE && rect.width() >= Constants.Profile.MIN_AVATAR_SIZE;
     }
 }
