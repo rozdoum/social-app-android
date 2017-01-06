@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <bitmap android:src="@drawable/login_background_image" />
+    </item>
+
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:endColor="#9916a0d7"
+                android:gradientRadius="320dp"
+                android:startColor="#9930ceee"
+                android:type="radial" />
+        </shape>
+    </item>
+</layer-list>
