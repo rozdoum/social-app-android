@@ -86,6 +86,6 @@
     <string name="posts_counter_format">%1$d posts</string>
     <string name="posts_label">Posts:</string>
     <string name="complain_sent">Complain was sent successfully</string>
-    <string name="uncountable_time_label">now</string>
+    <string name="now_time_range">now</string>
 
 </resources>
