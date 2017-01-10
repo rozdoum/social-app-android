@@ -18,7 +18,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,6 +49,7 @@ import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
+import com.rozdoum.socialcomponents.utils.FormatterUtil;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.List;
@@ -259,8 +259,7 @@ public class PostDetailsActivity extends BaseActivity {
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         updatingLikeCounter = false;
 
-        long now = System.currentTimeMillis();
-        CharSequence date = DateUtils.getRelativeTimeSpanString(post.getCreatedDate(), now, DateUtils.HOUR_IN_MILLIS);
+        CharSequence date = FormatterUtil.getRelativeTimeSpanString(this, post.getCreatedDate());
         dateTextView.setText(date);
 
         if (commentsCount == 0) {
