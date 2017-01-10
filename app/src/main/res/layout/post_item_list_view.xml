@@ -28,6 +28,7 @@
                 android:id="@+id/postImageView"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/post_list_item_image_height"
+                android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:scaleType="centerCrop" />
 
             <com.rozdoum.socialcomponents.views.CircularImageView
@@ -43,43 +44,45 @@
                 app:shadow_radius="@dimen/circle_image_shadow_radius"
                 app:shadow_color="@color/circle_image_shadow" />
 
-            <LinearLayout
-                android:id="@+id/textContainer"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/intrinsic_padding"
+                android:paddingRight="@dimen/intrinsic_padding"
+                android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:layout_below="@+id/postImageView"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/authorImageView"
-                android:layout_alignEnd="@+id/countersContainer">
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.Title" />
 
-                <TextView
-                    android:id="@+id/titleTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textAppearance="@style/TextAppearance.Title" />
-
-                <TextView
-                    android:id="@+id/detailsTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textAppearance="@style/TextAppearance.Second" />
-
-            </LinearLayout>
+            <TextView
+                android:id="@+id/detailsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/intrinsic_padding"
+                android:paddingRight="@dimen/intrinsic_padding"
+                android:layout_marginBottom="@dimen/intrinsic_padding"
+                android:layout_below="@+id/titleTextView"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/authorImageView"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="@style/TextAppearance.Second"
+                android:layout_alignParentEnd="true" />
 
             <LinearLayout
                 android:id="@+id/countersContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/textContainer"
+                android:layout_below="@+id/detailsTextView"
                 android:layout_toStartOf="@+id/authorImageView"
                 android:orientation="horizontal"
-                android:padding="@dimen/intrinsic_padding">
+                android:paddingLeft="@dimen/intrinsic_padding"
+                android:paddingRight="@dimen/intrinsic_padding"
+                android:layout_marginBottom="@dimen/intrinsic_padding">
 
                 <LinearLayout
                     android:id="@+id/likesContainer"
