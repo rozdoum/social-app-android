@@ -17,7 +17,7 @@ public class FormatterUtil {
 
     public static String firebaseDBDate = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     public static String firebaseDBDay = "yyyy-MM-dd";
-    public static final long UNCOUNTABLE_TIME_LIMIT = DateUtils.MINUTE_IN_MILLIS * 5; // 5 minutes
+    public static final long NOW_TIME_RANGE = DateUtils.MINUTE_IN_MILLIS * 5; // 5 minutes
 
     public static String dateTime = "yyyy-MM-dd HH:mm:ss";
 
@@ -43,8 +43,8 @@ public class FormatterUtil {
         long now = System.currentTimeMillis();
         long range = Math.abs(now - time);
 
-        if (range < UNCOUNTABLE_TIME_LIMIT) {
-            return context.getString(R.string.uncountable_time_label);
+        if (range < NOW_TIME_RANGE) {
+            return context.getString(R.string.now_time_range);
         }
 
         return DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS);
