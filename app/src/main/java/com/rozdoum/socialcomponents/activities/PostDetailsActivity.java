@@ -243,7 +243,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void loadPostDetailsImage() {
         String imageUrl = post.getImagePath();
-        imageUtil.getFullImage(imageUrl, postImageView, progressBar, R.drawable.ic_stub);
+        imageUtil.getFullImage(imageUrl, postImageView, R.drawable.ic_stub);
     }
 
     private void loadAuthorImage() {
