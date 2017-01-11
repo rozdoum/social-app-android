@@ -2,8 +2,6 @@ package com.rozdoum.socialcomponents.adapters.holders;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.format.DateUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -96,9 +94,10 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
         likeController = new LikeController(context, post.getId(), likeCounterTextView, likesImageView, true);
 
-        titleTextView.setText(post.getTitle());
-        String description = decorateDescription(post.getDescription());
-        detailsTextView.setText(Html.fromHtml(description));
+        String title = removeNewLinesDividers(post.getTitle());
+        titleTextView.setText(title);
+        String description = removeNewLinesDividers(post.getDescription());
+        detailsTextView.setText(description);
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
@@ -135,10 +134,10 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    private String decorateDescription(String description) {
-        int decoratedDescriptionLength = description.length() < Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST ?
-                description.length() : Constants.Post.MAX_DESCRIPTION_LENGTH_IN_LIST;
-        return description.substring(0, decoratedDescriptionLength - 1).replaceAll("(\n|<br>)", " ").trim();
+    private String removeNewLinesDividers(String text) {
+        int decoratedTextLength = text.length() < Constants.Post.MAX_TEXT_LENGTH_IN_LIST ?
+                text.length() : Constants.Post.MAX_TEXT_LENGTH_IN_LIST;
+        return text.substring(0, decoratedTextLength - 1).replaceAll("\n", " ").trim();
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {

@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -221,7 +220,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void fillPostFields() {
         titleTextView.setText(post.getTitle());
-        descriptionEditText.setText(Html.fromHtml(post.getDescription()));
+        descriptionEditText.setText(post.getDescription());
         loadPostDetailsImage();
         loadAuthorImage();
     }
