@@ -111,6 +111,13 @@ public class BaseActivity extends AppCompatActivity {
         builder.show();
     }
 
+    public void showWarningDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.button_ok, null);
+        builder.show();
+    }
+
     public boolean hasInternetConnection() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();

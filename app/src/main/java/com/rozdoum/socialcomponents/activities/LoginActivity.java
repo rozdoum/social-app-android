@@ -206,12 +206,23 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            LogUtil.logError(TAG, "signInWithCredential", task.getException());
-                            showSnackBar(R.string.error_authentication);
-                            hideProgress();
+                            handleAuthError(task);
                         }
                     }
                 });
+    }
+
+    private void handleAuthError(Task<AuthResult> task) {
+        Exception exception = task.getException();
+        LogUtil.logError(TAG, "signInWithCredential", exception);
+
+        if (exception != null) {
+            showWarningDialog(exception.getMessage());
+        } else {
+            showSnackBar(R.string.error_authentication);
+        }
+
+        hideProgress();
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
@@ -229,9 +240,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            LogUtil.logError(TAG, "signInWithCredential", task.getException());
-                            showSnackBar(R.string.error_authentication);
-                            hideProgress();
+                            handleAuthError(task);
                         }
                     }
                 });
