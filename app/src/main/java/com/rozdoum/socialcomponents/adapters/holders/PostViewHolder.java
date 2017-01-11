@@ -48,8 +48,6 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private ProfileManager profileManager;
     private PostManager postManager;
 
-    private Context context;
-
     private boolean isAuthorNeeded;
     private LikeController likeController;
 
