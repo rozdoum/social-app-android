@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.activities.BaseActivity;
 import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
+import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
@@ -44,8 +45,8 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return new PostViewHolder(view, createOnItemClickListener(), false);
     }
 
-    private PostViewHolder.OnItemClickListener createOnItemClickListener() {
-        return new PostViewHolder.OnItemClickListener() {
+    private PostViewHolder.OnClickListener createOnItemClickListener() {
+        return new PostViewHolder.OnClickListener() {
             @Override
             public void onItemClick(int position) {
                 if (callBack != null) {
@@ -53,6 +54,12 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
                     callBack.onItemClick(getItemByPosition(position));
                 }
+            }
+
+            @Override
+            public void onLikeClick(LikeController likeController, int position) {
+                Post post = getItemByPosition(position);
+                likeController.handleLikeClickAction(activity, post);
             }
         };
     }

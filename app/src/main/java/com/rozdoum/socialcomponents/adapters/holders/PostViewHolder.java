@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
@@ -28,6 +30,7 @@ import com.rozdoum.socialcomponents.utils.ImageUtil;
  */
 
 public class PostViewHolder extends RecyclerView.ViewHolder {
+    private Context context;
     private ImageView postImageView;
     private TextView titleTextView;
     private TextView detailsTextView;
@@ -36,6 +39,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private TextView commentsCountTextView;
     private TextView dateTextView;
     private ImageView authorImageView;
+    private ViewGroup likeViewGroup;
 
     private ImageLoader.ImageContainer imageRequest;
     private ImageLoader.ImageContainer authorImageRequest;
@@ -47,16 +51,18 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private Context context;
 
     private boolean isAuthorNeeded;
+    private LikeController likeController;
 
-    public PostViewHolder(View view, final OnItemClickListener onItemClickListener) {
-        this(view, onItemClickListener, true);
+    public PostViewHolder(View view, final OnClickListener onClickListener) {
+        this(view, onClickListener, true);
     }
 
-    public PostViewHolder(View view, final OnItemClickListener onItemClickListener, boolean isAuthorNeeded) {
+    public PostViewHolder(View view, final OnClickListener onClickListener, boolean isAuthorNeeded) {
         super(view);
         this.context = view.getContext();
         this.isAuthorNeeded = isAuthorNeeded;
 
+        this.context = view.getContext();
         postImageView = (ImageView) view.findViewById(R.id.postImageView);
         likeCounterTextView = (TextView) view.findViewById(R.id.likeCountTextView);
         likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
@@ -65,22 +71,33 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         titleTextView = (TextView) view.findViewById(R.id.titleTextView);
         detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
         authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
+        likeViewGroup = (ViewGroup) view.findViewById(R.id.likesContainer);
 
         imageUtil = ImageUtil.getInstance(context.getApplicationContext());
         profileManager = ProfileManager.getInstance(context.getApplicationContext());
         postManager = PostManager.getInstance(context.getApplicationContext());
 
-        if (onItemClickListener != null) {
+        if (onClickListener != null) {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onItemClickListener.onItemClick(getAdapterPosition());
+                    onClickListener.onItemClick(getAdapterPosition());
                 }
             });
         }
+
+        likeViewGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onClickListener.onLikeClick(likeController, getAdapterPosition());
+            }
+        });
     }
 
     public void bindData(Post post) {
+
+        likeController = new LikeController(context, post.getId(), likeCounterTextView, likesImageView, true);
+
         titleTextView.setText(post.getTitle());
         String description = decorateDescription(post.getDescription());
         detailsTextView.setText(Html.fromHtml(description));
@@ -142,12 +159,13 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         return new OnObjectExistListener<Like>() {
             @Override
             public void onDataChanged(boolean exist) {
-                likesImageView.setImageResource(exist ? R.drawable.ic_like_active : R.drawable.ic_like);
+                likeController.initLike(exist);
             }
         };
     }
 
-    public interface OnItemClickListener {
+    public interface OnClickListener {
         void onItemClick(int position);
+        void onLikeClick(LikeController likeController, int position);
     }
 }

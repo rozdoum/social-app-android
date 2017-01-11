@@ -1,15 +1,8 @@
 package com.rozdoum.socialcomponents.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,7 +17,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.BounceInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,6 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
+import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -57,7 +50,6 @@ import java.util.List;
 public class PostDetailsActivity extends BaseActivity {
 
     public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
-    private static final int ANIMATION_DURATION = 300;
     private static final int TIME_OUT_LOADING_COMMENTS = 30000;
 
     private EditText commentEditText;
@@ -79,11 +71,7 @@ public class PostDetailsActivity extends BaseActivity {
     private LinearLayout commentsContainer;
     private TextView warningCommentsTextView;
 
-    private AnimationType likeAnimationType;
-    private boolean isLiked = false;
-    private boolean likeIconInitialized = false;
     private boolean attemptToLoadComments = false;
-    private boolean updatingLikeCounter = true;
     private CommentsAdapter commentsAdapter;
 
     private MenuItem complainActionMenuItem;
@@ -93,10 +81,7 @@ public class PostDetailsActivity extends BaseActivity {
     private PostManager postManager;
     private ProfileManager profileManager;
     private ImageUtil imageUtil;
-
-    enum AnimationType {
-        COLOR_ANIM, BOUNCE_ANIM
-    }
+    private LikeController likeController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,7 +242,7 @@ public class PostDetailsActivity extends BaseActivity {
         commentsCountTextView.setText(String.valueOf(commentsCount));
         commentsLabel.setText(String.format(getString(R.string.label_comments), commentsCount));
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
-        updatingLikeCounter = false;
+        likeController.setUpdatingLikeCounter(false);
 
         CharSequence date = FormatterUtil.getRelativeTimeSpanString(this, post.getCreatedDate());
         dateTextView.setText(date);
@@ -323,11 +308,7 @@ public class PostDetailsActivity extends BaseActivity {
         return new OnObjectExistListener<Like>() {
             @Override
             public void onDataChanged(boolean exist) {
-                if (!likeIconInitialized) {
-                    likesImageView.setImageResource(exist ? R.drawable.ic_like_active : R.drawable.ic_like);
-                    likeIconInitialized = true;
-                    isLiked = exist;
-                }
+                likeController.initLike(exist);
             }
         };
     }
@@ -340,23 +321,12 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void initLikes() {
-        //set default animation type
-        likeAnimationType = AnimationType.BOUNCE_ANIM;
+        likeController = new LikeController(this, post.getId(), likeCounterTextView, likesImageView, false);
 
         likesContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (hasInternetConnection()) {
-                    ProfileStatus profileStatus = ProfileManager.getInstance(PostDetailsActivity.this).checkProfile();
-
-                    if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                        likeClickAction();
-                    } else {
-                        doAuthorization(profileStatus);
-                    }
-                } else {
-                    showSnackBar(R.string.internet_connection_failed);
-                }
+                likeController.handleLikeClickAction(PostDetailsActivity.this, post);
             }
         });
 
@@ -364,10 +334,10 @@ public class PostDetailsActivity extends BaseActivity {
         likesContainer.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (likeAnimationType == AnimationType.BOUNCE_ANIM) {
-                    likeAnimationType = AnimationType.COLOR_ANIM;
+                if (likeController.getLikeAnimationType() == LikeController.AnimationType.BOUNCE_ANIM) {
+                    likeController.setLikeAnimationType(LikeController.AnimationType.COLOR_ANIM);
                 } else {
-                    likeAnimationType = AnimationType.BOUNCE_ANIM;
+                    likeController.setLikeAnimationType(LikeController.AnimationType.BOUNCE_ANIM);
                 }
 
                 Snackbar snackbar = Snackbar
@@ -377,100 +347,6 @@ public class PostDetailsActivity extends BaseActivity {
                 return true;
             }
         });
-    }
-
-    private void likeClickAction() {
-        if (!updatingLikeCounter) {
-            startAnimateLikeButton(likeAnimationType);
-
-            if (!isLiked) {
-                addLike();
-            } else {
-                removeLike();
-            }
-        }
-    }
-
-    private void startAnimateLikeButton(AnimationType animationType) {
-        switch (animationType) {
-            case BOUNCE_ANIM:
-                bounceAnimateImageView();
-                break;
-            case COLOR_ANIM:
-                colorAnimateImageView();
-                break;
-        }
-    }
-
-    public void colorAnimateImageView() {
-        final int activatedColor = getResources().getColor(R.color.like_icon_activated);
-
-        final ValueAnimator colorAnim = !isLiked ? ObjectAnimator.ofFloat(0f, 1f)
-                : ObjectAnimator.ofFloat(1f, 0f);
-        colorAnim.setDuration(ANIMATION_DURATION);
-        colorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float mul = (Float) animation.getAnimatedValue();
-                int alpha = adjustAlpha(activatedColor, mul);
-                likesImageView.setColorFilter(alpha, PorterDuff.Mode.SRC_ATOP);
-                if (mul == 0.0) {
-                    likesImageView.setColorFilter(null);
-                }
-            }
-        });
-
-        colorAnim.start();
-    }
-
-    public void bounceAnimateImageView() {
-        AnimatorSet animatorSet = new AnimatorSet();
-
-        ObjectAnimator bounceAnimX = ObjectAnimator.ofFloat(likesImageView, "scaleX", 0.2f, 1f);
-        bounceAnimX.setDuration(ANIMATION_DURATION);
-        bounceAnimX.setInterpolator(new BounceInterpolator());
-
-        ObjectAnimator bounceAnimY = ObjectAnimator.ofFloat(likesImageView, "scaleY", 0.2f, 1f);
-        bounceAnimY.setDuration(ANIMATION_DURATION);
-        bounceAnimY.setInterpolator(new BounceInterpolator());
-        bounceAnimY.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                likesImageView.setImageResource(!isLiked ? R.drawable.ic_like_active
-                        : R.drawable.ic_like);
-            }
-        });
-
-        animatorSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-            }
-        });
-
-        animatorSet.play(bounceAnimX).with(bounceAnimY);
-        animatorSet.start();
-    }
-
-    public int adjustAlpha(int color, float factor) {
-        int alpha = Math.round(Color.alpha(color) * factor);
-        int red = Color.red(color);
-        int green = Color.green(color);
-        int blue = Color.blue(color);
-        return Color.argb(alpha, red, green, blue);
-    }
-
-    private void addLike() {
-        updatingLikeCounter = true;
-        isLiked = true;
-        likeCounterTextView.setText(String.valueOf(post.getLikesCount() + 1));
-        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(post.getId());
-    }
-
-    private void removeLike() {
-        updatingLikeCounter = true;
-        isLiked = false;
-        likeCounterTextView.setText(String.valueOf(post.getLikesCount() - 1));
-        ApplicationHelper.getDatabaseHelper().removeLike(post.getId());
     }
 
     private void sendComment() {
