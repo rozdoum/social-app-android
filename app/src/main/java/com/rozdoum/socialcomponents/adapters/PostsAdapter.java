@@ -34,6 +34,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private SwipeRefreshLayout swipeContainer;
     private OnObjectChangedListener<Post> onSelectedPostChangeListener;
     private int selectedPostPosition = -1;
+    private boolean attemptToLoadPosts = false;
 
     public PostsAdapter(final MainActivity activity, SwipeRefreshLayout swipeContainer) {
         this.activity = activity;
@@ -105,20 +106,25 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (position >= getItemCount() - 1 && isMoreDataAvailable && !isLoading) {
-            isLoading = true;
             long lastItemCreatedDate = postList.get(postList.size() - 1).getCreatedDate();
-            long nextItemCreatedDate = lastItemCreatedDate - 1;
+            final long nextItemCreatedDate = lastItemCreatedDate - 1;
 
             android.os.Handler mHandler = activity.getWindow().getDecorView().getHandler();
             mHandler.post(new Runnable() {
                 public void run() {
                     //change adapter contents
-                    postList.add(new Post(ItemType.LOAD));
-                    notifyItemInserted(postList.size());
+                    if (activity.hasInternetConnection()) {
+                        isLoading = true;
+                        postList.add(new Post(ItemType.LOAD));
+                        notifyItemInserted(postList.size());
+                        loadNext(nextItemCreatedDate);
+                    } else {
+                        activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
+                    }
                 }
             });
 
-            loadNext(nextItemCreatedDate);
+
         }
 
         if (getItemViewType(position) != ItemType.LOAD.getTypeCode()) {
@@ -160,6 +166,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     private void loadNext(final long nextItemCreatedDate) {
+
         if (!activity.hasInternetConnection()) {
             activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
             hideProgress();
