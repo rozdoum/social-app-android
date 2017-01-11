@@ -74,8 +74,8 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         titleEditText.setError(null);
         descriptionEditText.setError(null);
 
-        String title = titleEditText.getText().toString();
-        String description = descriptionEditText.getText().toString();
+        String title = titleEditText.getText().toString().trim();
+        String description = descriptionEditText.getText().toString().trim();
 
         View focusView = null;
         boolean cancel = false;

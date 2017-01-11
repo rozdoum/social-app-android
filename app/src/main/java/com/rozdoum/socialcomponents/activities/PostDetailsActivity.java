@@ -154,7 +154,7 @@ public class PostDetailsActivity extends BaseActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                sendButton.setEnabled(charSequence.length() > 0);
+                sendButton.setEnabled(charSequence.toString().trim().length() > 0);
             }
 
             @Override
