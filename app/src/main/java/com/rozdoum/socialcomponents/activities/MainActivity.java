@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
@@ -72,15 +73,21 @@ public class MainActivity extends BaseActivity {
                 });
             }
 
+            final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
             SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             postsAdapter = new PostsAdapter(this, swipeContainer);
-            postsAdapter.setOnItemClickListener(new PostsAdapter.OnItemClickListener() {
+            postsAdapter.setCallback(new PostsAdapter.Callback() {
                 @Override
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
                     startActivity(intent);
+                }
+
+                @Override
+                public void onListLoadingFinished() {
+                    progressBar.setVisibility(View.GONE);
                 }
             });
 
