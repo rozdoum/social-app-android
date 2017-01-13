@@ -43,7 +43,6 @@ public class LikeController {
     private boolean isListView = false;
 
     private boolean isLiked = false;
-    private boolean likeIconInitialized = false;
     private boolean updatingLikeCounter = true;
 
     public LikeController(Context context, String postId, TextView likeCounterTextView,
@@ -171,14 +170,6 @@ public class LikeController {
         isLiked = liked;
     }
 
-    public boolean isLikeIconInitialized() {
-        return likeIconInitialized;
-    }
-
-    public void setLikeIconInitialized(boolean likeIconInitialized) {
-        this.likeIconInitialized = likeIconInitialized;
-    }
-
     public boolean isUpdatingLikeCounter() {
         return updatingLikeCounter;
     }
@@ -188,11 +179,8 @@ public class LikeController {
     }
 
     public void initLike(boolean isLiked) {
-        if (!likeIconInitialized) {
             likesImageView.setImageResource(isLiked ? R.drawable.ic_like_active : R.drawable.ic_like);
-            likeIconInitialized = true;
             this.isLiked = isLiked;
-        }
     }
 
     private void updateLocalPostLikeCounter(Post post) {
