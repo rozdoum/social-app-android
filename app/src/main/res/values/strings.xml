@@ -39,6 +39,7 @@
     <string name="sign_out_menu_label">Sign out</string>
     <string name="edit_profile_menu_label">Edit profile</string>
     <string name="button_title_save">Save</string>
+    <string name="button_title_continue">Continue</string>
 
     <!-- Strings related to registration and login -->
     <string name="prompt_email">Email</string>
