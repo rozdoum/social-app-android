@@ -64,6 +64,10 @@ public abstract class PickImageActivity extends BaseActivity {
     }
 
     protected void loadImageToImageView() {
+        if (imageUri == null) {
+            return;
+        }
+
         Picasso.with(PickImageActivity.this)
                 .load(imageUri)
                 .memoryPolicy(MemoryPolicy.NO_CACHE)
