@@ -92,6 +92,7 @@ public class EditProfileActivity extends PickImageActivity implements OnProfileC
             }
         }
         hideProgress();
+        nameEditText.requestFocus();
     }
 
     private void attemptCreateProfile() {

@@ -49,10 +49,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_name"
-                    android:imeActionId="@+id/createProdile"
+                    android:imeActionId="@+id/createProfile"
                     android:imeOptions="actionUnspecified"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1" />
+                    android:inputType="textMultiLine" />
 
             </android.support.design.widget.TextInputLayout>
 
