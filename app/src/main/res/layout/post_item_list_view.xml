@@ -82,7 +82,7 @@
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding"
-                android:layout_marginBottom="@dimen/intrinsic_padding">
+                android:paddingBottom="@dimen/intrinsic_padding">
 
                 <LinearLayout
                     android:id="@+id/likesContainer"
