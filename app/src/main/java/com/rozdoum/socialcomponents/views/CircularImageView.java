@@ -22,7 +22,7 @@ public class CircularImageView extends ImageView {
 
     // Default Values
     private static final float DEFAULT_BORDER_WIDTH = 4;
-    private static final float DEFAULT_SHADOW_RADIUS = 8.0f;
+    private static final float DEFAULT_SHADOW_RADIUS = 4;
 
     // Properties
     private float borderWidth;
@@ -70,8 +70,8 @@ public class CircularImageView extends ImageView {
 
         // Init Shadow
         if (attributes.getBoolean(R.styleable.CircularImageView_shadow, false)) {
-            shadowRadius = DEFAULT_SHADOW_RADIUS;
-            drawShadow(attributes.getFloat(R.styleable.CircularImageView_shadow_radius, shadowRadius), attributes.getColor(R.styleable.CircularImageView_shadow_color, shadowColor));
+            shadowRadius = DEFAULT_SHADOW_RADIUS * getContext().getResources().getDisplayMetrics().density;
+            drawShadow(attributes.getDimension(R.styleable.CircularImageView_shadow_radius, shadowRadius), attributes.getColor(R.styleable.CircularImageView_shadow_color, shadowColor));
         }
     }
     //endregion
