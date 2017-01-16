@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "196433492167-6j7bg1618fiiv07b2to5t0n48uocdpvf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rozdoum.socialcomponents",
+            "certificate_hash": "D8C4533B96CF4B9CEF62197DDE9EB716BBFC8D32"
+          }
+        },
+        {
           "client_id": "196433492167-vl2r7i9ciu3jr72oqpqh57l9716h85o4.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196433492167-vl2r7i9ciu3jr72oqpqh57l9716h85o4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
