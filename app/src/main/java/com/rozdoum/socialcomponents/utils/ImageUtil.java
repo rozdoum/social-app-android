@@ -9,7 +9,6 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -73,58 +72,43 @@ public class ImageUtil {
 
     public ImageLoader.ImageContainer getImageThumb(final String imageUrl, final ImageView imageView, int defaultImageResId, final int errorImageResId) {
         imageView.setImageResource(defaultImageResId);
-        return getImage(imageUrl, imageView, null, errorImageResId);
+        return getImage(imageUrl, imageView, errorImageResId);
     }
 
-    public ImageLoader.ImageContainer getFullImage(final String imageUrl, final ImageView imageView,
-                                                   final ProgressBar progressBarView, final int errorImageResId) {
-
-        if (progressBarView != null) {
-            setProgressBarVisible(imageView, progressBarView, true);
-        }
-
-        return getImage(imageUrl, imageView, progressBarView, errorImageResId);
+    public ImageLoader.ImageContainer getFullImage(final String imageUrl, final ImageView imageView, final int errorImageResId) {
+        return getImage(imageUrl, imageView, errorImageResId);
     }
 
     /* *
     * load image to disc cash and memory cash
     * set to image view scaled bitmap with max width and max height
     * */
-    private ImageLoader.ImageContainer getImage(final String imageUrl, final ImageView imageView, final ProgressBar progressBarView, final int errorImageResId) {
+    private ImageLoader.ImageContainer getImage(final String imageUrl, final ImageView imageView, final int errorImageResId) {
         int maxImageWidth = (int) (calcMaxWidth(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
         int maxImageHeight = (int) (calcMaxHeight(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
 
-        return getImage(imageUrl, imageView, progressBarView, errorImageResId, maxImageWidth, maxImageHeight);
+        return getImage(imageUrl, imageView, errorImageResId, maxImageWidth, maxImageHeight);
     }
 
-    private ImageLoader.ImageContainer getImage(final String imageUrl, final ImageView imageView, final ProgressBar progressBarView, final int errorImageResId,
+    private ImageLoader.ImageContainer getImage(final String imageUrl, final ImageView imageView, final int errorImageResId,
                                                 int maxImageWidth, int maxImageHeight) {
 
         ImageLoader.ImageListener listener = new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
                 imageView.setImageBitmap(response.getBitmap());
-                if (progressBarView != null) {
-                    setProgressBarVisible(imageView, progressBarView, false);
-                }
+                imageView.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onErrorResponse(VolleyError error) {
                 imageView.setImageResource(errorImageResId);
-                if (progressBarView != null) {
-                    setProgressBarVisible(imageView, progressBarView, false);
-                }
+                imageView.setVisibility(View.VISIBLE);
                 LogUtil.logError(TAG, "Failed load image " + imageUrl, error);
             }
         };
 
         return imageLoader.get(imageUrl, listener, maxImageWidth, maxImageHeight);
-    }
-
-    private void setProgressBarVisible(ImageView imageView, ProgressBar progressBar, boolean visible) {
-        progressBar.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
-        imageView.setVisibility(visible ? View.INVISIBLE : View.VISIBLE);
     }
 
     private int calcMaxHeight(ImageView imageView) {
