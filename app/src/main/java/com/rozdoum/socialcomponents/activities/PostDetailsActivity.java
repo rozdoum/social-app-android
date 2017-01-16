@@ -51,6 +51,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
     private static final int TIME_OUT_LOADING_COMMENTS = 30000;
+    public static final int UPDATE_COUNTERS_REQUEST = 1;
 
     private EditText commentEditText;
     private Post post;
@@ -327,6 +328,7 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 likeController.handleLikeClickAction(PostDetailsActivity.this, post);
+                setResult(RESULT_OK);
             }
         });
 
@@ -358,6 +360,7 @@ public class PostDetailsActivity extends BaseActivity {
             commentEditText.clearFocus();
             hideKeyBoard();
             scrollToFirstComment();
+            setResult(RESULT_OK);
         }
     }
 
