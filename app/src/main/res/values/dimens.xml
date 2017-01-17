@@ -30,4 +30,8 @@
     <dimen name="base_login_button_width">300dp</dimen>
 
     <dimen name="progress_bar_size">50dp</dimen>
+
+    <dimen name="login_screen_content_offset_center_top">50dp</dimen>
+    <dimen name="login_screen_button_margin">32dp</dimen>
+    <dimen name="login_screen_title_margin">48dp</dimen>
 </resources>

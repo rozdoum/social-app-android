@@ -44,4 +44,9 @@
         <item name="android:textColor">@color/primary_dark_text</item>
     </style>
 
+    <style name="TextAppearance.MainTitle" parent="@android:style/TextAppearance">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
 </resources>

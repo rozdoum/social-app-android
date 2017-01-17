@@ -1,0 +1,3 @@
+<resources>
+    <dimen name="login_screen_content_offset_center_top">0dp</dimen>
+</resources>
