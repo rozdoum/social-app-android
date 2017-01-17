@@ -84,7 +84,12 @@
 
     <string name="send_comment_button_label">Send</string>
     <string name="posted_by_label">Posted by:</string>
-    <string name="posts_counter_format">%1$d posts</string>
+
+    <plurals name="posts_counter_format">
+        <item quantity="one">%d post</item>
+        <item quantity="other">%d posts</item>
+    </plurals>
+
     <string name="posts_label">Posts:</string>
     <string name="complain_sent">Complain was sent successfully</string>
     <string name="now_time_range">now</string>
