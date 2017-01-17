@@ -74,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/intrinsic_padding"
                     android:text="@string/posted_by_label"
-                    android:textAppearance="@style/TextAppearance.Label" />
+                    android:textAppearance="@style/TextAppearance.Second.Light" />
 
                 <TextView
                     android:id="@+id/authorTextView"
@@ -112,7 +112,8 @@
                         android:id="@+id/likeCounterTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/small_intrinsic_padding" />
+                        android:paddingLeft="@dimen/small_intrinsic_padding"
+                        android:textAppearance="@style/TextAppearance.Second.Light" />
 
                 </LinearLayout>
 
@@ -134,7 +135,8 @@
                         android:id="@+id/commentsCountTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/small_intrinsic_padding" />
+                        android:paddingLeft="@dimen/small_intrinsic_padding"
+                        android:textAppearance="@style/TextAppearance.Second.Light" />
 
                 </LinearLayout>
 
@@ -156,7 +158,8 @@
                         android:id="@+id/dateTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/small_intrinsic_padding" />
+                        android:paddingLeft="@dimen/small_intrinsic_padding"
+                        android:textAppearance="@style/TextAppearance.Second.Light" />
 
                 </LinearLayout>
 
@@ -183,7 +186,7 @@
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding"
                 android:text="Comments"
-                android:textColor="@android:color/black"
+                android:textColor="@color/primary_dark_text"
                 android:visibility="gone" />
 
             <RelativeLayout

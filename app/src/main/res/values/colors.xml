@@ -4,9 +4,11 @@
     <color name="primary_dark">#005B7F</color>
     <color name="primary_light">#D7CCC8</color>
     <color name="dart_transparent">#81000000</color>
-    <color name="primary_text">#212121</color>
-    <color name="secondary_text">#757575</color>
-    <color name="third_text">#999999</color>
+
+    <color name="primary_dark_text">#28333D</color>
+    <color name="secondary_text">#434343</color>
+    <color name="secondary_light">#979797</color>
+
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
 

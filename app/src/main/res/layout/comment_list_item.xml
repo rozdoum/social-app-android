@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:autoLink="web"
             android:ellipsize="end"
-            android:textAppearance="@style/TextAppearance.Second.Black" />
+            android:textAppearance="@style/TextAppearance.Second" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -49,7 +49,7 @@
                 android:layout_alignParentStart="true"
                 android:autoLink="web"
                 android:text="day ago"
-                android:textAppearance="@style/TextAppearance.Second" />
+                android:textAppearance="@style/TextAppearance.Second.Light" />
 
             <TextView
                 android:id="@+id/expand_collapse"
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:autoLink="web"
-                android:textAppearance="@style/TextAppearance.Second" />
+                android:textAppearance="@style/TextAppearance.Second.Light" />
 
         </RelativeLayout>
 

@@ -75,7 +75,7 @@
             android:paddingLeft="@dimen/intrinsic_padding"
             android:paddingTop="@dimen/large_intrinsic_padding"
             android:text="@string/posts_label"
-            android:textAppearance="@style/TextAppearance.Second.Black"
+            android:textAppearance="@style/TextAppearance.Second.Dark"
             android:visibility="invisible" />
 
         <android.support.v7.widget.RecyclerView
