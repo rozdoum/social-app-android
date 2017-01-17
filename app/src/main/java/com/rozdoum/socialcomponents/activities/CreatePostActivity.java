@@ -20,7 +20,7 @@ import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
 public class CreatePostActivity extends PickImageActivity implements OnPostCreatedListener {
     private static final String TAG = CreatePostActivity.class.getSimpleName();
-    public static final int CREATE_NEW_POST_REQUEST = 1;
+    public static final int CREATE_NEW_POST_REQUEST = 11;
 
     private ImageView imageView;
     private ProgressBar progressBar;

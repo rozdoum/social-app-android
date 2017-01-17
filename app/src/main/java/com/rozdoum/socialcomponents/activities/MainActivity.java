@@ -43,16 +43,23 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        postsAdapter.updateSelectedPost();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
-            postsAdapter.loadFirstPage();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST) {
+                postsAdapter.loadFirstPage();
+            }
+
+            if (requestCode == PostDetailsActivity.UPDATE_COUNTERS_REQUEST) {
+                postsAdapter.updateSelectedPost();
+            }
         }
+
+
     }
 
     private void initContentView() {
@@ -80,7 +87,7 @@ public class MainActivity extends BaseActivity {
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivity(intent);
+                    startActivityForResult(intent, PostDetailsActivity.UPDATE_COUNTERS_REQUEST);
                 }
             });
 
