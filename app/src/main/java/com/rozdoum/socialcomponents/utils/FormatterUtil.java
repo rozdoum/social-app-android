@@ -72,11 +72,11 @@ public class FormatterUtil {
         } else if (range >= DateUtils.HOUR_IN_MILLIS) {
             final int hours = (int) ((range + (DateUtils.HOUR_IN_MILLIS / 2)) / DateUtils.HOUR_IN_MILLIS);
             return String.format(res.getString(R.string.duration_hours_shortest), hours);
-        } else if (range >= UNCOUNTABLE_TIME_LIMIT) {
+        } else if (range >= NOW_TIME_RANGE) {
             final int minutes = (int) ((range + (DateUtils.MINUTE_IN_MILLIS / 2)) / DateUtils.MINUTE_IN_MILLIS);
             return String.format(res.getString(R.string.duration_minutes_shortest), minutes);
         } else {
-            return res.getString(R.string.uncountable_time_label);
+            return res.getString(R.string.now_time_range);
         }
     }
 
