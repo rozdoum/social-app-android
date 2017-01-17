@@ -1,6 +1,7 @@
 package com.rozdoum.socialcomponents.adapters;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -87,8 +88,8 @@ public class CommentsAdapter {
     }
 
     private void fillComment(String userName, String comment, ExpandableTextView commentTextView) {
-        Spannable contentString = new SpannableStringBuilder(userName + " " + comment);
-        contentString.setSpan(new ForegroundColorSpan(parent.getResources().getColor(R.color.highlight_text)),
+        Spannable contentString = new SpannableStringBuilder(userName + "   " + comment);
+        contentString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(parent.getContext(), R.color.highlight_text)),
                 0, userName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         commentTextView.setText(contentString);
