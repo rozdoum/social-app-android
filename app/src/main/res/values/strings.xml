@@ -59,7 +59,7 @@
     <string name="error_authentication">Authentication failed.</string>
     <string name="error_google_play_services">Google Play Services error.</string>
     <string name="button_login_with_facebook">Login with facebook</string>
-    <string name="button_login_with_google">Login with google+</string>
+    <string name="button_login_with_google">Login with google</string>
 
 
     <string name="loading">Loading...</string>
