@@ -102,7 +102,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
 
-        CharSequence date = FormatterUtil.getRelativeTimeSpanString(context, post.getCreatedDate());
+        CharSequence date = FormatterUtil.getRelativeTimeSpanStringShort(context, post.getCreatedDate());
         dateTextView.setText(date);
 
         if (imageRequest != null) {
