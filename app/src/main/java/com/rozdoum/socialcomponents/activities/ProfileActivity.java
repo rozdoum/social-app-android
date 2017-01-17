@@ -111,6 +111,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
         if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
             postsAdapter.loadPosts();
+            showSnackBar(R.string.message_post_was_created);
         }
     }
 
