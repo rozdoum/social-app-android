@@ -27,7 +27,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static final String TAG = PostsAdapter.class.getSimpleName();
 
     private List<Post> postList = new LinkedList<>();
-    private OnItemClickListener onItemClickListener;
+    private Callback callback;
     private MainActivity activity;
     private boolean isLoading = false;
     private boolean isMoreDataAvailable = true;
@@ -69,8 +69,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
+    public void setCallback(Callback callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -88,10 +88,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return new PostViewHolder.OnClickListener() {
             @Override
             public void onItemClick(int position) {
-                if (onItemClickListener != null) {
+                if (callback != null) {
                     selectedPostPosition = position;
                     onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
-                    onItemClickListener.onItemClick(getItemByPosition(position));
+                    callback.onItemClick(getItemByPosition(position));
                 }
             }
 
@@ -157,10 +157,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         isLoading = false;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(Post post);
-    }
-
     public void loadFirstPage() {
         loadNext(0);
     }
@@ -170,6 +166,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (!activity.hasInternetConnection()) {
             activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
             hideProgress();
+            callback.onListLoadingFinished();
             return;
         }
 
@@ -190,6 +187,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 } else {
                     isMoreDataAvailable = false;
                 }
+
+                callback.onListLoadingFinished();
             }
         };
 
@@ -218,5 +217,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Post selectedPost = getItemByPosition(selectedPostPosition);
             PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
         }
+    }
+
+    public interface Callback {
+        void onItemClick(Post post);
+
+        void onListLoadingFinished();
     }
 }

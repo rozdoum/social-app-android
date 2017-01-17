@@ -25,6 +25,13 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large" />
+
     <RelativeLayout
         android:id="@+id/activity_main"
         android:layout_width="wrap_content"
