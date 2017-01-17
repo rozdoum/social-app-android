@@ -15,12 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.model.Profile;
 
 /**
  * Created by alexey on 05.12.16.
@@ -39,19 +35,9 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void doAuthorization(ProfileStatus status) {
-        if (status.equals(ProfileStatus.NOT_AUTHORIZED)) {
+        if (status.equals(ProfileStatus.NOT_AUTHORIZED) || status.equals(ProfileStatus.NO_PROFILE)) {
             startLoginActivity();
-        } else if (status.equals(ProfileStatus.NO_PROFILE)) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            Profile profile = ProfileManager.getInstance(this).buildProfile(user);
-            startCreateProfileActivity(profile);
         }
-    }
-
-    private void startCreateProfileActivity(Profile profile) {
-        Intent intent = new Intent(this, CreateProfileActivity.class);
-        intent.putExtra(CreateProfileActivity.PROFILE_EXTRA_KEY, profile);
-        startActivity(intent);
     }
 
     private void startLoginActivity() {
