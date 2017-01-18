@@ -5,18 +5,23 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
+import com.rozdoum.socialcomponents.enums.UploadImagePrefix;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
 /**
@@ -72,17 +77,18 @@ public class PostManager extends FirebaseListenersManager {
         addListenerToMap(context, valueEventListener);
     }
 
-    public void createPostWithImage(Uri imageUri, final OnPostCreatedListener onPostCreatedListener, final Post post) {
+    public void createOrUpdatePostWithImage(Uri imageUri, final OnPostCreatedListener onPostCreatedListener, final Post post) {
         // Register observers to listen for when the download is done or if it fails
         DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
-        UploadTask uploadTask = databaseHelper.uploadImage(imageUri);
+        final String imageTitle = ImageUtil.generateImageTitle(UploadImagePrefix.POST);
+        UploadTask uploadTask = databaseHelper.uploadImage(imageUri, imageTitle);
 
         if (uploadTask != null) {
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
                     // Handle unsuccessful uploads
-                    onPostCreatedListener.onPostCreated(false);
+                    onPostCreatedListener.onPostSaved(false);
 
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -93,12 +99,38 @@ public class PostManager extends FirebaseListenersManager {
                     LogUtil.logDebug(TAG, "successful upload image, image url: " + String.valueOf(downloadUrl));
 
                     post.setImagePath(String.valueOf(downloadUrl));
+                    post.setImageTitle(imageTitle);
                     createOrUpdatePost(post);
 
-                    onPostCreatedListener.onPostCreated(true);
+                    onPostCreatedListener.onPostSaved(true);
                 }
             });
         }
+    }
+
+    public void removePost(final Post post, final OnTaskCompleteListener onTaskCompleteListener) {
+        final DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
+        Task<Void> removeImageTask = databaseHelper.removeImage(post.getImageTitle());
+
+        removeImageTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                databaseHelper.removePost(post).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        onTaskCompleteListener.onTaskComplete(task.isSuccessful());
+                        LogUtil.logDebug(TAG, "removePost(), success" + task.isSuccessful());
+                    }
+                });
+                LogUtil.logDebug(TAG, "removeImage(): success");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                LogUtil.logError(TAG, "removeImage()", exception);
+                onTaskCompleteListener.onTaskComplete(false);
+            }
+        });
     }
 
     public void addComplain(Post post) {

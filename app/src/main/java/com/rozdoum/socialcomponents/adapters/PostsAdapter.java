@@ -219,6 +219,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    public void removeSelectedPost() {
+        postList.remove(selectedPostPosition);
+        notifyItemRemoved(selectedPostPosition);
+    }
+
     public interface Callback {
         void onItemClick(Post post);
 

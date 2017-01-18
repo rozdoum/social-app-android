@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
+import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.model.Post;
@@ -42,21 +43,35 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        postsAdapter.updateSelectedPost();
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK && (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST
-                || requestCode == ProfileActivity.OPEN_PROFILE_REQUEST)) {
-            postsAdapter.loadFirstPage();
-            if (postsAdapter.getItemCount() > 0) {
-                recyclerView.scrollToPosition(0);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case ProfileActivity.OPEN_PROFILE_REQUEST:
+                    refreshPostList();
+
+                case CreatePostActivity.CREATE_NEW_POST_REQUEST:
+                    refreshPostList();
+
+                case PostDetailsActivity.UPDATE_POST_REQUEST:
+                    if (data != null) {
+                        PostStatus postStatus = (PostStatus) data.getSerializableExtra(PostDetailsActivity.POST_STATUS_EXTRA_KEY);
+                        if (postStatus.equals(PostStatus.REMOVED)) {
+                            postsAdapter.removeSelectedPost();
+                            showFloatButtonRelatedSnackBar(R.string.message_post_was_removed);
+                        } else if (postStatus.equals(PostStatus.UPDATED)) {
+                            postsAdapter.updateSelectedPost();
+                        }
+                    }
             }
+        }
+    }
+
+    private void refreshPostList() {
+        postsAdapter.loadFirstPage();
+        if (postsAdapter.getItemCount() > 0) {
+            recyclerView.scrollToPosition(0);
         }
     }
 
@@ -86,7 +101,7 @@ public class MainActivity extends BaseActivity {
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivityForResult(intent, PostDetailsActivity.UPDATE_COUNTERS_REQUEST);
+                    startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
                 }
 
                 @Override

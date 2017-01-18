@@ -7,6 +7,7 @@
     <string name="title_activity_create_profile">Create profile</string>
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_edit_profile">Edit profile</string>
+    <string name="title_activity_edit_post">Edit post</string>
 
     <string name="text_take_photo">Take photo</string>
     <string name="text_pick_photo">Pick from Gallery</string>
@@ -28,6 +29,9 @@
     <string name="warning_empty_title">Title is required</string>
     <string name="warning_empty_description">Description is required</string>
     <string name="error_post_title_length">Max length of the title should be less than 255 symbols</string>
+    <string name="error_fail_remove_post">Fail to remove post</string>
+    <string name="message_post_was_removed">Post was removed</string>
+    <string name="error_fail_update_post">Fail to update post</string>
 
     <string name="comment_text_hint">Enter your comment…</string>
     <string name="button_post_comment">Post comment</string>
@@ -78,6 +82,8 @@
     <string name="collapse_text_label">show less</string>
     <string name="expand_text_label">show more</string>
     <string name="add_complain">Complain</string>
+    <string name="edit_post_menu">Edit post</string>
+    <string name="delete_post_menu">Delete post</string>
     <string name="complain_text">You can complain to this post if it contains violence,
         bullying and threats, hate speech, tragic events and sexually explicit contents.
         Nobody will see the post if you complain to it. You can\'t delete your complain.</string>
@@ -93,4 +99,5 @@
     <string name="duration_hours_shortest">%1$d h</string>
     <string name="duration_days_shortest">%1$d d</string>
     <string name="duration_week_shortest">%1$d w</string>
+
 </resources>

@@ -15,10 +15,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.enums.UploadImagePrefix;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
@@ -86,7 +88,8 @@ public class ProfileManager extends FirebaseListenersManager {
             return;
         }
 
-        UploadTask uploadTask = databaseHelper.uploadImage(imageUri);
+        String imageTitle = ImageUtil.generateImageTitle(UploadImagePrefix.PROFILE);
+        UploadTask uploadTask = databaseHelper.uploadImage(imageUri, imageTitle);
 
         if (uploadTask != null) {
             uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {

@@ -122,4 +122,9 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
         }
     }
+
+    public void removeSelectedPost() {
+        postList.remove(selectedPostPosition);
+        notifyItemRemoved(selectedPostPosition);
+    }
 }

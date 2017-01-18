@@ -29,6 +29,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
+import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
@@ -112,6 +113,23 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
             postsAdapter.loadPosts();
         }
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case CreatePostActivity.CREATE_NEW_POST_REQUEST:
+                    postsAdapter.loadPosts();
+
+                case PostDetailsActivity.UPDATE_POST_REQUEST:
+                    if (data != null) {
+                        PostStatus postStatus = (PostStatus) data.getSerializableExtra(PostDetailsActivity.POST_STATUS_EXTRA_KEY);
+                        if (postStatus.equals(PostStatus.REMOVED)) {
+                            postsAdapter.removeSelectedPost();
+                        } else if (postStatus.equals(PostStatus.UPDATED)) {
+                            postsAdapter.updateSelectedPost();
+                        }
+                    }
+            }
+        }
     }
 
     private void loadPostsList() {
@@ -124,7 +142,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivity(intent);
+                    startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
                 }
 
                 @Override
