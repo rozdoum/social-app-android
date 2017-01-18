@@ -44,18 +44,22 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        postsAdapter.updateSelectedPost();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK && (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST
-                || requestCode == ProfileActivity.OPEN_PROFILE_REQUEST)) {
-            postsAdapter.loadFirstPage();
-            if (postsAdapter.getItemCount() > 0) {
-                recyclerView.scrollToPosition(0);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST || requestCode == ProfileActivity.OPEN_PROFILE_REQUEST) {
+                postsAdapter.loadFirstPage();
+                if (postsAdapter.getItemCount() > 0) {
+                    recyclerView.scrollToPosition(0);
+                }
+            }
+
+            if (requestCode == PostDetailsActivity.UPDATE_COUNTERS_REQUEST) {
+                postsAdapter.updateSelectedPost();
             }
         }
     }

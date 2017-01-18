@@ -88,7 +88,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     public void onStart() {
         super.onStart();
         loadProfile();
-        postsAdapter.updateSelectedPost();
 
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
@@ -109,8 +108,14 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
-            postsAdapter.loadPosts();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST) {
+                postsAdapter.loadPosts();
+            }
+
+            if (requestCode == PostDetailsActivity.UPDATE_COUNTERS_REQUEST) {
+                postsAdapter.updateSelectedPost();
+            }
         }
     }
 
@@ -124,7 +129,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivity(intent);
+                    startActivityForResult(intent, PostDetailsActivity.UPDATE_COUNTERS_REQUEST);
                 }
 
                 @Override
