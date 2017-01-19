@@ -25,19 +25,18 @@
                 android:layout_height="@dimen/profile_photo_side"
                 android:layout_gravity="center_horizontal">
 
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="@dimen/progress_bar_size"
+                    android:layout_height="@dimen/progress_bar_size"
+                    android:layout_centerInParent="true"
+                    android:visibility="visible" />
+
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_stub" />
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    style="?android:attr/progressBarStyleLarge"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_centerInParent="true"
-                    android:visibility="invisible" />
+                    android:visibility="gone" />
 
             </RelativeLayout>
 
@@ -56,15 +55,6 @@
                     android:maxLines="1" />
 
             </android.support.design.widget.TextInputLayout>
-
-            <Button
-                android:id="@+id/createProfileButton"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/action_create_profile"
-                android:textStyle="bold" />
 
         </LinearLayout>
     </ScrollView>

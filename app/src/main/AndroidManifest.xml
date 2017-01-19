@@ -20,6 +20,7 @@
         android:theme="@style/AppTheme">
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <activity android:name=".activities.MainActivity"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,12 +30,15 @@
         </activity>
         <activity
             android:name=".activities.PostDetailsActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/label_post_detail_activity" />
         <activity
             android:name=".activities.CreatePostActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/label_create_post_activity" />
         <activity
             android:name=".activities.ImageDetailActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/label_image_detail_activity"
             android:theme="@style/AppCompat.Black.NoActionBar" />
         <activity
@@ -43,14 +47,17 @@
             android:theme="@style/AppCompat.NoActionBar" />
         <activity
             android:name=".activities.CreateProfileActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_create_profile"/>
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
         <activity
             android:name=".activities.ProfileActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_profile" />
         <activity
             android:name=".activities.EditProfileActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_edit_profile" />
 
         <meta-data

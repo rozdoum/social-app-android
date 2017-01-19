@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/intrinsic_padding"
-    android:paddingTop="@dimen/intrinsic_padding">
+    android:paddingBottom="@dimen/large_intrinsic_padding"
+    android:paddingTop="@dimen/large_intrinsic_padding">
 
     <com.rozdoum.socialcomponents.views.CircularImageView
         android:id="@+id/avatarImageView"
@@ -22,8 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/avatarImageView"
-        android:paddingLeft="@dimen/intrinsic_padding"
-        android:paddingRight="@dimen/intrinsic_padding"
+        android:paddingLeft="@dimen/large_intrinsic_padding"
         expandableTextView:animDuration="200"
         expandableTextView:collapseText="@string/collapse_text_label"
         expandableTextView:expandText="@string/expand_text_label"
@@ -35,21 +34,21 @@
             android:layout_height="wrap_content"
             android:autoLink="web"
             android:ellipsize="end"
-            android:textAppearance="@style/TextAppearance.Second.Black" />
+            android:textAppearance="@style/TextAppearance.Second" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/small_intrinsic_padding">
 
             <TextView
                 android:id="@+id/dateTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:autoLink="web"
                 android:text="day ago"
-                android:textAppearance="@style/TextAppearance.Second" />
+                android:textAppearance="@style/TextAppearance.Second.Light" />
 
             <TextView
                 android:id="@+id/expand_collapse"
@@ -57,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:autoLink="web"
-                android:textAppearance="@style/TextAppearance.Second" />
+                android:textAppearance="@style/TextAppearance.Second.Light" />
 
         </RelativeLayout>
 

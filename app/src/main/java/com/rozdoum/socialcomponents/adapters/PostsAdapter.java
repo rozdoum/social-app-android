@@ -9,6 +9,7 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.adapters.holders.LoadViewHolder;
 import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
+import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
@@ -26,13 +27,14 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static final String TAG = PostsAdapter.class.getSimpleName();
 
     private List<Post> postList = new LinkedList<>();
-    private OnItemClickListener onItemClickListener;
+    private Callback callback;
     private MainActivity activity;
     private boolean isLoading = false;
     private boolean isMoreDataAvailable = true;
     private SwipeRefreshLayout swipeContainer;
     private OnObjectChangedListener<Post> onSelectedPostChangeListener;
     private int selectedPostPosition = -1;
+    private boolean attemptToLoadPosts = false;
 
     public PostsAdapter(final MainActivity activity, SwipeRefreshLayout swipeContainer) {
         this.activity = activity;
@@ -67,8 +69,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
+    public void setCallback(Callback callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -82,15 +84,21 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    private PostViewHolder.OnItemClickListener createOnItemClickListener() {
-        return new PostViewHolder.OnItemClickListener() {
+    private PostViewHolder.OnClickListener createOnItemClickListener() {
+        return new PostViewHolder.OnClickListener() {
             @Override
             public void onItemClick(int position) {
-                if (onItemClickListener != null) {
+                if (callback != null) {
                     selectedPostPosition = position;
                     onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
-                    onItemClickListener.onItemClick(getItemByPosition(position));
+                    callback.onItemClick(getItemByPosition(position));
                 }
+            }
+
+            @Override
+            public void onLikeClick(LikeController likeController, int position) {
+                Post post = getItemByPosition(position);
+                likeController.handleLikeClickAction(activity, post);
             }
         };
     }
@@ -98,20 +106,25 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (position >= getItemCount() - 1 && isMoreDataAvailable && !isLoading) {
-            isLoading = true;
             long lastItemCreatedDate = postList.get(postList.size() - 1).getCreatedDate();
-            long nextItemCreatedDate = lastItemCreatedDate - 1;
+            final long nextItemCreatedDate = lastItemCreatedDate - 1;
 
             android.os.Handler mHandler = activity.getWindow().getDecorView().getHandler();
             mHandler.post(new Runnable() {
                 public void run() {
                     //change adapter contents
-                    postList.add(new Post(ItemType.LOAD));
-                    notifyItemInserted(postList.size());
+                    if (activity.hasInternetConnection()) {
+                        isLoading = true;
+                        postList.add(new Post(ItemType.LOAD));
+                        notifyItemInserted(postList.size());
+                        loadNext(nextItemCreatedDate);
+                    } else {
+                        activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
+                    }
                 }
             });
 
-            loadNext(nextItemCreatedDate);
+
         }
 
         if (getItemViewType(position) != ItemType.LOAD.getTypeCode()) {
@@ -144,18 +157,16 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         isLoading = false;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(Post post);
-    }
-
     public void loadFirstPage() {
         loadNext(0);
     }
 
     private void loadNext(final long nextItemCreatedDate) {
+
         if (!activity.hasInternetConnection()) {
             activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
             hideProgress();
+            callback.onListLoadingFinished();
             return;
         }
 
@@ -176,6 +187,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 } else {
                     isMoreDataAvailable = false;
                 }
+
+                callback.onListLoadingFinished();
             }
         };
 
@@ -204,5 +217,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Post selectedPost = getItemByPosition(selectedPostPosition);
             PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
         }
+    }
+
+    public interface Callback {
+        void onItemClick(Post post);
+
+        void onListLoadingFinished();
     }
 }

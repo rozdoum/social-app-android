@@ -20,7 +20,7 @@ import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
 public class CreatePostActivity extends PickImageActivity implements OnPostCreatedListener {
     private static final String TAG = CreatePostActivity.class.getSimpleName();
-    public static final int CREATE_NEW_POST_REQUEST = 1;
+    public static final int CREATE_NEW_POST_REQUEST = 11;
 
     private ImageView imageView;
     private ProgressBar progressBar;
@@ -74,16 +74,19 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         titleEditText.setError(null);
         descriptionEditText.setError(null);
 
-        String title = titleEditText.getText().toString();
-        String description = descriptionEditText.getText().toString();
+        String title = titleEditText.getText().toString().trim();
+        String description = descriptionEditText.getText().toString().trim();
 
         View focusView = null;
         boolean cancel = false;
 
-        if (imageUri == null) {
-            showWarningDialog(R.string.warning_empty_image);
+        if (TextUtils.isEmpty(description)) {
+            descriptionEditText.setError(getString(R.string.warning_empty_description));
+            focusView = descriptionEditText;
             cancel = true;
-        } else if (TextUtils.isEmpty(title)) {
+        }
+
+        if (TextUtils.isEmpty(title)) {
             titleEditText.setError(getString(R.string.warning_empty_title));
             focusView = titleEditText;
             cancel = true;
@@ -91,9 +94,11 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             titleEditText.setError(getString(R.string.error_post_title_length));
             focusView = titleEditText;
             cancel = true;
-        } else if (TextUtils.isEmpty(description)) {
-            descriptionEditText.setError(getString(R.string.warning_empty_description));
-            focusView = descriptionEditText;
+        }
+
+        if (imageUri == null) {
+            showWarningDialog(R.string.warning_empty_image);
+            focusView = imageView;
             cancel = true;
         }
 

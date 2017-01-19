@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
@@ -50,8 +51,12 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK && (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST
+                || requestCode == ProfileActivity.OPEN_PROFILE_REQUEST)) {
             postsAdapter.loadFirstPage();
+            if (postsAdapter.getItemCount() > 0) {
+                recyclerView.scrollToPosition(0);
+            }
         }
     }
 
@@ -72,15 +77,21 @@ public class MainActivity extends BaseActivity {
                 });
             }
 
+            final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
             SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             postsAdapter = new PostsAdapter(this, swipeContainer);
-            postsAdapter.setOnItemClickListener(new PostsAdapter.OnItemClickListener() {
+            postsAdapter.setCallback(new PostsAdapter.Callback() {
                 @Override
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivity(intent);
+                    startActivityForResult(intent, PostDetailsActivity.UPDATE_COUNTERS_REQUEST);
+                }
+
+                @Override
+                public void onListLoadingFinished() {
+                    progressBar.setVisibility(View.GONE);
                 }
             });
 
@@ -112,7 +123,7 @@ public class MainActivity extends BaseActivity {
 
     private void openProfileActivity() {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
+        startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
     }
 
     @Override

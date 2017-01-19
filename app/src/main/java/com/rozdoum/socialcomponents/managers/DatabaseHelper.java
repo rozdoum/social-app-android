@@ -456,7 +456,25 @@ public class DatabaseHelper {
         return valueEventListener;
     }
 
-    public void hasCurrentUserLike(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
+    public ValueEventListener hasCurrentUserLike(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
+        DatabaseReference databaseReference = database.getReference("post-likes").child(postId).child(userId);
+        ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onObjectExistListener.onDataChanged(dataSnapshot.exists());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                LogUtil.logDebug(TAG, "hasCurrentUserLike(), onCancelled: " + databaseError);
+            }
+        });
+
+        activeListeners.put(valueEventListener, databaseReference);
+        return valueEventListener;
+    }
+
+    public void hasCurrentUserLikeSingleValue(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
         DatabaseReference databaseReference = database.getReference("post-likes").child(postId).child(userId);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -466,7 +484,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logDebug(TAG, "hasCurrentUserLikeSingleValue(), onCancelled: " + databaseError);
             }
         });
     }

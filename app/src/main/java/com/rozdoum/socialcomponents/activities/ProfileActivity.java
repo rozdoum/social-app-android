@@ -40,6 +40,7 @@ import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
 public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = ProfileActivity.class.getSimpleName();
+    public static final int OPEN_PROFILE_REQUEST = 22;
 
     // UI references.
     private TextView nameEditText;
@@ -78,6 +79,12 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        setResult(RESULT_OK);
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         loadProfile();
@@ -104,7 +111,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
         if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST && resultCode == RESULT_OK) {
             postsAdapter.loadPosts();
-            setResult(RESULT_OK);
         }
     }
 
@@ -158,8 +164,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             nameEditText.setText(profile.getUsername());
 
             if (profile.getPhotoUrl() != null) {
-                ImageUtil.getInstance(this).getFullImage(profile.getPhotoUrl(), imageView, progressBar,
-                        R.drawable.ic_stub);
+                ImageUtil.getInstance(this).getFullImage(profile.getPhotoUrl(), imageView, R.drawable.ic_stub);
             }
         }
         hideProgress();

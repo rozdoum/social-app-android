@@ -27,19 +27,19 @@
                 android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:layout_alignParentTop="true">
 
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="@dimen/progress_bar_size"
+                    android:layout_height="@dimen/progress_bar_size"
+                    android:layout_centerInParent="true"
+                    android:visibility="visible" />
+
                 <ImageView
                     android:id="@+id/postImageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:visibility="invisible" />
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:visibility="invisible" />
+                    android:visibility="gone" />
 
             </RelativeLayout>
 
@@ -48,13 +48,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/imageContainer"
+                android:layout_below="@+id/authorImageView"
                 android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:layout_toStartOf="@+id/authorImageView"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding"
                 android:text="Title"
-                android:textAppearance="@style/TextAppearance.Title" />
+                android:textAppearance="@style/TextAppearance.Title"
+                android:layout_alignEnd="@+id/authorImageView" />
 
             <LinearLayout
                 android:id="@+id/authorContainer"
@@ -64,8 +65,8 @@
                 android:layout_below="@+id/titleTextView"
                 android:layout_marginBottom="@dimen/large_intrinsic_padding"
                 android:orientation="horizontal"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding">
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding">
 
                 <TextView
                     android:id="@+id/authorLabelTextView"
@@ -73,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/intrinsic_padding"
                     android:text="@string/posted_by_label"
-                    android:textAppearance="@style/TextAppearance.Label" />
+                    android:textAppearance="@style/TextAppearance.Second.Light" />
 
                 <TextView
                     android:id="@+id/authorTextView"
@@ -83,16 +84,15 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/countersContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_below="@+id/authorContainer"
                 android:layout_marginBottom="@dimen/large_intrinsic_padding"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding">
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding">
 
                 <LinearLayout
                     android:id="@+id/likesContainer"
@@ -111,7 +111,8 @@
                         android:id="@+id/likeCounterTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/small_intrinsic_padding" />
+                        android:paddingLeft="@dimen/small_intrinsic_padding"
+                        android:textAppearance="@style/TextAppearance.Second.Light" />
 
                 </LinearLayout>
 
@@ -119,7 +120,8 @@
                     android:id="@+id/commentsCounterContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/large_intrinsic_padding"
+                    android:layout_alignStart="@+id/likesContainer"
+                    android:layout_marginStart="@dimen/post_counters_internal_padding"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -133,7 +135,8 @@
                         android:id="@+id/commentsCountTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/small_intrinsic_padding" />
+                        android:paddingLeft="@dimen/small_intrinsic_padding"
+                        android:textAppearance="@style/TextAppearance.Second.Light" />
 
                 </LinearLayout>
 
@@ -141,7 +144,8 @@
                     android:id="@+id/dateContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/large_intrinsic_padding"
+                    android:layout_alignStart="@+id/commentsCounterContainer"
+                    android:layout_marginStart="@dimen/post_counters_internal_padding"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -155,11 +159,12 @@
                         android:id="@+id/dateTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/small_intrinsic_padding" />
+                        android:paddingLeft="@dimen/small_intrinsic_padding"
+                        android:textAppearance="@style/TextAppearance.Second.Light" />
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/descriptionEditText"
@@ -167,8 +172,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/countersContainer"
                 android:layout_marginBottom="@dimen/large_intrinsic_padding"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding"
                 android:autoLink="all"
                 android:text="description"
                 android:textAppearance="@style/TextAppearance.Second" />
@@ -179,10 +184,10 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/descriptionEditText"
                 android:layout_marginBottom="@dimen/intrinsic_padding"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding"
                 android:text="Comments"
-                android:textColor="@android:color/black"
+                android:textColor="@color/primary_dark_text"
                 android:visibility="gone" />
 
             <RelativeLayout
@@ -190,8 +195,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/commentsLabel"
-                android:paddingLeft="@dimen/intrinsic_padding"
-                android:paddingRight="@dimen/intrinsic_padding">
+                android:paddingLeft="@dimen/large_intrinsic_padding"
+                android:paddingRight="@dimen/large_intrinsic_padding">
 
                 <LinearLayout
                     android:id="@+id/commentsContainer"

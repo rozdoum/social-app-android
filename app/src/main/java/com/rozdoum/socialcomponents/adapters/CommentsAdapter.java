@@ -1,9 +1,9 @@
 package com.rozdoum.socialcomponents.adapters;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +17,7 @@ import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Profile;
+import com.rozdoum.socialcomponents.utils.FormatterUtil;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.ArrayList;
@@ -66,8 +67,7 @@ public class CommentsAdapter {
 
         commentTextView.setText(comment.getText());
 
-        long now = System.currentTimeMillis();
-        CharSequence date = DateUtils.getRelativeTimeSpanString(comment.getCreatedDate(), now, DateUtils.MINUTE_IN_MILLIS);
+        CharSequence date = FormatterUtil.getRelativeTimeSpanString(parent.getContext(), comment.getCreatedDate());
         dateTextView.setText(date);
 
         return convertView;
@@ -88,8 +88,8 @@ public class CommentsAdapter {
     }
 
     private void fillComment(String userName, String comment, ExpandableTextView commentTextView) {
-        Spannable contentString = new SpannableStringBuilder(userName + " " + comment);
-        contentString.setSpan(new ForegroundColorSpan(parent.getResources().getColor(R.color.highlight_text)),
+        Spannable contentString = new SpannableStringBuilder(userName + "   " + comment);
+        contentString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(parent.getContext(), R.color.highlight_text)),
                 0, userName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         commentTextView.setText(contentString);
