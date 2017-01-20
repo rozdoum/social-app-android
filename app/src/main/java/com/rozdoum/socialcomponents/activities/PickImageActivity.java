@@ -181,6 +181,10 @@ public abstract class PickImageActivity extends BaseActivity {
     }
 
     protected void startCropImageActivity() {
+        if (imageUri == null) {
+            return;
+        }
+
         CropImage.activity(imageUri)
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setFixAspectRatio(true)
