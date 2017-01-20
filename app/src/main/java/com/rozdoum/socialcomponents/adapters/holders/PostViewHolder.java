@@ -60,7 +60,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
         this.context = view.getContext();
         postImageView = (ImageView) view.findViewById(R.id.postImageView);
-        likeCounterTextView = (TextView) view.findViewById(R.id.likeCountTextView);
+        likeCounterTextView = (TextView) view.findViewById(R.id.likeCounterTextView);
         likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
         commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
         dateTextView = (TextView) view.findViewById(R.id.dateTextView);
