@@ -130,7 +130,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
                 @Override
                 public void onPostsLoaded(int postsCount) {
-                    postsCounterTextView.setText(String.format(getString(R.string.posts_counter_format), postsCount));
+                    postsCounterTextView.setText(getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount));
 
                     if (postsCount > 0) {
                         postsLabelTextView.setVisibility(View.VISIBLE);
