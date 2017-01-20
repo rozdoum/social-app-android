@@ -233,7 +233,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void loadAuthorImage() {
         if (post.getAuthorId() != null) {
-            profileManager.getProfile(this, post.getAuthorId(), createProfileChangeListener());
+            profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener());
         }
     }
 
