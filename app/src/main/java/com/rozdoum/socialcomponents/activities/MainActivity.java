@@ -42,12 +42,6 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        postsAdapter.updateSelectedPost();
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -59,6 +53,10 @@ public class MainActivity extends BaseActivity {
             if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST) {
                 refreshPostList();
                 showFloatButtonRelatedSnackBar(R.string.message_post_was_created);
+            }
+
+            if (requestCode == PostDetailsActivity.UPDATE_COUNTERS_REQUEST) {
+                postsAdapter.updateSelectedPost();
             }
         }
     }
