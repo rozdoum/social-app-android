@@ -244,7 +244,7 @@ public class PostDetailsActivity extends BaseActivity {
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         likeController.setUpdatingLikeCounter(false);
 
-        CharSequence date = FormatterUtil.getRelativeTimeSpanString(this, post.getCreatedDate());
+        CharSequence date = FormatterUtil.getRelativeTimeSpanStringShort(this, post.getCreatedDate());
         dateTextView.setText(date);
 
         if (commentsCount == 0) {
