@@ -2,7 +2,6 @@ package com.rozdoum.socialcomponents.adapters.holders;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -138,7 +137,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private String removeNewLinesDividers(String text) {
         int decoratedTextLength = text.length() < Constants.Post.MAX_TEXT_LENGTH_IN_LIST ?
                 text.length() : Constants.Post.MAX_TEXT_LENGTH_IN_LIST;
-        return text.substring(0, decoratedTextLength - 1).replaceAll("\n", " ").trim();
+        return text.substring(0, decoratedTextLength).replaceAll("\n", " ").trim();
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
