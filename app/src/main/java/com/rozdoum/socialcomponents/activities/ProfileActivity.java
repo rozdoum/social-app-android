@@ -190,6 +190,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             }
             logoutFirebase();
         }
+
+        ImageUtil.getInstance(this).clearCache();
     }
 
     private void logoutByProvider(String providerId) {

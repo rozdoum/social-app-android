@@ -76,11 +76,11 @@ public class ProfileManager extends FirebaseListenersManager {
         });
     }
 
-    private void createProfile(Profile profile, OnProfileCreatedListener onProfileCreatedListener) {
-        createProfile(profile, null, onProfileCreatedListener);
+    public void createOrUpdateProfile(Profile profile, OnProfileCreatedListener onProfileCreatedListener) {
+        createOrUpdateProfile(profile, null, onProfileCreatedListener);
     }
 
-    public void createProfile(final Profile profile, Uri imageUri, final OnProfileCreatedListener onProfileCreatedListener) {
+    public void createOrUpdateProfile(final Profile profile, Uri imageUri, final OnProfileCreatedListener onProfileCreatedListener) {
         if (imageUri == null) {
             databaseHelper.createOrUpdateProfile(profile, onProfileCreatedListener);
             return;

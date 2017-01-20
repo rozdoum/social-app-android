@@ -123,7 +123,7 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
             // perform the user login attempt.
             showProgress();
             profile.setUsername(name);
-            ProfileManager.getInstance(this).createProfile(profile, imageUri, this);
+            ProfileManager.getInstance(this).createOrUpdateProfile(profile, imageUri, this);
         }
     }
 
