@@ -1,7 +1,6 @@
 package com.rozdoum.socialcomponents.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +15,7 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
 public class CreatePostActivity extends PickImageActivity implements OnPostCreatedListener {
@@ -120,27 +120,16 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
     @Override
     public void onPostCreated(boolean success) {
         hideProgress();
-        Snackbar snackbar;
 
         if (success) {
             setResult(RESULT_OK);
-            snackbar = Snackbar
-                    .make(findViewById(android.R.id.content), R.string.message_post_was_created, Snackbar.LENGTH_LONG)
-                    .setCallback(new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar snackbar, int event) {
-                            super.onDismissed(snackbar, event);
-                            CreatePostActivity.this.finish();
-                        }
-                    });
-
+            CreatePostActivity.this.finish();
+            LogUtil.logDebug(TAG, "Post was created");
         } else {
             creatingPost = false;
-            snackbar = Snackbar.make(findViewById(android.R.id.content),
-                    R.string.error_fail_create_post, Snackbar.LENGTH_LONG);
+            showSnackBar(R.string.error_fail_create_post);
+            LogUtil.logDebug(TAG, "Failed to create a post");
         }
-
-        snackbar.show();
     }
 
     @Override
