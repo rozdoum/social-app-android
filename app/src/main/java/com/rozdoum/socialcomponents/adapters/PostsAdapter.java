@@ -32,9 +32,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private boolean isLoading = false;
     private boolean isMoreDataAvailable = true;
     private SwipeRefreshLayout swipeContainer;
-    private OnObjectChangedListener<Post> onSelectedPostChangeListener;
     private int selectedPostPosition = -1;
-    private boolean attemptToLoadPosts = false;
 
     public PostsAdapter(final MainActivity activity, SwipeRefreshLayout swipeContainer) {
         this.activity = activity;
@@ -64,10 +62,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     private void cleanSelectedPostInformation() {
-        onSelectedPostChangeListener = null;
         selectedPostPosition = -1;
     }
-
 
     public void setCallback(Callback callback) {
         this.callback = callback;
@@ -90,7 +86,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             public void onItemClick(int position) {
                 if (callback != null) {
                     selectedPostPosition = position;
-                    onSelectedPostChangeListener = createOnPostChangeListener(selectedPostPosition);
                     callback.onItemClick(getItemByPosition(position));
                 }
             }
@@ -213,7 +208,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void updateSelectedPost() {
-        if (onSelectedPostChangeListener != null && selectedPostPosition != -1) {
+        if (selectedPostPosition != -1) {
             Post selectedPost = getItemByPosition(selectedPostPosition);
             PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
         }

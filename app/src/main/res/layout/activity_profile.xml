@@ -1,88 +1,78 @@
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_horizontal"
+    android:layout_height="wrap_content"
+    android:focusableInTouchMode="true"
     android:orientation="vertical"
     tools:context="com.rozdoum.socialcomponents.activities.ProfileActivity">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/profileInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:focusableInTouchMode="true"
-        android:orientation="vertical">
+        android:padding="@dimen/intrinsic_padding">
 
         <RelativeLayout
-            android:id="@+id/profileInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/intrinsic_padding">
+            android:id="@+id/imageContainer"
+            android:layout_width="@dimen/profile_photo_side"
+            android:layout_height="@dimen/profile_photo_side">
 
-            <RelativeLayout
-                android:id="@+id/userInfoContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="@dimen/progress_bar_size"
+                android:layout_height="@dimen/progress_bar_size"
+                android:layout_centerInParent="true"
+                android:visibility="visible" />
 
-                <RelativeLayout
-                    android:id="@+id/imageContainer"
-                    android:layout_width="@dimen/profile_photo_side"
-                    android:layout_height="@dimen/profile_photo_side">
-
-                    <ProgressBar
-                        android:id="@+id/progressBar"
-                        android:layout_width="@dimen/progress_bar_size"
-                        android:layout_height="@dimen/progress_bar_size"
-                        android:layout_centerInParent="true"
-                        android:visibility="visible" />
-
-                    <ImageView
-                        android:id="@+id/imageView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:visibility="gone" />
-
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/nameEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_below="@id/imageContainer"
-                    android:layout_centerHorizontal="true"
-                    android:hint="@string/prompt_name"
-                    android:paddingTop="@dimen/intrinsic_padding"
-                    android:textAppearance="@style/TextAppearance.Title" />
-
-            </RelativeLayout>
-
-            <TextView
-                android:id="@+id/postsCounterTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_margin="@dimen/large_intrinsic_padding"
-                android:layout_toEndOf="@+id/userInfoContainer"
-                android:text="0 posts"
-                android:textAppearance="@style/TextAppearance.Title" />
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/postsLabelTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/intrinsic_padding"
-            android:paddingTop="@dimen/large_intrinsic_padding"
-            android:text="@string/posts_label"
-            android:textAppearance="@style/TextAppearance.Second.Dark"
-            android:visibility="invisible" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
+            android:id="@+id/nameEditText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/intrinsic_padding" />
+            android:layout_marginLeft="@dimen/large_intrinsic_padding"
+            android:layout_marginRight="@dimen/large_intrinsic_padding"
+            android:layout_marginBottom="@dimen/large_intrinsic_padding"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/imageContainer"
+            android:layout_centerHorizontal="true"
+            android:hint="@string/prompt_name"
+            android:paddingTop="@dimen/intrinsic_padding"
+            android:textAppearance="@style/TextAppearance.Title" />
 
-    </LinearLayout>
-</android.support.v4.widget.NestedScrollView>
+        <TextView
+            android:id="@+id/postsCounterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_below="@id/nameEditText"
+            android:layout_marginLeft="@dimen/large_intrinsic_padding"
+            android:layout_toEndOf="@+id/imageContainer"
+            android:text="0 posts"
+            android:textAppearance="@style/TextAppearance.Title" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/postsLabelTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/intrinsic_padding"
+        android:paddingTop="@dimen/large_intrinsic_padding"
+        android:text="@string/posts_label"
+        android:textAppearance="@style/TextAppearance.Second.Dark"
+        android:visibility="invisible" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/intrinsic_padding" />
+
+</LinearLayout>
