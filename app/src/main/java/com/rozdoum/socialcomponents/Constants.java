@@ -16,4 +16,8 @@ public class Constants {
         public static final int MAX_TEXT_LENGTH_IN_LIST = 300; //characters
         public static final int MAX_POST_TITLE_LENGTH = 255; //characters
     }
+
+    public static class Database {
+        public static final int MAX_UPLOAD_RETRY_MILLIS = 60000; //1 minute
+    }
 }

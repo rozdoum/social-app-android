@@ -21,6 +21,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
+import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
@@ -73,6 +74,9 @@ public class DatabaseHelper {
         database = FirebaseDatabase.getInstance();
         database.setPersistenceEnabled(true);
         storage = FirebaseStorage.getInstance();
+
+//        Sets the maximum time to retry upload operations if a failure occurs.
+        storage.setMaxUploadRetryTimeMillis(Constants.Database.MAX_UPLOAD_RETRY_MILLIS);
     }
 
     public DatabaseReference getDatabaseReference() {
