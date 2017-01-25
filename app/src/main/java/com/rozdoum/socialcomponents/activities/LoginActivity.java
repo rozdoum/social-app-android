@@ -35,6 +35,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
+import com.rozdoum.socialcomponents.utils.LogoutHelper;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
 import java.util.Arrays;
@@ -59,8 +60,23 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        // Configure Google Sign In
+        mGoogleApiClient = GoogleApiHelper.createGoogleApiClient(this);
+        findViewById(R.id.googleSignInButton).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signInWithGoogle();
+            }
+        });
+
+
         // Configure firebase auth
         mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() != null) {
+            LogoutHelper.signOut(mGoogleApiClient, this);
+        }
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -84,15 +100,6 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                 }
             }
         };
-
-        // Configure Google Sign In
-        mGoogleApiClient = GoogleApiHelper.createGoogleApiClient(this);
-        findViewById(R.id.googleSignInButton).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signInWithGoogle();
-            }
-        });
 
         // Configure Facebook  Sign In
         mCallbackManager = CallbackManager.Factory.create();

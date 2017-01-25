@@ -3,7 +3,6 @@ package com.rozdoum.socialcomponents.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,28 +14,19 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.facebook.FacebookSdk;
-import com.facebook.login.LoginManager;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.UserInfo;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
-import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
-import com.rozdoum.socialcomponents.utils.PreferencesUtil;
+import com.rozdoum.socialcomponents.utils.LogoutHelper;
 
 public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = ProfileActivity.class.getSimpleName();
@@ -187,75 +177,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         startActivity(intent);
     }
 
-    private void signOut() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            for (UserInfo profile : user.getProviderData()) {
-                String providerId = profile.getProviderId();
-                logoutByProvider(providerId);
-            }
-            logoutFirebase();
-        }
-
-        ImageUtil.getInstance(this).clearCache();
-    }
-
-    private void logoutByProvider(String providerId) {
-        switch (providerId) {
-            case GoogleAuthProvider.PROVIDER_ID:
-                logoutGoogle();
-                break;
-
-            case FacebookAuthProvider.PROVIDER_ID:
-                logoutFacebook();
-                break;
-        }
-    }
-
-    private void logoutFirebase() {
-        mAuth.signOut();
-        PreferencesUtil.setProfileCreated(this, false);
-        startMainActivity();
-    }
-
-    private void logoutFacebook() {
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        LoginManager.getInstance().logOut();
-    }
-
-    private void logoutGoogle() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = GoogleApiHelper.createGoogleApiClient(this);
-        }
-
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-        }
-
-        mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-            @Override
-            public void onConnected(@Nullable Bundle bundle) {
-                if (mGoogleApiClient.isConnected()) {
-                    Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-                        @Override
-                        public void onResult(@NonNull Status status) {
-                            if (status.isSuccess()) {
-                                LogUtil.logDebug(TAG, "User Logged out from Google");
-                            } else {
-                                LogUtil.logDebug(TAG, "Error Logged out from Google");
-                            }
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onConnectionSuspended(int i) {
-                LogUtil.logDebug(TAG, "Google API Client Connection Suspended");
-            }
-        });
-    }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         LogUtil.logDebug(TAG, "onConnectionFailed:" + connectionResult);
@@ -282,7 +203,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 startEditProfileActivity();
                 return true;
             case R.id.signOut:
-                signOut();
+                LogoutHelper.signOut(mGoogleApiClient, this);
+                startMainActivity();
                 return true;
             case R.id.createPost:
                 if (hasInternetConnection()) {
