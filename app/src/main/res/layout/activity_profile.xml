@@ -18,11 +18,6 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/intrinsic_padding">
 
-            <RelativeLayout
-                android:id="@+id/userInfoContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
                 <RelativeLayout
                     android:id="@+id/imageContainer"
                     android:layout_width="@dimen/profile_photo_side"
@@ -43,26 +38,28 @@
 
                 </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/nameEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_below="@id/imageContainer"
-                    android:layout_centerHorizontal="true"
-                    android:hint="@string/prompt_name"
-                    android:paddingTop="@dimen/intrinsic_padding"
-                    android:textAppearance="@style/TextAppearance.Title" />
-
-            </RelativeLayout>
+            <TextView
+                android:id="@+id/nameEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/large_intrinsic_padding"
+                android:layout_marginRight="@dimen/large_intrinsic_padding"
+                android:layout_marginBottom="@dimen/large_intrinsic_padding"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/imageContainer"
+                android:layout_centerHorizontal="true"
+                android:hint="@string/prompt_name"
+                android:paddingTop="@dimen/intrinsic_padding"
+                android:textAppearance="@style/TextAppearance.Title" />
 
             <TextView
                 android:id="@+id/postsCounterTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_margin="@dimen/large_intrinsic_padding"
-                android:layout_toEndOf="@+id/userInfoContainer"
+
+                android:layout_below="@id/nameEditText"
+                android:layout_marginLeft="@dimen/large_intrinsic_padding"
+                android:layout_toEndOf="@+id/imageContainer"
                 android:text="0 posts"
                 android:textAppearance="@style/TextAppearance.Title" />
 
