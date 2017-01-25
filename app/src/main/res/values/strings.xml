@@ -86,8 +86,13 @@
     <string name="posted_by_label">Posted by:</string>
 
     <plurals name="posts_counter_format">
-        <item quantity="one">%d post</item>
-        <item quantity="other">%d posts</item>
+        <item quantity="one">%d\npost</item>
+        <item quantity="other">%d\nposts</item>
+    </plurals>
+
+    <plurals name="likes_counter_format">
+        <item quantity="one">%d\nlike</item>
+        <item quantity="other">%d\nlikes</item>
     </plurals>
 
     <string name="posts_label">Posts:</string>
