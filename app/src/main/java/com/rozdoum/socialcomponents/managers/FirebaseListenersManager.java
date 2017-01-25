@@ -33,6 +33,7 @@ public class FirebaseListenersManager {
             for (ValueEventListener listener : activeListeners.get(context)) {
                 databaseHelper.closeListener(listener);
             }
+            activeListeners.remove(context);
         }
     }
 }

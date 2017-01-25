@@ -87,6 +87,7 @@ public class DatabaseHelper {
         if (activeListeners.containsKey(listener)) {
             DatabaseReference reference = activeListeners.get(listener);
             reference.removeEventListener(listener);
+            activeListeners.remove(listener);
             LogUtil.logDebug(TAG, "closeListener(), listener was removed: " + listener);
         } else {
             LogUtil.logDebug(TAG, "closeListener(), listener not found :" + listener);
@@ -98,6 +99,8 @@ public class DatabaseHelper {
             DatabaseReference reference = activeListeners.get(listener);
             reference.removeEventListener(listener);
         }
+
+        activeListeners.clear();
     }
 
     public void createOrUpdateProfile(Profile profile, final OnProfileCreatedListener onProfileCreatedListener) {
