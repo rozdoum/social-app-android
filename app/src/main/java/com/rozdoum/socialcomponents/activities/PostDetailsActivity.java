@@ -385,11 +385,17 @@ public class PostDetailsActivity extends BaseActivity {
         String commentText = commentEditText.getText().toString();
 
         if (commentText.length() > 0) {
-            ApplicationHelper.getDatabaseHelper().createOrUpdateComment(commentText, post.getId());
+            ApplicationHelper.getDatabaseHelper().createOrUpdateComment(commentText, post.getId(), new OnTaskCompleteListener() {
+                @Override
+                public void onTaskComplete(boolean success) {
+                    if (success) {
+                        scrollToFirstComment();
+                    }
+                }
+            });
             commentEditText.setText(null);
             commentEditText.clearFocus();
             hideKeyBoard();
-            scrollToFirstComment();
             Intent intent = getIntent();
             setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
         }
