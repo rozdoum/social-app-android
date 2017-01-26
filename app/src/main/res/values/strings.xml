@@ -25,6 +25,7 @@
     <string name="error_incorrect_file_type">Incorrect file type</string>
     <string name="error_bigger_file">File size is bigger than 10Mb</string>
     <string name="message_creating_post">Creating post ..</string>
+    <string name="message_saving">Saving ..</string>
     <string name="warning_empty_image">Image is required</string>
     <string name="warning_empty_title">Title is required</string>
     <string name="warning_empty_description">Description is required</string>
@@ -32,6 +33,7 @@
     <string name="error_fail_remove_post">Fail to remove post</string>
     <string name="message_post_was_removed">Post was removed</string>
     <string name="error_fail_update_post">Fail to update post</string>
+    <string name="error_post_was_removed">Post was removed</string>
 
     <string name="comment_text_hint">Enter your comment…</string>
     <string name="button_post_comment">Post comment</string>

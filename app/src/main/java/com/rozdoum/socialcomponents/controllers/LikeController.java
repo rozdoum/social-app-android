@@ -17,7 +17,9 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.activities.BaseActivity;
 import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
 
 /**
@@ -191,26 +193,42 @@ public class LikeController {
         }
     }
 
-    public void handleLikeClickAction(BaseActivity baseActivity, Post post) {
-        if (baseActivity.hasInternetConnection()) {
-            ProfileStatus profileStatus = ProfileManager.getInstance(baseActivity).checkProfile();
-
-            if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                if (isListView) {
-                    likeClickActionLocal(post);
+    public void handleLikeClickAction(final BaseActivity baseActivity, final Post post) {
+        PostManager.getInstance(baseActivity.getApplicationContext()).isPostExistSingleValue(post.getId(), new OnObjectExistListener<Post>() {
+            @Override
+            public void onDataChanged(boolean exist) {
+                if (exist) {
+                    if (baseActivity.hasInternetConnection()) {
+                        doHandleLikeClickAction(baseActivity, post);
+                    } else {
+                        showWarningMessage(baseActivity, R.string.internet_connection_failed);
+                    }
                 } else {
-                    likeClickAction(post.getLikesCount());
+                    showWarningMessage(baseActivity, R.string.message_post_was_removed);
                 }
+            }
+        });
+    }
+
+    private void showWarningMessage(BaseActivity baseActivity, int messageId) {
+        if (baseActivity instanceof MainActivity) {
+            ((MainActivity) baseActivity).showFloatButtonRelatedSnackBar(messageId);
+        } else {
+            baseActivity.showSnackBar(messageId);
+        }
+    }
+
+    private void doHandleLikeClickAction(BaseActivity baseActivity, Post post) {
+        ProfileStatus profileStatus = ProfileManager.getInstance(baseActivity).checkProfile();
+
+        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+            if (isListView) {
+                likeClickActionLocal(post);
             } else {
-                baseActivity.doAuthorization(profileStatus);
+                likeClickAction(post.getLikesCount());
             }
         } else {
-            int message = R.string.internet_connection_failed;
-            if (baseActivity instanceof MainActivity) {
-                ((MainActivity) baseActivity).showFloatButtonRelatedSnackBar(message);
-            } else {
-                baseActivity.showSnackBar(message);
-            }
+            baseActivity.doAuthorization(profileStatus);
         }
     }
 }
