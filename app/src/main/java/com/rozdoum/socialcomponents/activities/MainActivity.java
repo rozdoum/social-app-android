@@ -51,10 +51,12 @@ public class MainActivity extends BaseActivity {
             switch (requestCode) {
                 case ProfileActivity.OPEN_PROFILE_REQUEST:
                     refreshPostList();
+                    break;
 
                 case CreatePostActivity.CREATE_NEW_POST_REQUEST:
                     refreshPostList();
                     showFloatButtonRelatedSnackBar(R.string.message_post_was_created);
+                    break;
 
                 case PostDetailsActivity.UPDATE_POST_REQUEST:
                     if (data != null) {
@@ -66,6 +68,7 @@ public class MainActivity extends BaseActivity {
                             postsAdapter.updateSelectedPost();
                         }
                     }
+                    break;
             }
         }
     }

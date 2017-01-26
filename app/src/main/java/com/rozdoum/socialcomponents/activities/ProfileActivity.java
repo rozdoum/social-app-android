@@ -111,6 +111,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 case CreatePostActivity.CREATE_NEW_POST_REQUEST:
                     postsAdapter.loadPosts();
                     showSnackBar(R.string.message_post_was_created);
+                    break;
 
                 case PostDetailsActivity.UPDATE_POST_REQUEST:
                     if (data != null) {
@@ -121,6 +122,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                             postsAdapter.updateSelectedPost();
                         }
                     }
+                    break;
             }
         }
     }
