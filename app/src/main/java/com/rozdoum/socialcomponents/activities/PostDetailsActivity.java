@@ -171,6 +171,17 @@ public class PostDetailsActivity extends BaseActivity {
                 scrollToFirstComment();
             }
         });
+
+        View.OnClickListener onAuthorClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openProfileActivity();
+            }
+        };
+
+        authorImageView.setOnClickListener(onAuthorClickListener);
+
+        authorTextView.setOnClickListener(onAuthorClickListener);
     }
 
     @Override
@@ -302,6 +313,12 @@ public class PostDetailsActivity extends BaseActivity {
         Intent intent = new Intent(this, ImageDetailActivity.class);
         intent.putExtra(ImageDetailActivity.IMAGE_URL_EXTRA_KEY, post.getImagePath());
         startActivity(intent);
+    }
+
+    private void openProfileActivity() {
+        Intent intent = new Intent(PostDetailsActivity.this, ProfileActivity.class);
+        intent.putExtra(ProfileActivity.USER_ID_EXTRA_KEY, post.getAuthorId());
+        startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
     }
 
     private OnObjectExistListener<Like> createOnLikeObjectExistListener() {

@@ -31,6 +31,7 @@ import com.rozdoum.socialcomponents.utils.LogoutHelper;
 public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = ProfileActivity.class.getSimpleName();
     public static final int OPEN_PROFILE_REQUEST = 22;
+    public static final String USER_ID_EXTRA_KEY = "ProfileActivity.USER_ID_EXTRA_KEY";
 
     // UI references.
     private TextView nameEditText;
@@ -42,7 +43,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     private FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
-    private FirebaseUser firebaseUser;
+    private String currentUserId;
+    private String userID;
 
     private PostsByUserAdapter postsAdapter;
 
@@ -55,8 +57,13 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        userID = getIntent().getStringExtra(USER_ID_EXTRA_KEY);
+
         mAuth = FirebaseAuth.getInstance();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            currentUserId = firebaseUser.getUid();
+        }
 
         // Set up the login form.
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -114,7 +121,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         if (recyclerView == null) {
 
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            postsAdapter = new PostsByUserAdapter(this, firebaseUser.getUid());
+            postsAdapter = new PostsByUserAdapter(this, userID);
             postsAdapter.setOnItemClickListener(new PostsByUserAdapter.CallBack() {
                 @Override
                 public void onItemClick(Post post) {
@@ -143,7 +150,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     private void loadProfile() {
         showProgress();
-        ProfileManager.getInstance(this).getProfileSingleValue(firebaseUser.getUid(), createOnProfileChangedListener());
+        ProfileManager.getInstance(this).getProfileSingleValue(userID, createOnProfileChangedListener());
     }
 
     private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
@@ -189,9 +196,13 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.profile_menu, menu);
-        return true;
+        if (userID.equals(currentUserId)) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.profile_menu, menu);
+            return true;
+        }
+
+        return false;
     }
 
     @Override

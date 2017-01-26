@@ -88,6 +88,13 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
                 onClickListener.onLikeClick(likeController, getAdapterPosition());
             }
         });
+
+        authorImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickListener.onAuthorClick(getAdapterPosition());
+            }
+        });
     }
 
     public void bindData(Post post) {
@@ -164,5 +171,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     public interface OnClickListener {
         void onItemClick(int position);
         void onLikeClick(LikeController likeController, int position);
+
+        void onAuthorClick(int position);
     }
 }

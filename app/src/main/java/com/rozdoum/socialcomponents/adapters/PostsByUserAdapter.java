@@ -59,6 +59,11 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 Post post = getItemByPosition(position);
                 likeController.handleLikeClickAction(activity, post);
             }
+
+            @Override
+            public void onAuthorClick(int position) {
+
+            }
         };
     }
 

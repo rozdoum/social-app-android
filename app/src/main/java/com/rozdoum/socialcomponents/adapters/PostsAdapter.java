@@ -95,6 +95,13 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 Post post = getItemByPosition(position);
                 likeController.handleLikeClickAction(activity, post);
             }
+
+            @Override
+            public void onAuthorClick(int position) {
+                if (callback != null) {
+                    callback.onAuthorClick(getItemByPosition(position).getAuthorId());
+                }
+            }
         };
     }
 
@@ -218,5 +225,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         void onItemClick(Post post);
 
         void onListLoadingFinished();
+
+        void onAuthorClick(String authorId);
     }
 }

@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
@@ -101,6 +102,11 @@ public class MainActivity extends BaseActivity {
                 public void onListLoadingFinished() {
                     progressBar.setVisibility(View.GONE);
                 }
+
+                @Override
+                public void onAuthorClick(String authorId) {
+                    openProfileActivity(authorId);
+                }
             });
 
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -129,8 +135,9 @@ public class MainActivity extends BaseActivity {
         startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
     }
 
-    private void openProfileActivity() {
+    private void openProfileActivity(String userId) {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+        intent.putExtra(ProfileActivity.USER_ID_EXTRA_KEY, userId);
         startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
     }
 
@@ -149,7 +156,8 @@ public class MainActivity extends BaseActivity {
                 ProfileStatus profileStatus = profileManager.checkProfile();
 
                 if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                    openProfileActivity();
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    openProfileActivity(userId);
                 } else {
                     doAuthorization(profileStatus);
                 }
