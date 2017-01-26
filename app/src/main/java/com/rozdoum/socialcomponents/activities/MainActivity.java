@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
+import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.model.Post;
@@ -47,17 +48,24 @@ public class MainActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
-            if (requestCode == ProfileActivity.OPEN_PROFILE_REQUEST) {
-                refreshPostList();
-            }
+            switch (requestCode) {
+                case ProfileActivity.OPEN_PROFILE_REQUEST:
+                    refreshPostList();
 
-            if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST) {
-                refreshPostList();
-                showFloatButtonRelatedSnackBar(R.string.message_post_was_created);
-            }
+                case CreatePostActivity.CREATE_NEW_POST_REQUEST:
+                    refreshPostList();
+                    showFloatButtonRelatedSnackBar(R.string.message_post_was_created);
 
-            if (requestCode == PostDetailsActivity.UPDATE_COUNTERS_REQUEST) {
-                postsAdapter.updateSelectedPost();
+                case PostDetailsActivity.UPDATE_POST_REQUEST:
+                    if (data != null) {
+                        PostStatus postStatus = (PostStatus) data.getSerializableExtra(PostDetailsActivity.POST_STATUS_EXTRA_KEY);
+                        if (postStatus.equals(PostStatus.REMOVED)) {
+                            postsAdapter.removeSelectedPost();
+                            showFloatButtonRelatedSnackBar(R.string.message_post_was_removed);
+                        } else if (postStatus.equals(PostStatus.UPDATED)) {
+                            postsAdapter.updateSelectedPost();
+                        }
+                    }
             }
         }
     }
@@ -95,7 +103,7 @@ public class MainActivity extends BaseActivity {
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivityForResult(intent, PostDetailsActivity.UPDATE_COUNTERS_REQUEST);
+                    startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
                 }
 
                 @Override

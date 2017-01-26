@@ -19,6 +19,7 @@ public class Post implements Serializable, LazyLoading {
     private String description;
     private long createdDate;
     private String imagePath;
+    private String imageTitle;
     private String authorId;
     private long commentsCount;
     private long likesCount;
@@ -60,6 +61,14 @@ public class Post implements Serializable, LazyLoading {
 
     public String getImagePath() {
         return imagePath;
+    }
+
+    public String getImageTitle() {
+        return imageTitle;
+    }
+
+    public void setImageTitle(String imageTitle) {
+        this.imageTitle = imageTitle;
     }
 
     public void setImagePath(String imagePath) {
@@ -113,6 +122,7 @@ public class Post implements Serializable, LazyLoading {
         result.put("description", description);
         result.put("createdDate", createdDate);
         result.put("imagePath", imagePath);
+        result.put("imageTitle", imageTitle);
         result.put("authorId", authorId);
         result.put("createdDateText", FormatterUtil.getFirebaseDateFormat().format(new Date(createdDate)));
 

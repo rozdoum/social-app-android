@@ -22,13 +22,13 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
     private static final String TAG = CreatePostActivity.class.getSimpleName();
     public static final int CREATE_NEW_POST_REQUEST = 11;
 
-    private ImageView imageView;
+    protected ImageView imageView;
     private ProgressBar progressBar;
-    private EditText titleEditText;
-    private EditText descriptionEditText;
+    protected EditText titleEditText;
+    protected EditText descriptionEditText;
 
-    private PostManager postManager;
-    private boolean creatingPost = false;
+    protected PostManager postManager;
+    protected boolean creatingPost = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +69,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         loadImageToImageView();
     }
 
-    private void attemptCreatePost() {
+    protected void attemptCreatePost() {
         // Reset errors.
         titleEditText.setError(null);
         descriptionEditText.setError(null);
@@ -96,7 +96,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             cancel = true;
         }
 
-        if (imageUri == null) {
+        if (!(this instanceof EditPostActivity) && imageUri == null) {
             showWarningDialog(R.string.warning_empty_image);
             focusView = imageView;
             cancel = true;
@@ -106,19 +106,22 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             creatingPost = true;
             showProgress(R.string.message_creating_post);
             hideKeyboard();
-
-            Post post = new Post();
-            post.setTitle(title);
-            post.setDescription(description);
-            post.setAuthorId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            postManager.createPostWithImage(imageUri, CreatePostActivity.this, post);
+            savePost(title, description);
         } else if (focusView != null) {
             focusView.requestFocus();
         }
     }
 
+    protected void savePost(String title, String description) {
+        Post post = new Post();
+        post.setTitle(title);
+        post.setDescription(description);
+        post.setAuthorId(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        postManager.createOrUpdatePostWithImage(imageUri, CreatePostActivity.this, post);
+    }
+
     @Override
-    public void onPostCreated(boolean success) {
+    public void onPostSaved(boolean success) {
         hideProgress();
 
         if (success) {

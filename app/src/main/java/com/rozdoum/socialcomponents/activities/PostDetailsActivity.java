@@ -31,12 +31,14 @@ import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.controllers.LikeController;
+import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
@@ -50,7 +52,8 @@ public class PostDetailsActivity extends BaseActivity {
 
     public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
     private static final int TIME_OUT_LOADING_COMMENTS = 30000;
-    public static final int UPDATE_COUNTERS_REQUEST = 1;
+    public static final int UPDATE_POST_REQUEST = 1;
+    public static final String POST_STATUS_EXTRA_KEY = "PostDetailsActivity.POST_STATUS_EXTRA_KEY";
 
     private EditText commentEditText;
     private Post post;
@@ -82,6 +85,7 @@ public class PostDetailsActivity extends BaseActivity {
     private ProfileManager profileManager;
     private ImageUtil imageUtil;
     private LikeController likeController;
+    private boolean postRemoving = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,6 +214,15 @@ public class PostDetailsActivity extends BaseActivity {
             }
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            Intent intent = getIntent();
+            setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
+        }
     }
 
     private OnObjectChangedListener<Post> createOnPostChangeListener() {
@@ -344,7 +357,8 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 likeController.handleLikeClickAction(PostDetailsActivity.this, post);
-                setResult(RESULT_OK);
+                Intent intent = getIntent();
+                setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
             }
         });
 
@@ -376,7 +390,8 @@ public class PostDetailsActivity extends BaseActivity {
             commentEditText.clearFocus();
             hideKeyBoard();
             scrollToFirstComment();
-            setResult(RESULT_OK);
+            Intent intent = getIntent();
+            setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
         }
     }
 
@@ -389,6 +404,11 @@ public class PostDetailsActivity extends BaseActivity {
         }
     }
 
+    private boolean hasAccess() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        return currentUser != null && post.getAuthorId().equals(currentUser.getUid());
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -396,6 +416,11 @@ public class PostDetailsActivity extends BaseActivity {
         complainActionMenuItem = menu.findItem(R.id.complain_action);
         if (post.isHasComplain()) {
             complainActionMenuItem.setVisible(false);
+        }
+
+        if (hasAccess()) {
+            menu.findItem(R.id.edit_post_action).setVisible(true);
+            menu.findItem(R.id.delete_post_action).setVisible(true);
         }
         return true;
     }
@@ -413,9 +438,52 @@ public class PostDetailsActivity extends BaseActivity {
                     doAuthorization(profileStatus);
                 }
                 return true;
+
+            case R.id.edit_post_action:
+                if (hasAccess()) {
+                    openEditPostActivity();
+                }
+                return true;
+
+            case R.id.delete_post_action:
+                if (hasAccess()) {
+                    removePost();
+                }
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void removePost() {
+        if (hasInternetConnection()) {
+            if (!postRemoving) {
+                postManager.removePost(post, new OnTaskCompleteListener() {
+                    @Override
+                    public void onTaskComplete(boolean success) {
+                        if (success) {
+                            Intent intent = getIntent();
+                            setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.REMOVED));
+                            postRemoving = false;
+                            finish();
+                        } else {
+                            showSnackBar(R.string.error_fail_remove_post);
+                        }
+                    }
+                });
+
+                postRemoving = true;
+            }
+        } else {
+            showSnackBar(R.string.internet_connection_failed);
+        }
+
+    }
+
+    private void openEditPostActivity() {
+        Intent intent = new Intent(PostDetailsActivity.this, EditPostActivity.class);
+        intent.putExtra(EditPostActivity.POST_EXTRA_KEY, post);
+        startActivityForResult(intent, EditPostActivity.EDIT_POST_REQUEST);
     }
 
     private void openComplainDialog() {

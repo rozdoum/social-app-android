@@ -19,6 +19,9 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageLoader;
+import com.rozdoum.socialcomponents.enums.UploadImagePrefix;
+
+import java.util.Date;
 
 
 public class ImageUtil {
@@ -134,6 +137,9 @@ public class ImageUtil {
         }
     }
 
+    public static String generateImageTitle(UploadImagePrefix prefix) {
+        return prefix.toString() + new Date().getTime();
+    }
     public void clearCache() {
         cache.clear();
         lruCache.evictAll();

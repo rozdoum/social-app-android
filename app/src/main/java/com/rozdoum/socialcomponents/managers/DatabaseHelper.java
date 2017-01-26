@@ -35,7 +35,6 @@ import com.rozdoum.socialcomponents.utils.LogUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,8 +117,12 @@ public class DatabaseHelper {
     public void createOrUpdatePost(Post post) {
         try {
             DatabaseReference databaseReference = database.getReference();
-            String postId = databaseReference.child("posts").push().getKey();
-            post.setId(postId);
+            String postId = post.getId();
+            if (postId == null) {
+                postId = databaseReference.child("posts").push().getKey();
+                post.setId(postId);
+            }
+
             Map<String, Object> postValues = post.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put("/posts/" + postId, postValues);
@@ -128,6 +131,19 @@ public class DatabaseHelper {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
+    }
+
+    public Task<Void> removePost(Post post) {
+        DatabaseReference databaseReference = database.getReference();
+        DatabaseReference postRef = databaseReference.child("posts").child(post.getId());
+        return postRef.removeValue();
+    }
+
+    public Task<Void> removeImage(String imageTitle) {
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://socialcomponents.appspot.com");
+        StorageReference desertRef = storageRef.child("images/" + imageTitle);
+
+        return desertRef.delete();
     }
 
     public void createOrUpdateComment(String commentText, final String postId) {
@@ -261,9 +277,9 @@ public class DatabaseHelper {
         });
     }
 
-    public UploadTask uploadImage(Uri uri) {
+    public UploadTask uploadImage(Uri uri, String imageTitle) {
         StorageReference storageRef = storage.getReferenceFromUrl("gs://socialcomponents.appspot.com");
-        StorageReference riversRef = storageRef.child("images/" + new Date().getTime() + "_" + uri.getLastPathSegment());
+        StorageReference riversRef = storageRef.child("images/" + imageTitle);
         // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
                 .setCacheControl("max-age=7776000, Expires=7776000, public, must-revalidate")
@@ -320,8 +336,10 @@ public class DatabaseHelper {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Post post = dataSnapshot.getValue(Post.class);
-                post.setId(id);
-                listener.onObjectChanged(post);
+                if (post != null) {
+                    post.setId(id);
+                    listener.onObjectChanged(post);
+                }
             }
 
             @Override
@@ -371,6 +389,7 @@ public class DatabaseHelper {
                         post.setTitle((String) mapObj.get("title"));
                         post.setDescription((String) mapObj.get("description"));
                         post.setImagePath((String) mapObj.get("imagePath"));
+                        post.setImageTitle((String) mapObj.get("imageTitle"));
                         post.setAuthorId((String) mapObj.get("authorId"));
                         post.setCreatedDate((long) mapObj.get("createdDate"));
                         if (mapObj.containsKey("commentsCount")) {

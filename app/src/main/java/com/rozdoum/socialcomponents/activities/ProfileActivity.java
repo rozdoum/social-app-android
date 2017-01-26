@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
+import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
@@ -106,13 +107,20 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
-            if (requestCode == CreatePostActivity.CREATE_NEW_POST_REQUEST) {
-                postsAdapter.loadPosts();
-                showSnackBar(R.string.message_post_was_created);
-            }
+            switch (requestCode) {
+                case CreatePostActivity.CREATE_NEW_POST_REQUEST:
+                    postsAdapter.loadPosts();
+                    showSnackBar(R.string.message_post_was_created);
 
-            if (requestCode == PostDetailsActivity.UPDATE_COUNTERS_REQUEST) {
-                postsAdapter.updateSelectedPost();
+                case PostDetailsActivity.UPDATE_POST_REQUEST:
+                    if (data != null) {
+                        PostStatus postStatus = (PostStatus) data.getSerializableExtra(PostDetailsActivity.POST_STATUS_EXTRA_KEY);
+                        if (postStatus.equals(PostStatus.REMOVED)) {
+                            postsAdapter.removeSelectedPost();
+                        } else if (postStatus.equals(PostStatus.UPDATED)) {
+                            postsAdapter.updateSelectedPost();
+                        }
+                    }
             }
         }
     }
@@ -127,7 +135,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 public void onItemClick(Post post) {
                     Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
                     intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivityForResult(intent, PostDetailsActivity.UPDATE_COUNTERS_REQUEST);
+                    startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
                 }
 
                 @Override
