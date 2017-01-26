@@ -17,6 +17,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
@@ -55,7 +56,7 @@ public class PostManager extends FirebaseListenersManager {
         }
     }
 
-    public void getPostsList(OnDataChangedListener<Post> onDataChangedListener, long date) {
+    public void getPostsList(OnPostListChangedListener<Post> onDataChangedListener, long date) {
         ApplicationHelper.getDatabaseHelper().getPostList(onDataChangedListener, date);
     }
 
