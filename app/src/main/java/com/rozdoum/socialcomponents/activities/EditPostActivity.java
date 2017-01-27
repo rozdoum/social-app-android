@@ -10,6 +10,7 @@ import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 public class EditPostActivity extends CreatePostActivity {
+    private static final String TAG = EditPostActivity.class.getSimpleName();
     public static final String POST_EXTRA_KEY = "EditPostActivity.POST_EXTRA_KEY";
     public static final int EDIT_POST_REQUEST = 33;
 
@@ -63,7 +64,6 @@ public class EditPostActivity extends CreatePostActivity {
         String imageUrl = post.getImagePath();
         imageUtil.getFullImage(imageUrl, imageView, R.drawable.ic_stub);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

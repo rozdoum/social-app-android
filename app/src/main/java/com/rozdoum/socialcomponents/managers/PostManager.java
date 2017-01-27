@@ -80,7 +80,11 @@ public class PostManager extends FirebaseListenersManager {
     public void createOrUpdatePostWithImage(Uri imageUri, final OnPostCreatedListener onPostCreatedListener, final Post post) {
         // Register observers to listen for when the download is done or if it fails
         DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
-        final String imageTitle = ImageUtil.generateImageTitle(UploadImagePrefix.POST);
+        if (post.getId() == null) {
+            post.setId(databaseHelper.generatePostId());
+        }
+
+        final String imageTitle = ImageUtil.generateImageTitle(UploadImagePrefix.POST, post.getId());
         UploadTask uploadTask = databaseHelper.uploadImage(imageUri, imageTitle);
 
         if (uploadTask != null) {
@@ -108,9 +112,14 @@ public class PostManager extends FirebaseListenersManager {
         }
     }
 
+    public Task<Void> removeImage(String imageTitle) {
+        final DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
+        return databaseHelper.removeImage(imageTitle);
+    }
+
     public void removePost(final Post post, final OnTaskCompleteListener onTaskCompleteListener) {
         final DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
-        Task<Void> removeImageTask = databaseHelper.removeImage(post.getImageTitle());
+        Task<Void> removeImageTask = removeImage(post.getImageTitle());
 
         removeImageTask.addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -119,7 +128,7 @@ public class PostManager extends FirebaseListenersManager {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         onTaskCompleteListener.onTaskComplete(task.isSuccessful());
-                        LogUtil.logDebug(TAG, "removePost(), success" + task.isSuccessful());
+                        LogUtil.logDebug(TAG, "removePost(), is success: " + task.isSuccessful());
                     }
                 });
                 LogUtil.logDebug(TAG, "removeImage(): success");

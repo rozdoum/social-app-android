@@ -114,18 +114,18 @@ public class DatabaseHelper {
         });
     }
 
+    public String generatePostId() {
+        DatabaseReference databaseReference = database.getReference();
+        return databaseReference.child("posts").push().getKey();
+    }
+
     public void createOrUpdatePost(Post post) {
         try {
             DatabaseReference databaseReference = database.getReference();
-            String postId = post.getId();
-            if (postId == null) {
-                postId = databaseReference.child("posts").push().getKey();
-                post.setId(postId);
-            }
 
             Map<String, Object> postValues = post.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/posts/" + postId, postValues);
+            childUpdates.put("/posts/" + post.getId(), postValues);
 
             databaseReference.updateChildren(childUpdates);
         } catch (Exception e) {

@@ -137,9 +137,14 @@ public class ImageUtil {
         }
     }
 
-    public static String generateImageTitle(UploadImagePrefix prefix) {
+    public static String generateImageTitle(UploadImagePrefix prefix, String parentId) {
+        if (parentId != null) {
+            return prefix.toString() + parentId;
+        }
+
         return prefix.toString() + new Date().getTime();
     }
+
     public void clearCache() {
         cache.clear();
         lruCache.evictAll();
