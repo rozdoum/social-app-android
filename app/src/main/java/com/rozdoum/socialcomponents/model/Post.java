@@ -124,6 +124,9 @@ public class Post implements Serializable, LazyLoading {
         result.put("imagePath", imagePath);
         result.put("imageTitle", imageTitle);
         result.put("authorId", authorId);
+        result.put("commentsCount", commentsCount);
+        result.put("likesCount", likesCount);
+        result.put("hasComplain", hasComplain);
         result.put("createdDateText", FormatterUtil.getFirebaseDateFormat().format(new Date(createdDate)));
 
         return result;
