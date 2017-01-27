@@ -190,8 +190,13 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     }
 
     private void startEditProfileActivity() {
-        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-        startActivity(intent);
+        if (hasInternetConnection()) {
+            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+            startActivity(intent);
+            imageView.setImageResource(R.drawable.ic_stub);
+        } else {
+            showSnackBar(R.string.internet_connection_failed);
+        }
     }
 
     @Override
@@ -220,7 +225,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.editProfile:
-                imageView.setImageResource(R.drawable.ic_stub);
                 startEditProfileActivity();
                 return true;
             case R.id.signOut:

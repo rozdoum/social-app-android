@@ -481,9 +481,13 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void openEditPostActivity() {
-        Intent intent = new Intent(PostDetailsActivity.this, EditPostActivity.class);
-        intent.putExtra(EditPostActivity.POST_EXTRA_KEY, post);
-        startActivityForResult(intent, EditPostActivity.EDIT_POST_REQUEST);
+        if (hasInternetConnection()) {
+            Intent intent = new Intent(PostDetailsActivity.this, EditPostActivity.class);
+            intent.putExtra(EditPostActivity.POST_EXTRA_KEY, post);
+            startActivityForResult(intent, EditPostActivity.EDIT_POST_REQUEST);
+        } else {
+            showSnackBar(R.string.internet_connection_failed);
+        }
     }
 
     private void openComplainDialog() {
