@@ -118,6 +118,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                         PostStatus postStatus = (PostStatus) data.getSerializableExtra(PostDetailsActivity.POST_STATUS_EXTRA_KEY);
                         if (postStatus.equals(PostStatus.REMOVED)) {
                             postsAdapter.removeSelectedPost();
+
                         } else if (postStatus.equals(PostStatus.UPDATED)) {
                             postsAdapter.updateSelectedPost();
                         }
@@ -141,7 +142,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 }
 
                 @Override
-                public void onPostsLoaded(int postsCount) {
+                public void onPostsListChanged(int postsCount) {
                     postsCounterTextView.setText(getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount));
 
                     if (postsCount > 0) {
