@@ -220,8 +220,10 @@ public class PostDetailsActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            Intent intent = getIntent();
-            setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
+            if (requestCode == EditPostActivity.EDIT_POST_REQUEST) {
+                Intent intent = getIntent();
+                setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
+            }
         }
     }
 
@@ -409,6 +411,19 @@ public class PostDetailsActivity extends BaseActivity {
         return currentUser != null && post.getAuthorId().equals(currentUser.getUid());
     }
 
+    private void updateOptionMenuVisibility(Menu menu) {
+        if (hasAccess()) {
+            menu.findItem(R.id.edit_post_action).setVisible(true);
+            menu.findItem(R.id.delete_post_action).setVisible(true);
+        }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        updateOptionMenuVisibility(menu);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -418,10 +433,7 @@ public class PostDetailsActivity extends BaseActivity {
             complainActionMenuItem.setVisible(false);
         }
 
-        if (hasAccess()) {
-            menu.findItem(R.id.edit_post_action).setVisible(true);
-            menu.findItem(R.id.delete_post_action).setVisible(true);
-        }
+        updateOptionMenuVisibility(menu);
         return true;
     }
 
