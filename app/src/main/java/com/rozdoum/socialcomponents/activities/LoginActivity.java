@@ -1,7 +1,6 @@
 package com.rozdoum.socialcomponents.activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -27,7 +26,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -69,7 +67,6 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
             }
         });
 
-
         // Configure firebase auth
         mAuth = FirebaseAuth.getInstance();
 
@@ -84,16 +81,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                 if (user != null) {
                     // Profile is signed in
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setPhotoUri(Uri.parse(profilePhotoUrlLarge))
-                            .build();
-
-                    user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            checkIsProfileExist(user.getUid());
-                        }
-                    });
+                    checkIsProfileExist(user.getUid());
                 } else {
                     // Profile is signed out
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_out");
@@ -195,6 +183,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
 
     private void startCreateProfileActivity() {
         Intent intent = new Intent(LoginActivity.this, CreateProfileActivity.class);
+        intent.putExtra(CreateProfileActivity.LARGE_IMAGE_URL_EXTRA_KEY, profilePhotoUrlLarge);
         startActivity(intent);
     }
 
