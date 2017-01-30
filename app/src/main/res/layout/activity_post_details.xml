@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/titleTextView"
-                android:layout_marginBottom="@dimen/large_intrinsic_padding"
+                android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/large_intrinsic_padding"
                 android:paddingRight="@dimen/large_intrinsic_padding">
@@ -90,9 +90,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/authorContainer"
-                android:layout_marginBottom="@dimen/large_intrinsic_padding"
-                android:layout_marginLeft="@dimen/large_intrinsic_padding"
-                android:layout_marginRight="@dimen/large_intrinsic_padding" />
+                android:layout_marginBottom="@dimen/intrinsic_padding"
+                android:layout_marginLeft="@dimen/intrinsic_padding"
+                android:layout_marginRight="@dimen/intrinsic_padding" />
 
             <TextView
                 android:id="@+id/descriptionEditText"

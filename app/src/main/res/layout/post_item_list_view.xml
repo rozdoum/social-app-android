@@ -21,9 +21,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/intrinsic_padding">
+            android:layout_height="match_parent">
 
             <ImageView
                 android:id="@+id/postImageView"
@@ -65,7 +63,6 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/intrinsic_padding"
                 android:paddingRight="@dimen/intrinsic_padding"
-                android:layout_marginBottom="@dimen/intrinsic_padding"
                 android:layout_below="@+id/titleTextView"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/authorImageView"
@@ -80,9 +77,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/detailsTextView"
-                android:layout_toStartOf="@+id/authorImageView"
-                android:layout_marginLeft="@dimen/intrinsic_padding"
-                android:layout_marginRight="@dimen/intrinsic_padding" />
+                android:layout_toStartOf="@+id/authorImageView" />
 
         </RelativeLayout>
 
