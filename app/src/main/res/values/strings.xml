@@ -42,7 +42,7 @@
     <string name="create_post_full_menu_label">Create post</string>
     <string name="sign_out_menu_label">Sign out</string>
     <string name="edit_profile_menu_label">Edit profile</string>
-    <string name="button_title_save">Save</string>
+    <string name="button_title_save">Done</string>
     <string name="button_title_continue">Continue</string>
 
     <!-- Strings related to registration and login -->
