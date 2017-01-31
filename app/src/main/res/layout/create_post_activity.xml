@@ -16,6 +16,7 @@
             android:id="@+id/imageContainer"
             android:layout_width="match_parent"
             android:layout_height="300dp"
+            android:layout_marginBottom="@dimen/intrinsic_padding"
             android:layout_alignParentTop="true">
 
             <ImageView
@@ -40,6 +41,7 @@
             android:id="@+id/input_layout_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/intrinsic_padding"
             android:layout_below="@+id/imageContainer">
 
             <EditText
