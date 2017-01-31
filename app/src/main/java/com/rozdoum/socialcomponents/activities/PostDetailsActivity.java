@@ -470,7 +470,7 @@ public class PostDetailsActivity extends BaseActivity {
 
             case R.id.delete_post_action:
                 if (hasAccess()) {
-                    removePost();
+                    attemptToRemovePost();
                 }
                 return true;
         }
@@ -478,35 +478,52 @@ public class PostDetailsActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void removePost() {
+    private void attemptToRemovePost() {
         if (hasInternetConnection()) {
             if (!postRemoving) {
-                postManager.removePost(post, new OnTaskCompleteListener() {
-                    @Override
-                    public void onTaskComplete(boolean success) {
-                        if (success) {
-                            Intent intent = getIntent();
-                            setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.REMOVED));
-                            postRemoving = false;
-                            finish();
-                        } else {
-                            showSnackBar(R.string.error_fail_remove_post);
-                        }
-                    }
-                });
-
-                postRemoving = true;
+                openConfirmDeletingDialog();
             }
         } else {
             showSnackBar(R.string.internet_connection_failed);
         }
+    }
 
+    private void removePost() {
+        postManager.removePost(post, new OnTaskCompleteListener() {
+            @Override
+            public void onTaskComplete(boolean success) {
+                if (success) {
+                    Intent intent = getIntent();
+                    setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.REMOVED));
+                    postRemoving = false;
+                    finish();
+                } else {
+                    showSnackBar(R.string.error_fail_remove_post);
+                }
+            }
+        });
+
+        postRemoving = true;
     }
 
     private void openEditPostActivity() {
         Intent intent = new Intent(PostDetailsActivity.this, EditPostActivity.class);
         intent.putExtra(EditPostActivity.POST_EXTRA_KEY, post);
         startActivityForResult(intent, EditPostActivity.EDIT_POST_REQUEST);
+    }
+
+    private void openConfirmDeletingDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.confirm_deletion_post)
+                .setNegativeButton(R.string.button_title_cancel, null)
+                .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        removePost();
+                    }
+                });
+
+        builder.create().show();
     }
 
     private void openComplainDialog() {

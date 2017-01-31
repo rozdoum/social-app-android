@@ -32,6 +32,7 @@
     <string name="error_fail_remove_post">Fail to remove post</string>
     <string name="message_post_was_removed">Post was removed</string>
     <string name="error_fail_update_post">Fail to update post</string>
+    <string name="confirm_deletion_post">Delete this post?</string>
 
     <string name="comment_text_hint">Enter your comment…</string>
     <string name="button_post_comment">Post comment</string>
