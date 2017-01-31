@@ -76,6 +76,13 @@ public class ImageUtil {
         return displaymetrics;
     }
 
+    public ImageLoader.ImageContainer getImageThumb(String imageUrl, ImageView imageView, ImageLoader.ImageListener listener) {
+        int maxImageWidth = (int) (calcMaxWidth(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
+        int maxImageHeight = (int) (calcMaxHeight(imageView) * IMPROVE_IMAGE_QUALITY_FACTOR);
+
+        return imageLoader.get(imageUrl, listener, maxImageWidth, maxImageHeight);
+    }
+
     public ImageLoader.ImageContainer getImageThumb(final String imageUrl, final ImageView imageView, int defaultImageResId, final int errorImageResId) {
         imageView.setImageResource(defaultImageResId);
         return getImage(imageUrl, imageView, errorImageResId);

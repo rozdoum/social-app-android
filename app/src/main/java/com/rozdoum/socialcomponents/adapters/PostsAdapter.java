@@ -178,6 +178,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 if (nextItemCreatedDate == 0) {
                     postList.clear();
+                    notifyDataSetChanged();
                     swipeContainer.setRefreshing(false);
                 }
 

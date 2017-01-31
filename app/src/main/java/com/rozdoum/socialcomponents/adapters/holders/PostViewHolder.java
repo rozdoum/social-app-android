@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,12 +23,15 @@ import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 /**
  * Created by alexey on 27.12.16.
  */
 
 public class PostViewHolder extends RecyclerView.ViewHolder {
+    public static final String TAG = PostViewHolder.class.getSimpleName();
+
     private Context context;
     private ImageView postImageView;
     private TextView titleTextView;
@@ -58,7 +62,6 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         this.context = view.getContext();
         this.isAuthorNeeded = isAuthorNeeded;
 
-        this.context = view.getContext();
         postImageView = (ImageView) view.findViewById(R.id.postImageView);
         likeCounterTextView = (TextView) view.findViewById(R.id.likeCounterTextView);
         likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
@@ -119,14 +122,10 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         imageRequest = imageUtil.getImageThumb(imageUrl, postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
 
         if (isAuthorNeeded && post.getAuthorId() != null) {
-            authorImageView.setVisibility(View.VISIBLE);
-            Object imageViewTag = authorImageView.getTag();
-
-            if (!post.getAuthorId().equals(imageViewTag)) {
-                cancelLoadingAuthorImage();
-                authorImageView.setTag(post.getAuthorId());
-                profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
-            }
+            authorImageView.setVisibility(View.INVISIBLE);
+            cancelLoadingAuthorImage();
+            authorImageView.setTag(post.getAuthorId());
+            profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
         }
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -150,10 +149,23 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
         return new OnObjectChangedListener<Profile>() {
             @Override
-            public void onObjectChanged(Profile obj) {
+            public void onObjectChanged(final Profile obj) {
                 if (obj.getPhotoUrl() != null) {
                     authorImageRequest = imageUtil.getImageThumb(obj.getPhotoUrl(),
-                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+                            authorImageView, new ImageLoader.ImageListener() {
+                                @Override
+                                public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                                    if (authorImageView.getTag().equals(obj.getId())) {
+                                        authorImageView.setImageBitmap(response.getBitmap());
+                                        authorImageView.setVisibility(View.VISIBLE);
+                                    }
+                                }
+
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    LogUtil.logError(TAG, "Failed load image " + obj.getPhotoUrl(), error);
+                                }
+                            });
                 }
             }
         };
@@ -170,6 +182,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     public interface OnClickListener {
         void onItemClick(int position);
+
         void onLikeClick(LikeController likeController, int position);
 
         void onAuthorClick(int position);
