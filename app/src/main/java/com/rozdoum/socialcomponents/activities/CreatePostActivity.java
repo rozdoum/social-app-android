@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,6 +51,17 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             @Override
             public void onClick(View v) {
                 onSelectImageClick(v);
+            }
+        });
+
+        titleEditText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (titleEditText.hasFocus() && titleEditText.getError() != null) {
+                    titleEditText.setError(null);
+                    return true;
+                }
+                return false;
             }
         });
     }

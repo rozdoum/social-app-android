@@ -9,7 +9,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:focusable="true">
 
         <RelativeLayout
             android:id="@+id/imageContainer"
@@ -21,7 +22,9 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_stub" />
+                android:src="@drawable/ic_stub"
+                android:focusableInTouchMode="true"
+                android:focusable="true" />
 
             <ProgressBar
                 android:id="@+id/progressBar"
