@@ -55,11 +55,11 @@ public class ProfileManager extends FirebaseListenersManager {
         databaseHelper = ApplicationHelper.getDatabaseHelper();
     }
 
-    public Profile buildProfile(FirebaseUser firebaseUser) {
+    public Profile buildProfile(FirebaseUser firebaseUser, String largeAvatarURL) {
         Profile profile = new Profile(firebaseUser.getUid());
         profile.setEmail(firebaseUser.getEmail());
         profile.setUsername(firebaseUser.getDisplayName());
-        profile.setPhotoUrl(firebaseUser.getPhotoUrl().toString());
+        profile.setPhotoUrl(largeAvatarURL != null ? largeAvatarURL : firebaseUser.getPhotoUrl().toString());
         return profile;
     }
 

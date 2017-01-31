@@ -28,7 +28,7 @@ import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
 public class CreateProfileActivity extends PickImageActivity implements OnProfileCreatedListener {
     private static final String TAG = CreateProfileActivity.class.getSimpleName();
-    public static final String PROFILE_EXTRA_KEY = "CreateProfileActivity.PROFILE_EXTRA_KEY";
+    public static final String LARGE_IMAGE_URL_EXTRA_KEY = "CreateProfileActivity.LARGE_IMAGE_URL_EXTRA_KEY";
 
     // UI references.
     private EditText nameEditText;
@@ -36,6 +36,7 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
     private ProgressBar progressBar;
 
     private Profile profile;
+    private String largeAvatarURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +51,10 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
         imageView = (ImageView) findViewById(R.id.imageView);
         nameEditText = (EditText) findViewById(R.id.nameEditText);
 
+        largeAvatarURL = getIntent().getStringExtra(LARGE_IMAGE_URL_EXTRA_KEY);
+
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        profile = ProfileManager.getInstance(this).buildProfile(firebaseUser);
+        profile = ProfileManager.getInstance(this).buildProfile(firebaseUser, largeAvatarURL);
 
         nameEditText.setText(profile.getUsername());
 
