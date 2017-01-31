@@ -26,6 +26,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
@@ -146,7 +147,7 @@ public class DatabaseHelper {
         return desertRef.delete();
     }
 
-    public void createOrUpdateComment(String commentText, final String postId) {
+    public void createOrUpdateComment(String commentText, final String postId, final OnTaskCompleteListener onTaskCompleteListener) {
         try {
             String authorId = firebaseAuth.getCurrentUser().getUid();
             DatabaseReference mCommentsReference = database.getReference().child("post-comments/" + postId);
@@ -183,6 +184,9 @@ public class DatabaseHelper {
                         @Override
                         public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
                             LogUtil.logInfo(TAG, "Updating comments count transaction is completed.");
+                            if (onTaskCompleteListener != null) {
+                                onTaskCompleteListener.onTaskComplete(true);
+                            }
                         }
                     });
                 }
