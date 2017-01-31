@@ -96,7 +96,7 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             @Override
             public void onListChanged(List<Post> list) {
                 setList(list);
-                callBack.onPostsLoaded(list.size());
+                callBack.onPostsListChanged(list.size());
             }
         };
 
@@ -106,7 +106,7 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public interface CallBack {
         void onItemClick(Post post);
 
-        void onPostsLoaded(int postsCount);
+        void onPostsListChanged(int postsCount);
     }
 
     private OnObjectChangedListener<Post> createOnPostChangeListener(final int postPosition) {
@@ -128,6 +128,7 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void removeSelectedPost() {
         postList.remove(selectedPostPosition);
+        callBack.onPostsListChanged(postList.size());
         notifyItemRemoved(selectedPostPosition);
     }
 }
