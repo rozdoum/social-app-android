@@ -35,10 +35,12 @@ public class CommentsAdapter {
     private ImageUtil imageUtil;
     private LayoutInflater inflater;
     private ProfileManager profileManager;
+    private OnAuthorClickListener onAuthorClickListener;
 
 
-    public CommentsAdapter(ViewGroup parent) {
+    public CommentsAdapter(ViewGroup parent, OnAuthorClickListener onAuthorClickListener) {
         this.parent = parent;
+        this.onAuthorClickListener = onAuthorClickListener;
         imageUtil = ImageUtil.getInstance(parent.getContext().getApplicationContext());
         inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         profileManager = ProfileManager.getInstance(parent.getContext().getApplicationContext());
@@ -60,7 +62,7 @@ public class CommentsAdapter {
         ExpandableTextView commentTextView = (ExpandableTextView) convertView.findViewById(R.id.commentText);
         TextView dateTextView = (TextView) convertView.findViewById(R.id.dateTextView);
 
-        String authorId = comment.getAuthorId();
+        final String authorId = comment.getAuthorId();
         if (authorId != null)
             profileManager.getProfileSingleValue(authorId, createOnProfileChangeListener(commentTextView,
                     avatarImageView, comment.getText()));
@@ -69,6 +71,13 @@ public class CommentsAdapter {
 
         CharSequence date = FormatterUtil.getRelativeTimeSpanString(parent.getContext(), comment.getCreatedDate());
         dateTextView.setText(date);
+
+        avatarImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAuthorClickListener.onAuthorClick(authorId);
+            }
+        });
 
         return convertView;
     }
@@ -100,4 +109,7 @@ public class CommentsAdapter {
         initListView();
     }
 
+    public interface OnAuthorClickListener {
+        public void onAuthorClick(String authorId);
+    }
 }

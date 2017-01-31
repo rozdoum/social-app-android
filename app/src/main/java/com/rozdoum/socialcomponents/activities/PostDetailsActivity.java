@@ -122,7 +122,12 @@ public class PostDetailsActivity extends BaseActivity {
 
         final Button sendButton = (Button) findViewById(R.id.sendButton);
 
-        commentsAdapter = new CommentsAdapter(commentsContainer);
+        commentsAdapter = new CommentsAdapter(commentsContainer, new CommentsAdapter.OnAuthorClickListener() {
+            @Override
+            public void onAuthorClick(String authorId) {
+                openProfileActivity(authorId);
+            }
+        });
         initLikes();
 
         postManager.getPost(this, postId, createOnPostChangeListener());
@@ -179,7 +184,7 @@ public class PostDetailsActivity extends BaseActivity {
         View.OnClickListener onAuthorClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openProfileActivity();
+                openProfileActivity(post.getAuthorId());
             }
         };
 
@@ -330,9 +335,9 @@ public class PostDetailsActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    private void openProfileActivity() {
+    private void openProfileActivity(String authorId) {
         Intent intent = new Intent(PostDetailsActivity.this, ProfileActivity.class);
-        intent.putExtra(ProfileActivity.USER_ID_EXTRA_KEY, post.getAuthorId());
+        intent.putExtra(ProfileActivity.USER_ID_EXTRA_KEY, authorId);
         startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
     }
 
