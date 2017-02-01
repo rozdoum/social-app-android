@@ -88,7 +88,7 @@ public class ProfileManager extends FirebaseListenersManager {
             return;
         }
 
-        String imageTitle = ImageUtil.generateImageTitle(UploadImagePrefix.PROFILE);
+        String imageTitle = ImageUtil.generateImageTitle(UploadImagePrefix.PROFILE, profile.getId());
         UploadTask uploadTask = databaseHelper.uploadImage(imageUri, imageTitle);
 
         if (uploadTask != null) {
