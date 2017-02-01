@@ -119,11 +119,6 @@ public class ProfileManager extends FirebaseListenersManager {
         databaseHelper.getProfileSingleValue(id, listener);
     }
 
-    public void getProfile(Context context, String id, final OnObjectChangedListener<Profile> listener) {
-        ValueEventListener valueEventListener = databaseHelper.getProfile(id, listener);
-        addListenerToMap(context, valueEventListener);
-    }
-
     public ProfileStatus checkProfile() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
