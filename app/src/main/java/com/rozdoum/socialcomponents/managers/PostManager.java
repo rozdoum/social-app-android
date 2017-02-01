@@ -158,4 +158,9 @@ public class PostManager extends FirebaseListenersManager {
         DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
         databaseHelper.hasCurrentUserLikeSingleValue(postId, userId, onObjectExistListener);
     }
+
+    public void isPostExistSingleValue(String postId, final OnObjectExistListener<Post> onObjectExistListener) {
+        DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
+        databaseHelper.isPostExistSingleValue(postId, onObjectExistListener);
+    }
 }

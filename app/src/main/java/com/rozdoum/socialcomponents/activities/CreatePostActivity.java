@@ -116,7 +116,6 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
 
         if (!cancel) {
             creatingPost = true;
-            showProgress(R.string.message_creating_post);
             hideKeyboard();
             savePost(title, description);
         } else if (focusView != null) {
@@ -125,6 +124,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
     }
 
     protected void savePost(String title, String description) {
+        showProgress(R.string.message_creating_post);
         Post post = new Post();
         post.setTitle(title);
         post.setDescription(description);

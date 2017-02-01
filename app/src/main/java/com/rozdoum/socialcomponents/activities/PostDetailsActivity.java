@@ -86,6 +86,7 @@ public class PostDetailsActivity extends BaseActivity {
     private ImageUtil imageUtil;
     private LikeController likeController;
     private boolean postRemoving = false;
+    private boolean isPostExist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,12 +237,33 @@ public class PostDetailsActivity extends BaseActivity {
         return new OnObjectChangedListener<Post>() {
             @Override
             public void onObjectChanged(Post obj) {
-                post = obj;
-                fillPostFields();
-                updateCounters();
-                initLikeButtonState();
+                if (obj != null) {
+                    isPostExist = true;
+                    post = obj;
+                    fillPostFields();
+                    updateCounters();
+                    initLikeButtonState();
+                } else {
+                    isPostExist = false;
+                    Intent intent = getIntent();
+                    setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.REMOVED));
+                    showPostWasRemovedDialog();
+                }
             }
         };
+    }
+
+    private void showPostWasRemovedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(PostDetailsActivity.this);
+        builder.setMessage(R.string.error_post_was_removed);
+        builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
     }
 
     private void scrollToFirstComment() {
@@ -363,9 +385,11 @@ public class PostDetailsActivity extends BaseActivity {
         likesContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                likeController.handleLikeClickAction(PostDetailsActivity.this, post);
-                Intent intent = getIntent();
-                setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
+                if (isPostExist) {
+                    likeController.handleLikeClickAction(PostDetailsActivity.this, post);
+                    Intent intent = getIntent();
+                    setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
+                }
             }
         });
 
@@ -391,7 +415,7 @@ public class PostDetailsActivity extends BaseActivity {
     private void sendComment() {
         String commentText = commentEditText.getText().toString();
 
-        if (commentText.length() > 0) {
+        if (commentText.length() > 0 && isPostExist) {
             ApplicationHelper.getDatabaseHelper().createOrUpdateComment(commentText, post.getId(), new OnTaskCompleteListener() {
                 @Override
                 public void onTaskComplete(boolean success) {
@@ -450,16 +474,14 @@ public class PostDetailsActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (!isPostExist) {
+            return super.onOptionsItemSelected(item);
+        }
+
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.complain_action:
-                ProfileStatus profileStatus = profileManager.checkProfile();
-
-                if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                    openComplainDialog();
-                } else {
-                    doAuthorization(profileStatus);
-                }
+                doComplainAction();
                 return true;
 
             case R.id.edit_post_action:
@@ -476,6 +498,16 @@ public class PostDetailsActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void doComplainAction() {
+        ProfileStatus profileStatus = profileManager.checkProfile();
+
+        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+            openComplainDialog();
+        } else {
+            doAuthorization(profileStatus);
+        }
     }
 
     private void attemptToRemovePost() {

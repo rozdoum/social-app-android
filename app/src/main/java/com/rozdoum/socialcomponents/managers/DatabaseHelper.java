@@ -351,8 +351,8 @@ public class DatabaseHelper {
                 Post post = dataSnapshot.getValue(Post.class);
                 if (post != null) {
                     post.setId(id);
-                    listener.onObjectChanged(post);
                 }
+                listener.onObjectChanged(post);
             }
 
             @Override
@@ -544,5 +544,20 @@ public class DatabaseHelper {
     public void addComplainToPost(Post post) {
         DatabaseReference databaseReference = getDatabaseReference();
         databaseReference.child("posts").child(post.getId()).child("hasComplain").setValue(true);
+    }
+
+    public void isPostExistSingleValue(String postId, final OnObjectExistListener<Post> onObjectExistListener) {
+        DatabaseReference databaseReference = database.getReference("posts").child(postId);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onObjectExistListener.onDataChanged(dataSnapshot.exists());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                LogUtil.logDebug(TAG, "isPostExistSingleValue(), onCancelled: " + databaseError);
+            }
+        });
     }
 }

@@ -21,8 +21,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
 import com.rozdoum.socialcomponents.enums.PostStatus;
+import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -135,10 +137,17 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             postsAdapter = new PostsByUserAdapter(this, userID);
             postsAdapter.setOnItemClickListener(new PostsByUserAdapter.CallBack() {
                 @Override
-                public void onItemClick(Post post) {
-                    Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
-                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
+                public void onItemClick(final Post post) {
+                    PostManager.getInstance(ProfileActivity.this).isPostExistSingleValue(post.getId(), new OnObjectExistListener<Post>() {
+                        @Override
+                        public void onDataChanged(boolean exist) {
+                            if (exist) {
+                                openPostDetailsActivity(post);
+                            } else {
+                                showSnackBar(R.string.error_post_was_removed);
+                            }
+                        }
+                    });
                 }
 
                 @Override
@@ -157,6 +166,12 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             recyclerView.setNestedScrollingEnabled(false);
             postsAdapter.loadPosts();
         }
+    }
+
+    private void openPostDetailsActivity(Post post) {
+        Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
+        intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+        startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
     }
 
     private void loadProfile() {

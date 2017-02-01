@@ -19,7 +19,9 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
 
 public class MainActivity extends BaseActivity {
@@ -103,10 +105,17 @@ public class MainActivity extends BaseActivity {
             postsAdapter = new PostsAdapter(this, swipeContainer);
             postsAdapter.setCallback(new PostsAdapter.Callback() {
                 @Override
-                public void onItemClick(Post post) {
-                    Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
-                    intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-                    startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
+                public void onItemClick(final Post post) {
+                    PostManager.getInstance(MainActivity.this).isPostExistSingleValue(post.getId(), new OnObjectExistListener<Post>() {
+                        @Override
+                        public void onDataChanged(boolean exist) {
+                            if (exist) {
+                                openPostDetailsActivity(post);
+                            } else {
+                                showFloatButtonRelatedSnackBar(R.string.error_post_was_removed);
+                            }
+                        }
+                    });
                 }
 
                 @Override
@@ -125,6 +134,12 @@ public class MainActivity extends BaseActivity {
             recyclerView.setAdapter(postsAdapter);
             postsAdapter.loadFirstPage();
         }
+    }
+
+    private void openPostDetailsActivity(Post post) {
+        Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
+        intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+        startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
     }
 
     public void showFloatButtonRelatedSnackBar(int messageId) {
