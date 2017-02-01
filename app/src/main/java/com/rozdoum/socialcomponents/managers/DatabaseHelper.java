@@ -25,11 +25,13 @@ import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.PostListResult;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
@@ -49,7 +51,6 @@ public class DatabaseHelper {
     public static final String TAG = DatabaseHelper.class.getSimpleName();
 
     private static DatabaseHelper instance;
-    private static final int POST_AMOUNT_ON_PAGE = 10;
 
     private Context context;
     private FirebaseDatabase database;
@@ -292,20 +293,27 @@ public class DatabaseHelper {
         return riversRef.putFile(uri, metadata);
     }
 
-    public void getPostList(final OnDataChangedListener<Post> onDataChangedListener, long date) {
+    public void getPostList(final OnPostListChangedListener<Post> onDataChangedListener, long date) {
         DatabaseReference databaseReference = database.getReference("posts");
         Query postsQuery;
         if (date == 0) {
-            postsQuery = databaseReference.limitToLast(POST_AMOUNT_ON_PAGE).orderByChild("createdDate");
+            postsQuery = databaseReference.limitToLast(Constants.Post.POST_AMOUNT_ON_PAGE).orderByChild("createdDate");
         } else {
-            postsQuery = databaseReference.limitToLast(POST_AMOUNT_ON_PAGE).endAt(date).orderByChild("createdDate");
+            postsQuery = databaseReference.limitToLast(Constants.Post.POST_AMOUNT_ON_PAGE).endAt(date).orderByChild("createdDate");
         }
 
         postsQuery.keepSynced(true);
         postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                onDataChangedListener.onListChanged(parsePostList(dataSnapshot));
+                Map<String, Object> objectMap = (Map<String, Object>) dataSnapshot.getValue();
+                PostListResult result = parsePostList(objectMap);
+
+                if (result.getPosts().isEmpty() && result.isMoreDataAvailable()) {
+                    getPostList(onDataChangedListener, result.getLastItemCreatedDate() - 1);
+                } else {
+                    onDataChangedListener.onListChanged(parsePostList(objectMap));
+                }
             }
 
             @Override
@@ -324,7 +332,8 @@ public class DatabaseHelper {
         postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                onDataChangedListener.onListChanged(parsePostList(dataSnapshot));
+                PostListResult result = parsePostList((Map<String, Object>) dataSnapshot.getValue());
+                onDataChangedListener.onListChanged(result.getPosts());
             }
 
             @Override
@@ -375,17 +384,26 @@ public class DatabaseHelper {
         });
     }
 
-    private List<Post> parsePostList(DataSnapshot dataSnapshot) {
-        Map<String, Object> objectMap = (HashMap<String, Object>)
-                dataSnapshot.getValue();
+    private PostListResult parsePostList(Map<String, Object> objectMap) {
+        PostListResult result = new PostListResult();
         List<Post> list = new ArrayList<Post>();
+        boolean isMoreDataAvailable = true;
+        long lastItemCreatedDate = 0;
+
         if (objectMap != null) {
+            isMoreDataAvailable = Constants.Post.POST_AMOUNT_ON_PAGE == objectMap.size();
+
             for (String key : objectMap.keySet()) {
                 Object obj = objectMap.get(key);
                 if (obj instanceof Map) {
                     Map<String, Object> mapObj = (Map<String, Object>) obj;
 
                     boolean hasComplain = mapObj.containsKey("hasComplain") && (boolean) mapObj.get("hasComplain");
+                    long createdDate = (long) mapObj.get("createdDate");
+
+                    if (lastItemCreatedDate == 0 || lastItemCreatedDate > createdDate) {
+                        lastItemCreatedDate = createdDate;
+                    }
 
                     if (!hasComplain) {
                         Post post = new Post();
@@ -395,7 +413,7 @@ public class DatabaseHelper {
                         post.setImagePath((String) mapObj.get("imagePath"));
                         post.setImageTitle((String) mapObj.get("imageTitle"));
                         post.setAuthorId((String) mapObj.get("authorId"));
-                        post.setCreatedDate((long) mapObj.get("createdDate"));
+                        post.setCreatedDate(createdDate);
                         if (mapObj.containsKey("commentsCount")) {
                             post.setCommentsCount((long) mapObj.get("commentsCount"));
                         }
@@ -413,9 +431,13 @@ public class DatabaseHelper {
                     return ((Long) rhs.getCreatedDate()).compareTo(lhs.getCreatedDate());
                 }
             });
+
+            result.setPosts(list);
+            result.setLastItemCreatedDate(lastItemCreatedDate);
+            result.setMoreDataAvailable(isMoreDataAvailable);
         }
 
-        return list;
+        return result;
     }
 
     public void getProfileSingleValue(String id, final OnObjectChangedListener<Profile> listener) {
@@ -523,5 +545,4 @@ public class DatabaseHelper {
         DatabaseReference databaseReference = getDatabaseReference();
         databaseReference.child("posts").child(post.getId()).child("hasComplain").setValue(true);
     }
-
 }

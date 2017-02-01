@@ -12,9 +12,10 @@ import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.PostListResult;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private MainActivity activity;
     private boolean isLoading = false;
     private boolean isMoreDataAvailable = true;
+    private long lastLoadedItemCreatedDate;
     private SwipeRefreshLayout swipeContainer;
     private int selectedPostPosition = -1;
 
@@ -108,9 +110,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (position >= getItemCount() - 1 && isMoreDataAvailable && !isLoading) {
-            long lastItemCreatedDate = postList.get(postList.size() - 1).getCreatedDate();
-            final long nextItemCreatedDate = lastItemCreatedDate - 1;
-
             android.os.Handler mHandler = activity.getWindow().getDecorView().getHandler();
             mHandler.post(new Runnable() {
                 public void run() {
@@ -119,7 +118,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         isLoading = true;
                         postList.add(new Post(ItemType.LOAD));
                         notifyItemInserted(postList.size());
-                        loadNext(nextItemCreatedDate);
+                        loadNext(lastLoadedItemCreatedDate - 1);
                     } else {
                         activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
                     }
@@ -172,9 +171,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return;
         }
 
-        OnDataChangedListener<Post> onPostsDataChangedListener = new OnDataChangedListener<Post>() {
+        OnPostListChangedListener<Post> onPostsDataChangedListener = new OnPostListChangedListener<Post>() {
             @Override
-            public void onListChanged(List<Post> list) {
+            public void onListChanged(PostListResult result) {
+                lastLoadedItemCreatedDate = result.getLastItemCreatedDate();
+                isMoreDataAvailable = result.isMoreDataAvailable();
+                List<Post> list = result.getPosts();
 
                 if (nextItemCreatedDate == 0) {
                     postList.clear();
@@ -186,9 +188,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 if (!list.isEmpty()) {
                     addList(list);
-                    isMoreDataAvailable = true;
                 } else {
-                    isMoreDataAvailable = false;
+                    isLoading = false;
                 }
 
                 callback.onListLoadingFinished();
