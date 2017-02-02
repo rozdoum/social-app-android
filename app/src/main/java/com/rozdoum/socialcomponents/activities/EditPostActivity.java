@@ -28,7 +28,7 @@ public class EditPostActivity extends CreatePostActivity {
 
         imageUtil = ImageUtil.getInstance(this);
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
-        addCheckIsPostExistListener();
+        addCheckIsPostChangedListener();
         showProgress();
         fillUIFields();
     }
@@ -51,7 +51,7 @@ public class EditPostActivity extends CreatePostActivity {
         doSavePost(title, description);
     }
 
-    private void addCheckIsPostExistListener() {
+    private void addCheckIsPostChangedListener() {
         PostManager.getInstance(this).getPost(this, post.getId(), new OnObjectChangedListener<Post>() {
             @Override
             public void onObjectChanged(Post obj) {
@@ -68,9 +68,25 @@ public class EditPostActivity extends CreatePostActivity {
                     builder.setCancelable(false);
                     builder.show();
 
+                } else {
+                    checkIsPostCountersChanged(obj);
                 }
             }
         });
+    }
+
+    private void checkIsPostCountersChanged(Post updatedPost) {
+        if (post.getLikesCount() != updatedPost.getLikesCount()) {
+            post.setLikesCount(updatedPost.getLikesCount());
+        }
+
+        if (post.getCommentsCount() != updatedPost.getCommentsCount()) {
+            post.setCommentsCount(updatedPost.getCommentsCount());
+        }
+
+        if (post.isHasComplain() != updatedPost.isHasComplain()) {
+            post.setHasComplain(updatedPost.isHasComplain());
+        }
     }
 
     private void openMainActivity() {
