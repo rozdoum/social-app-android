@@ -16,7 +16,7 @@
         app:border="true"
         app:border_width="0dp" />
 
-    <com.rozdoum.socialcomponents.ExpandableTextView
+    <com.rozdoum.socialcomponents.views.ExpandableTextView
         android:id="@+id/commentText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,6 +60,6 @@
 
         </RelativeLayout>
 
-    </com.rozdoum.socialcomponents.ExpandableTextView>
+    </com.rozdoum.socialcomponents.views.ExpandableTextView>
 
 </RelativeLayout>

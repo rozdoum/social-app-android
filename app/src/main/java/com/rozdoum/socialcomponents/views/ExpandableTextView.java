@@ -1,4 +1,4 @@
-package com.rozdoum.socialcomponents;
+package com.rozdoum.socialcomponents.views;
 
 /**
  * Created by alexey on 21.12.16.
@@ -21,6 +21,8 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.rozdoum.socialcomponents.R;
 
 
 public class ExpandableTextView extends LinearLayout implements View.OnClickListener {

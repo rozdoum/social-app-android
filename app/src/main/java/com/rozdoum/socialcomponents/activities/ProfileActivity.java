@@ -135,7 +135,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             postsAdapter = new PostsByUserAdapter(this, userID);
-            postsAdapter.setOnItemClickListener(new PostsByUserAdapter.CallBack() {
+            postsAdapter.setCallBack(new PostsByUserAdapter.CallBack() {
                 @Override
                 public void onItemClick(final Post post) {
                     PostManager.getInstance(ProfileActivity.this).isPostExistSingleValue(post.getId(), new OnObjectExistListener<Post>() {
