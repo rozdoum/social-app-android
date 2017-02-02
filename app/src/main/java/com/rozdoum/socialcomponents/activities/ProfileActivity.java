@@ -3,6 +3,7 @@ package com.rozdoum.socialcomponents.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,6 +51,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     private String userID;
 
     private PostsByUserAdapter postsAdapter;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,14 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         nameEditText = (TextView) findViewById(R.id.nameEditText);
         postsCounterTextView = (TextView) findViewById(R.id.postsCounterTextView);
         postsLabelTextView = (TextView) findViewById(R.id.postsLabelTextView);
+
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                onRefreshAction();
+            }
+        });
 
         loadPostsList();
     }
@@ -128,6 +138,11 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                     break;
             }
         }
+    }
+
+    private void onRefreshAction() {
+        postsAdapter.loadPosts();
+        ProfileManager.getInstance(this).getProfileSingleValue(userID, createOnProfileChangedListener());
     }
 
     private void loadPostsList() {
@@ -197,6 +212,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             }
         }
         hideProgress();
+        swipeContainer.setRefreshing(false);
     }
 
     private void startMainActivity() {
