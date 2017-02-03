@@ -28,9 +28,20 @@ public class EditPostActivity extends CreatePostActivity {
 
         imageUtil = ImageUtil.getInstance(this);
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
-        addCheckIsPostExistListener();
         showProgress();
         fillUIFields();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        addCheckIsPostExistListener();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        postManager.closeListeners(this);
     }
 
     @Override
