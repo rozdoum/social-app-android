@@ -118,7 +118,6 @@
                     android:textAppearance="@style/TextAppearance.Second.Dark"
                     android:visibility="gone" />
 
-
             </RelativeLayout>
 
             <android.support.v7.widget.Toolbar
