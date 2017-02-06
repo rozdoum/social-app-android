@@ -38,4 +38,5 @@
     <dimen name="login_screen_title_margin">48dp</dimen>
 
     <dimen name="profile_screen_margin_between_counters">32dp</dimen>
+    <dimen name="profile_screen_avatar_right_margin">24dp</dimen>
 </resources>
