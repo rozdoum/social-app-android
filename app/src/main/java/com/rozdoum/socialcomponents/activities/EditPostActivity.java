@@ -10,7 +10,7 @@ import android.view.MenuItem;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
@@ -52,23 +52,31 @@ public class EditPostActivity extends CreatePostActivity {
     }
 
     private void addCheckIsPostExistListener() {
-        PostManager.getInstance(this).getPost(this, post.getId(), new OnObjectChangedListener<Post>() {
+        PostManager.getInstance(this).getPost(this, post.getId(), new OnPostChangedListener() {
             @Override
             public void onObjectChanged(Post obj) {
                 if (obj == null) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(EditPostActivity.this);
-                    builder.setMessage(R.string.error_post_was_removed);
-                    builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            openMainActivity();
-                            finish();
-                        }
-                    });
-                    builder.setCancelable(false);
-                    builder.show();
-
+                    showWarningDialog(getResources().getString(R.string.error_post_was_removed));
                 }
+            }
+
+            @Override
+            public void onError(String errorText) {
+                showWarningDialog(errorText);
+            }
+
+            private void showWarningDialog(String message) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditPostActivity.this);
+                builder.setMessage(message);
+                builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openMainActivity();
+                        finish();
+                    }
+                });
+                builder.setCancelable(false);
+                builder.show();
             }
         });
     }

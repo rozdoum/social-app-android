@@ -22,9 +22,11 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.Constants;
+import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
@@ -343,16 +345,24 @@ public class DatabaseHelper {
         });
     }
 
-    public ValueEventListener getPost(final String id, final OnObjectChangedListener<Post> listener) {
+    public ValueEventListener getPost(final String id, final OnPostChangedListener listener) {
         DatabaseReference databaseReference = getDatabaseReference().child("posts").child(id);
         ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Post post = dataSnapshot.getValue(Post.class);
-                if (post != null) {
-                    post.setId(id);
+                if (dataSnapshot.getValue() != null) {
+                    if (isPostValid((Map<String, Object>) dataSnapshot.getValue())) {
+                        Post post = dataSnapshot.getValue(Post.class);
+                        if (post != null) {
+                            post.setId(id);
+                        }
+                        listener.onObjectChanged(post);
+                    } else {
+                        listener.onError(String.format(context.getString(R.string.error_general_post), id));
+                    }
+                } else {
+                    listener.onObjectChanged(null);
                 }
-                listener.onObjectChanged(post);
             }
 
             @Override
@@ -366,14 +376,18 @@ public class DatabaseHelper {
         return valueEventListener;
     }
 
-    public void getSinglePost(final String id, final OnObjectChangedListener<Post> listener) {
+    public void getSinglePost(final String id, final OnPostChangedListener listener) {
         DatabaseReference databaseReference = getDatabaseReference().child("posts").child(id);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Post post = dataSnapshot.getValue(Post.class);
-                post.setId(id);
-                listener.onObjectChanged(post);
+                if (isPostValid((Map<String, Object>) dataSnapshot.getValue())) {
+                    Post post = dataSnapshot.getValue(Post.class);
+                    post.setId(id);
+                    listener.onObjectChanged(post);
+                } else {
+                    listener.onError(String.format(context.getString(R.string.error_general_post), id));
+                }
             }
 
             @Override
@@ -397,6 +411,11 @@ public class DatabaseHelper {
                 Object obj = objectMap.get(key);
                 if (obj instanceof Map) {
                     Map<String, Object> mapObj = (Map<String, Object>) obj;
+
+                    if (!isPostValid(mapObj)) {
+                        LogUtil.logDebug(TAG, "Invalid post, id: " + key);
+                        continue;
+                    }
 
                     boolean hasComplain = mapObj.containsKey("hasComplain") && (boolean) mapObj.get("hasComplain");
                     long createdDate = (long) mapObj.get("createdDate");
@@ -438,6 +457,15 @@ public class DatabaseHelper {
         }
 
         return result;
+    }
+
+    private boolean isPostValid(Map<String, Object> post) {
+        return post.containsKey("title")
+                && post.containsKey("description")
+                && post.containsKey("imagePath")
+                && post.containsKey("imageTitle")
+                && post.containsKey("authorId")
+                && post.containsKey("description");
     }
 
     public void getProfileSingleValue(String id, final OnObjectChangedListener<Profile> listener) {
