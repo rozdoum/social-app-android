@@ -11,13 +11,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -68,27 +70,25 @@ public abstract class PickImageActivity extends BaseActivity {
             return;
         }
 
-        Picasso.with(PickImageActivity.this)
+        Glide.with(this)
                 .load(imageUri)
-                .memoryPolicy(MemoryPolicy.NO_CACHE)
-                .fit()
-                .centerInside()
-                .into(getImageView(), new Callback() {
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .fitCenter()
+                .listener(new RequestListener<Uri, GlideDrawable>() {
                     @Override
-                    public void onSuccess() {
-                        LogUtil.logDebug(TAG, "Picasso Success Loading image - " + imageUri.getPath());
-                        getProgressView().setVisibility(View.GONE);
+                    public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
                     }
 
                     @Override
-                    public void onError() {
-                        LogUtil.logDebug(TAG, "Picasso Error Loading image - " + imageUri.getPath());
+                    public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                         getProgressView().setVisibility(View.GONE);
-                        getImageView().setImageResource(R.drawable.ic_stub);
-
-                        showSnackBar(R.string.error_fail_load_image);
+                        LogUtil.logDebug(TAG, "Glide Success Loading image from uri : " + imageUri.getPath());
+                        return false;
                     }
-                });
+                })
+                .into(getImageView());
     }
 
     protected boolean isImageFileValid(Uri imageUri) {

@@ -16,13 +16,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
@@ -59,7 +59,11 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
         nameEditText.setText(profile.getUsername());
 
         if (profile.getPhotoUrl() != null) {
-            ImageUtil.getInstance(this).getFullImage(profile.getPhotoUrl(), imageView, R.drawable.ic_stub);
+            Glide.with(this)
+                    .load(profile.getPhotoUrl())
+                    .crossFade()
+                    .error(R.drawable.ic_stub)
+                    .into(imageView);
         }
 
         nameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
