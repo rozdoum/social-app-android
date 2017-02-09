@@ -10,7 +10,7 @@ import android.view.MenuItem;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
@@ -28,6 +28,7 @@ public class EditPostActivity extends CreatePostActivity {
 
         imageUtil = ImageUtil.getInstance(this);
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
+        addCheckIsPostExistListener();
         showProgress();
         fillUIFields();
     }
@@ -62,12 +63,14 @@ public class EditPostActivity extends CreatePostActivity {
         doSavePost(title, description);
     }
 
-    private void addCheckIsPostExistListener() {
+    private void addCheckIsPostChangedListener() {
         PostManager.getInstance(this).getPost(this, post.getId(), new OnPostChangedListener() {
             @Override
             public void onObjectChanged(Post obj) {
                 if (obj == null) {
                     showWarningDialog(getResources().getString(R.string.error_post_was_removed));
+                } else {
+                    checkIsPostCountersChanged(obj);
                 }
             }
 
@@ -90,6 +93,20 @@ public class EditPostActivity extends CreatePostActivity {
                 builder.show();
             }
         });
+    }
+
+    private void checkIsPostCountersChanged(Post updatedPost) {
+        if (post.getLikesCount() != updatedPost.getLikesCount()) {
+            post.setLikesCount(updatedPost.getLikesCount());
+        }
+
+        if (post.getCommentsCount() != updatedPost.getCommentsCount()) {
+            post.setCommentsCount(updatedPost.getCommentsCount());
+        }
+
+        if (post.isHasComplain() != updatedPost.isHasComplain()) {
+            post.setHasComplain(updatedPost.isHasComplain());
+        }
     }
 
     private void openMainActivity() {
