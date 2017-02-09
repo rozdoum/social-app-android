@@ -395,7 +395,7 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void initLikes() {
-        likeController = new LikeController(this, post.getId(), likeCounterTextView, likesImageView, false);
+        likeController = new LikeController(this, post, likeCounterTextView, likesImageView, false);
 
         likesContainer.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -97,6 +97,7 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             @Override
             public void onListChanged(List<Post> list) {
                 setList(list);
+
                 callBack.onPostsListChanged(list.size());
             }
         };

@@ -104,7 +104,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(Post post) {
 
-        likeController = new LikeController(context, post.getId(), likeCounterTextView, likesImageView, true);
+        likeController = new LikeController(context, post, likeCounterTextView, likesImageView, true);
 
         String title = removeNewLinesDividers(post.getTitle());
         titleTextView.setText(title);
