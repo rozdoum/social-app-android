@@ -35,7 +35,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="?attr/actionBarSize"
-                android:padding="@dimen/large_intrinsic_padding"
+                android:paddingTop="@dimen/intrinsic_padding"
+                android:paddingLeft="@dimen/intrinsic_padding"
+                android:paddingRight="@dimen/intrinsic_padding"
                 app:layout_collapseMode="parallax">
 
                 <RelativeLayout
@@ -58,7 +60,7 @@
                         android:layout_height="match_parent"
                         android:visibility="gone"
                         app:border="false"
-                        app:shadow="true" />
+                        app:shadow="false" />
 
                 </RelativeLayout>
 
@@ -68,6 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@+id/imageContainer"
                     android:layout_alignParentTop="true"
+                    android:layout_marginLeft="@dimen/profile_screen_avatar_right_margin"
                     android:orientation="vertical">
 
                     <TextView
@@ -75,9 +78,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/large_intrinsic_padding"
-                        android:layout_marginLeft="@dimen/large_intrinsic_padding"
-                        android:layout_marginRight="@dimen/large_intrinsic_padding"
-                        android:hint="@string/prompt_name"
+                        android:text="@string/prompt_name"
                         android:paddingTop="@dimen/intrinsic_padding"
                         android:textAppearance="@style/TextAppearance.Title" />
 
@@ -90,7 +91,6 @@
                             android:id="@+id/postsCounterTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="@dimen/large_intrinsic_padding"
                             android:layout_marginRight="@dimen/profile_screen_margin_between_counters"
                             android:gravity="center"
                             android:textAppearance="@style/TextAppearance.Title" />
@@ -113,9 +113,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/imageContainer"
-                    android:paddingTop="@dimen/large_intrinsic_padding"
+                    android:paddingTop="@dimen/intrinsic_padding"
                     android:text="@string/posts_label"
-                    android:textAppearance="@style/TextAppearance.Second.Dark"
+                    android:textAppearance="@style/TextAppearance.Second.Light"
                     android:visibility="gone" />
 
             </RelativeLayout>

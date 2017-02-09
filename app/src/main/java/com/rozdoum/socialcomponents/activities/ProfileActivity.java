@@ -8,6 +8,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.TextAppearanceSpan;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -139,7 +143,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
                 @Override
                 public void onPostsLoaded(int postsCount) {
-                    postsCounterTextView.setText(getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount));
+                    String label = getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount);
+                    postsCounterTextView.setText(buildCounterSpannable(label, postsCount));
 
                     if (postsCount > 0) {
                         postsLabelTextView.setVisibility(View.VISIBLE);
@@ -152,6 +157,16 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             recyclerView.setAdapter(postsAdapter);
             postsAdapter.loadPosts();
         }
+    }
+
+    private Spannable buildCounterSpannable(String label, int value) {
+        SpannableStringBuilder contentString = new SpannableStringBuilder();
+        contentString.append(String.valueOf(value));
+        contentString.append("\n");
+        int start = contentString.length();
+        contentString.append(label);
+        contentString.setSpan(new TextAppearanceSpan(this, R.style.TextAppearance_Second_Light), start, contentString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return contentString;
     }
 
     private void loadProfile() {
