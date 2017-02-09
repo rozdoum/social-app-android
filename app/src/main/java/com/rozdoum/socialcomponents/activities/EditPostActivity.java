@@ -10,7 +10,7 @@ import android.view.MenuItem;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
@@ -28,7 +28,6 @@ public class EditPostActivity extends CreatePostActivity {
 
         imageUtil = ImageUtil.getInstance(this);
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
-        addCheckIsPostExistListener();
         showProgress();
         fillUIFields();
     }
@@ -36,7 +35,7 @@ public class EditPostActivity extends CreatePostActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        addCheckIsPostExistListener();
+        addCheckIsPostChangedListener();
     }
 
     @Override
