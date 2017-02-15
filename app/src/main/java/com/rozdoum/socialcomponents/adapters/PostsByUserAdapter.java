@@ -83,7 +83,8 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private void setList(List<Post> list) {
-        postList = list;
+        postList.clear();
+        postList.addAll(list);
         notifyDataSetChanged();
     }
 
