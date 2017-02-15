@@ -3,9 +3,15 @@ package com.rozdoum.socialcomponents.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.TextAppearanceSpan;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -53,11 +59,15 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     private String userID;
 
     private PostsByUserAdapter postsAdapter;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
 
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -77,6 +87,14 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         nameEditText = (TextView) findViewById(R.id.nameEditText);
         postsCounterTextView = (TextView) findViewById(R.id.postsCounterTextView);
         postsLabelTextView = (TextView) findViewById(R.id.postsLabelTextView);
+
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                onRefreshAction();
+            }
+        });
 
         loadPostsList();
     }
@@ -133,6 +151,11 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         }
     }
 
+    private void onRefreshAction() {
+        postsAdapter.loadPosts();
+        ProfileManager.getInstance(this).getProfileSingleValue(userID, createOnProfileChangedListener());
+    }
+
     private void loadPostsList() {
         if (recyclerView == null) {
 
@@ -155,7 +178,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
                 @Override
                 public void onPostsListChanged(int postsCount) {
-                    postsCounterTextView.setText(getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount));
+                    String label = getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount);
+                    postsCounterTextView.setText(buildCounterSpannable(label, postsCount));
 
                     if (postsCount > 0) {
                         postsLabelTextView.setVisibility(View.VISIBLE);
@@ -166,9 +190,18 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setAdapter(postsAdapter);
-            recyclerView.setNestedScrollingEnabled(false);
             postsAdapter.loadPosts();
         }
+    }
+
+    private Spannable buildCounterSpannable(String label, int value) {
+        SpannableStringBuilder contentString = new SpannableStringBuilder();
+        contentString.append(String.valueOf(value));
+        contentString.append("\n");
+        int start = contentString.length();
+        contentString.append(label);
+        contentString.setSpan(new TextAppearanceSpan(this, R.style.TextAppearance_Second_Light), start, contentString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return contentString;
     }
 
     private void openPostDetailsActivity(Post post) {
@@ -216,6 +249,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             }
         }
         hideProgress();
+        swipeContainer.setRefreshing(false);
     }
 
     private void startMainActivity() {
@@ -225,8 +259,13 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     }
 
     private void startEditProfileActivity() {
-        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-        startActivity(intent);
+        if (hasInternetConnection()) {
+            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+            startActivity(intent);
+            imageView.setImageResource(R.drawable.ic_stub);
+        } else {
+            showSnackBar(R.string.internet_connection_failed);
+        }
     }
 
     @Override
@@ -247,7 +286,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             return true;
         }
 
-        return false;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -255,7 +294,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.editProfile:
-                imageView.setImageResource(R.drawable.ic_stub);
                 startEditProfileActivity();
                 return true;
             case R.id.signOut:

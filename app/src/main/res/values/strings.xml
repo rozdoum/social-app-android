@@ -70,7 +70,9 @@
 
 
     <string name="loading">Loading...</string>
+    <string name="removing">Removing...</string>
     <string name="error_general">Somthing went wrong.</string>
+    <string name="error_general_post">Somthing went wrong with post, id: %1$s</string>
     <string name="internet_connection_failed">No internet connection</string>
 
     <!-- Strings related to login -->
@@ -95,8 +97,13 @@
     <string name="posted_by_label">Posted by:</string>
 
     <plurals name="posts_counter_format">
-        <item quantity="one">%d post</item>
-        <item quantity="other">%d posts</item>
+        <item quantity="one">post</item>
+        <item quantity="other">posts</item>
+    </plurals>
+
+    <plurals name="likes_counter_format">
+        <item quantity="one">%d\nlike</item>
+        <item quantity="other">%d\nlikes</item>
     </plurals>
 
     <string name="posts_label">Posts:</string>

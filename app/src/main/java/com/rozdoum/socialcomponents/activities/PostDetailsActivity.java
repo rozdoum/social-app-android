@@ -42,6 +42,7 @@ import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
@@ -87,7 +88,7 @@ public class PostDetailsActivity extends BaseActivity {
     private PostManager postManager;
     private ProfileManager profileManager;
     private LikeController likeController;
-    private boolean postRemoving = false;
+    private boolean postRemovingProcess = false;
     private boolean isPostExist;
 
     @Override
@@ -234,8 +235,8 @@ public class PostDetailsActivity extends BaseActivity {
         }
     }
 
-    private OnObjectChangedListener<Post> createOnPostChangeListener() {
-        return new OnObjectChangedListener<Post>() {
+    private OnPostChangedListener createOnPostChangeListener() {
+        return new OnPostChangedListener() {
             @Override
             public void onObjectChanged(Post obj) {
                 if (obj != null) {
@@ -244,12 +245,26 @@ public class PostDetailsActivity extends BaseActivity {
                     fillPostFields();
                     updateCounters();
                     initLikeButtonState();
-                } else {
+                } else if (!postRemovingProcess) {
                     isPostExist = false;
                     Intent intent = getIntent();
                     setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.REMOVED));
                     showPostWasRemovedDialog();
                 }
+            }
+
+            @Override
+            public void onError(String errorText) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(PostDetailsActivity.this);
+                builder.setMessage(errorText);
+                builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+                builder.setCancelable(false);
+                builder.show();
             }
         };
     }
@@ -534,7 +549,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void attemptToRemovePost() {
         if (hasInternetConnection()) {
-            if (!postRemoving) {
+            if (!postRemovingProcess) {
                 openConfirmDeletingDialog();
             }
         } else {
@@ -549,21 +564,28 @@ public class PostDetailsActivity extends BaseActivity {
                 if (success) {
                     Intent intent = getIntent();
                     setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.REMOVED));
-                    postRemoving = false;
                     finish();
                 } else {
+                    postRemovingProcess = false;
                     showSnackBar(R.string.error_fail_remove_post);
                 }
+
+                hideProgress();
             }
         });
 
-        postRemoving = true;
+        showProgress(R.string.removing);
+        postRemovingProcess = true;
     }
 
     private void openEditPostActivity() {
-        Intent intent = new Intent(PostDetailsActivity.this, EditPostActivity.class);
-        intent.putExtra(EditPostActivity.POST_EXTRA_KEY, post);
-        startActivityForResult(intent, EditPostActivity.EDIT_POST_REQUEST);
+        if (hasInternetConnection()) {
+            Intent intent = new Intent(PostDetailsActivity.this, EditPostActivity.class);
+            intent.putExtra(EditPostActivity.POST_EXTRA_KEY, post);
+            startActivityForResult(intent, EditPostActivity.EDIT_POST_REQUEST);
+        } else {
+            showSnackBar(R.string.internet_connection_failed);
+        }
     }
 
     private void openConfirmDeletingDialog() {

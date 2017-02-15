@@ -14,8 +14,8 @@ import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.enums.UploadImagePrefix;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
@@ -64,13 +64,13 @@ public class PostManager extends FirebaseListenersManager {
         ApplicationHelper.getDatabaseHelper().getPostListByUser(onDataChangedListener, userId);
     }
 
-    public void getPost(Context context, String postId, OnObjectChangedListener<Post> onObjectChangedListener) {
-        ValueEventListener valueEventListener = ApplicationHelper.getDatabaseHelper().getPost(postId, onObjectChangedListener);
+    public void getPost(Context context, String postId, OnPostChangedListener onPostChangedListener) {
+        ValueEventListener valueEventListener = ApplicationHelper.getDatabaseHelper().getPost(postId, onPostChangedListener);
         addListenerToMap(context, valueEventListener);
     }
 
-    public void getSinglePostValue(String postId, OnObjectChangedListener<Post> onObjectChangedListener) {
-        ApplicationHelper.getDatabaseHelper().getSinglePost(postId, onObjectChangedListener);
+    public void getSinglePostValue(String postId, OnPostChangedListener onPostChangedListener) {
+        ApplicationHelper.getDatabaseHelper().getSinglePost(postId, onPostChangedListener);
     }
 
     public void getCommentsList(Context context, String postId, OnDataChangedListener<Comment> onDataChangedListener) {

@@ -11,8 +11,9 @@ import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -82,7 +83,8 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private void setList(List<Post> list) {
-        postList = list;
+        postList.clear();
+        postList.addAll(list);
         notifyDataSetChanged();
     }
 
@@ -109,12 +111,17 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void onPostsListChanged(int postsCount);
     }
 
-    private OnObjectChangedListener<Post> createOnPostChangeListener(final int postPosition) {
-        return new OnObjectChangedListener<Post>() {
+    private OnPostChangedListener createOnPostChangeListener(final int postPosition) {
+        return new OnPostChangedListener() {
             @Override
             public void onObjectChanged(Post obj) {
                 postList.set(postPosition, obj);
                 notifyItemChanged(postPosition);
+            }
+
+            @Override
+            public void onError(String errorText) {
+                LogUtil.logDebug(TAG, errorText);
             }
         };
     }

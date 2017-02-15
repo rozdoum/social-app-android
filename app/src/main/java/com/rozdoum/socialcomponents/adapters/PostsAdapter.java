@@ -12,10 +12,11 @@ import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.PostListResult;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -206,12 +207,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    private OnObjectChangedListener<Post> createOnPostChangeListener(final int postPosition) {
-        return new OnObjectChangedListener<Post>() {
+    private OnPostChangedListener createOnPostChangeListener(final int postPosition) {
+        return new OnPostChangedListener() {
             @Override
             public void onObjectChanged(Post obj) {
                 postList.set(postPosition, obj);
                 notifyItemChanged(postPosition);
+            }
+
+            @Override
+            public void onError(String errorText) {
+                LogUtil.logDebug(TAG, errorText);
             }
         };
     }

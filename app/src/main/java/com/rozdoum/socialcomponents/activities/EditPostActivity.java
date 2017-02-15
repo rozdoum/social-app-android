@@ -15,7 +15,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
 public class EditPostActivity extends CreatePostActivity {
@@ -30,9 +30,20 @@ public class EditPostActivity extends CreatePostActivity {
         super.onCreate(savedInstanceState);
 
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
-        addCheckIsPostExistListener();
         showProgress();
         fillUIFields();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        addCheckIsPostChangedListener();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        postManager.closeListeners(this);
     }
 
     @Override
@@ -53,26 +64,50 @@ public class EditPostActivity extends CreatePostActivity {
         doSavePost(title, description);
     }
 
-    private void addCheckIsPostExistListener() {
-        PostManager.getInstance(this).getPost(this, post.getId(), new OnObjectChangedListener<Post>() {
+    private void addCheckIsPostChangedListener() {
+        PostManager.getInstance(this).getPost(this, post.getId(), new OnPostChangedListener() {
             @Override
             public void onObjectChanged(Post obj) {
                 if (obj == null) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(EditPostActivity.this);
-                    builder.setMessage(R.string.error_post_was_removed);
-                    builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            openMainActivity();
-                            finish();
-                        }
-                    });
-                    builder.setCancelable(false);
-                    builder.show();
-
+                    showWarningDialog(getResources().getString(R.string.error_post_was_removed));
+                } else {
+                    checkIsPostCountersChanged(obj);
                 }
             }
+
+            @Override
+            public void onError(String errorText) {
+                showWarningDialog(errorText);
+            }
+
+            private void showWarningDialog(String message) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditPostActivity.this);
+                builder.setMessage(message);
+                builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        openMainActivity();
+                        finish();
+                    }
+                });
+                builder.setCancelable(false);
+                builder.show();
+            }
         });
+    }
+
+    private void checkIsPostCountersChanged(Post updatedPost) {
+        if (post.getLikesCount() != updatedPost.getLikesCount()) {
+            post.setLikesCount(updatedPost.getLikesCount());
+        }
+
+        if (post.getCommentsCount() != updatedPost.getCommentsCount()) {
+            post.setCommentsCount(updatedPost.getCommentsCount());
+        }
+
+        if (post.isHasComplain() != updatedPost.isHasComplain()) {
+            post.setHasComplain(updatedPost.isHasComplain());
+        }
     }
 
     private void openMainActivity() {
