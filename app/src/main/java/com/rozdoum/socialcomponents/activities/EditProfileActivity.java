@@ -13,6 +13,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
@@ -20,7 +24,6 @@ import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
 public class EditProfileActivity extends PickImageActivity implements OnProfileCreatedListener {
@@ -88,7 +91,23 @@ public class EditProfileActivity extends PickImageActivity implements OnProfileC
             nameEditText.setText(profile.getUsername());
 
             if (profile.getPhotoUrl() != null) {
-                ImageUtil.getInstance(this).getFullImage(profile.getPhotoUrl(), imageView, R.drawable.ic_stub);
+                Glide.with(this)
+                        .load(profile.getPhotoUrl())
+                        .crossFade()
+                        .error(R.drawable.ic_stub)
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .into(imageView);
             }
         }
         hideProgress();

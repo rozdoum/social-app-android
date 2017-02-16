@@ -7,8 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.Constants;
@@ -22,8 +21,6 @@ import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
-import com.rozdoum.socialcomponents.utils.LogUtil;
 
 /**
  * Created by alexey on 27.12.16.
@@ -43,10 +40,6 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private ImageView authorImageView;
     private ViewGroup likeViewGroup;
 
-    private ImageLoader.ImageContainer imageRequest;
-    private ImageLoader.ImageContainer authorImageRequest;
-
-    private ImageUtil imageUtil;
     private ProfileManager profileManager;
     private PostManager postManager;
 
@@ -72,9 +65,8 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
         likeViewGroup = (ViewGroup) view.findViewById(R.id.likesContainer);
 
-        authorImageView.setVisibility(isAuthorNeeded ? View.INVISIBLE : View.GONE);
+        authorImageView.setVisibility(isAuthorNeeded ? View.VISIBLE : View.GONE);
 
-        imageUtil = ImageUtil.getInstance(context.getApplicationContext());
         profileManager = ProfileManager.getInstance(context.getApplicationContext());
         postManager = PostManager.getInstance(context.getApplicationContext());
 
@@ -116,29 +108,22 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         CharSequence date = FormatterUtil.getRelativeTimeSpanStringShort(context, post.getCreatedDate());
         dateTextView.setText(date);
 
-        if (imageRequest != null) {
-            imageRequest.cancelRequest();
-        }
-
         String imageUrl = post.getImagePath();
-        imageRequest = imageUtil.getImageThumb(imageUrl, postImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+
+        Glide.with(context)
+                .load(imageUrl)
+                .centerCrop()
+                .crossFade()
+                .error(R.drawable.ic_stub)
+                .into(postImageView);
 
         if (isAuthorNeeded && post.getAuthorId() != null) {
-            authorImageView.setVisibility(View.INVISIBLE);
-            cancelLoadingAuthorImage();
-            authorImageView.setTag(post.getAuthorId());
             profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
         }
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
             postManager.hasCurrentUserLikeSingleValue(post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
-        }
-    }
-
-    private void cancelLoadingAuthorImage() {
-        if (authorImageRequest != null) {
-            authorImageRequest.cancelRequest();
         }
     }
 
@@ -153,21 +138,12 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onObjectChanged(final Profile obj) {
                 if (obj.getPhotoUrl() != null) {
-                    authorImageRequest = imageUtil.getImageThumb(obj.getPhotoUrl(),
-                            authorImageView, new ImageLoader.ImageListener() {
-                                @Override
-                                public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                                    if (authorImageView.getTag().equals(obj.getId())) {
-                                        authorImageView.setImageBitmap(response.getBitmap());
-                                        authorImageView.setVisibility(View.VISIBLE);
-                                    }
-                                }
 
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    LogUtil.logError(TAG, "Failed load image " + obj.getPhotoUrl(), error);
-                                }
-                            });
+                    Glide.with(context)
+                            .load(obj.getPhotoUrl())
+                            .centerCrop()
+                            .crossFade()
+                            .into(authorImageView);
                 }
             }
         };

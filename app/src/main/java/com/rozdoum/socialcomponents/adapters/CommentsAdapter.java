@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.rozdoum.socialcomponents.ExpandableTextView;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -18,7 +19,6 @@ import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,6 @@ public class CommentsAdapter {
 
     private ViewGroup parent;
     private List<Comment> commentList = new ArrayList<>();
-    private ImageUtil imageUtil;
     private LayoutInflater inflater;
     private ProfileManager profileManager;
     private OnAuthorClickListener onAuthorClickListener;
@@ -41,7 +40,6 @@ public class CommentsAdapter {
     public CommentsAdapter(ViewGroup parent, OnAuthorClickListener onAuthorClickListener) {
         this.parent = parent;
         this.onAuthorClickListener = onAuthorClickListener;
-        imageUtil = ImageUtil.getInstance(parent.getContext().getApplicationContext());
         inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         profileManager = ProfileManager.getInstance(parent.getContext().getApplicationContext());
     }
@@ -90,7 +88,11 @@ public class CommentsAdapter {
                 fillComment(userName, comment, expandableTextView);
 
                 if (obj.getPhotoUrl() != null) {
-                    imageUtil.getImageThumb(obj.getPhotoUrl(), avatarImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+                    Glide.with(parent.getContext())
+                            .load(obj.getPhotoUrl())
+                            .crossFade()
+                            .error(R.drawable.ic_stub)
+                            .into(avatarImageView);
                 }
             }
         };

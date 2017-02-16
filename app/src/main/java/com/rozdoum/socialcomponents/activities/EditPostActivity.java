@@ -7,26 +7,28 @@ import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 public class EditPostActivity extends CreatePostActivity {
     private static final String TAG = EditPostActivity.class.getSimpleName();
     public static final String POST_EXTRA_KEY = "EditPostActivity.POST_EXTRA_KEY";
     public static final int EDIT_POST_REQUEST = 33;
 
-    private ImageUtil imageUtil;
     private Post post;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        imageUtil = ImageUtil.getInstance(this);
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
         showProgress();
         fillUIFields();
@@ -135,8 +137,24 @@ public class EditPostActivity extends CreatePostActivity {
     }
 
     private void loadPostDetailsImage() {
-        String imageUrl = post.getImagePath();
-        imageUtil.getFullImage(imageUrl, imageView, R.drawable.ic_stub);
+        Glide.with(this)
+                .load(post.getImagePath())
+                .crossFade()
+                .centerCrop()
+                .error(R.drawable.ic_stub)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(imageView);
     }
 
     @Override

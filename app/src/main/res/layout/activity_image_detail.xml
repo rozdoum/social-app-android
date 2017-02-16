@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/image_detail_container"
@@ -11,14 +11,15 @@
         android:id="@+id/progressBar"
         android:layout_width="@dimen/progress_bar_size"
         android:layout_height="@dimen/progress_bar_size"
-        android:layout_centerInParent="true"
+        android:layout_gravity="center"
         android:visibility="visible" />
 
     <com.rozdoum.socialcomponents.views.TouchImageView
         android:id="@+id/touchImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:scaleType="matrix"
+        android:src="@android:color/transparent" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -28,7 +29,6 @@
         app:titleTextColor="@android:color/white"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:background="@color/dart_transparent">
-    </android.support.v7.widget.Toolbar>
+        android:background="@color/dart_transparent"></android.support.v7.widget.Toolbar>
 
-</RelativeLayout>
+</FrameLayout>

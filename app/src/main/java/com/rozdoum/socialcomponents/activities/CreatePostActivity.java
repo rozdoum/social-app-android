@@ -24,7 +24,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
     public static final int CREATE_NEW_POST_REQUEST = 11;
 
     protected ImageView imageView;
-    private ProgressBar progressBar;
+    protected ProgressBar progressBar;
     protected EditText titleEditText;
     protected EditText descriptionEditText;
 

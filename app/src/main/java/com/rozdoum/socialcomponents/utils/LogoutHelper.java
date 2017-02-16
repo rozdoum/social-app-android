@@ -1,11 +1,13 @@
 package com.rozdoum.socialcomponents.utils;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
+import com.bumptech.glide.Glide;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
@@ -21,6 +23,7 @@ import com.google.firebase.auth.UserInfo;
 public class LogoutHelper {
 
     private static final String TAG = LogoutHelper.class.getSimpleName();
+    private static ClearImageCacheAsyncTask clearImageCacheAsyncTask;
 
     public static void signOut(GoogleApiClient mGoogleApiClient, FragmentActivity fragmentActivity) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -32,7 +35,10 @@ public class LogoutHelper {
             logoutFirebase(fragmentActivity.getApplicationContext());
         }
 
-        ImageUtil.getInstance(fragmentActivity.getApplicationContext()).clearCache();
+        if (clearImageCacheAsyncTask == null) {
+            clearImageCacheAsyncTask = new ClearImageCacheAsyncTask(fragmentActivity.getApplicationContext());
+            clearImageCacheAsyncTask.execute();
+        }
     }
 
     private static void logoutByProvider(String providerId, GoogleApiClient mGoogleApiClient, FragmentActivity fragmentActivity) {
@@ -89,5 +95,26 @@ public class LogoutHelper {
                 LogUtil.logDebug(TAG, "Google API Client Connection Suspended");
             }
         });
+    }
+
+    private static class ClearImageCacheAsyncTask extends AsyncTask<Void, Void, Void> {
+        private Context context;
+
+        public ClearImageCacheAsyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Glide.get(context.getApplicationContext()).clearDiskCache();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void o) {
+            super.onPostExecute(o);
+            clearImageCacheAsyncTask = null;
+            Glide.get(context.getApplicationContext()).clearMemory();
+        }
     }
 }

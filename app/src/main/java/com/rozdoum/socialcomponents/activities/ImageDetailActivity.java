@@ -1,13 +1,19 @@
 package com.rozdoum.socialcomponents.activities;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.views.TouchImageView;
 
 public class ImageDetailActivity extends BaseActivity {
@@ -25,8 +31,8 @@ public class ImageDetailActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         actionBar = getSupportActionBar();
-        TouchImageView touchImageView = (TouchImageView) findViewById(R.id.touchImageView);
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        final TouchImageView touchImageView = (TouchImageView) findViewById(R.id.touchImageView);
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
         final ViewGroup viewGroup = (ViewGroup) findViewById(R.id.image_detail_container);
 
         if (actionBar != null) {
@@ -52,8 +58,19 @@ public class ImageDetailActivity extends BaseActivity {
 
         String imageUrl = getIntent().getStringExtra(IMAGE_URL_EXTRA_KEY);
 
-        ImageUtil imageUtil = ImageUtil.getInstance(this);
-        imageUtil.getFullImage(imageUrl, touchImageView, R.drawable.ic_stub);
+        int maxImageSide = calcMaxImageSide();
+
+        Glide.with(this)
+                .load(imageUrl)
+                .asBitmap()
+                .fitCenter()
+                .into(new SimpleTarget<Bitmap>(maxImageSide, maxImageSide) {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        progressBar.setVisibility(View.GONE);
+                        touchImageView.setImageBitmap(resource);
+                    }
+                });
 
         touchImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,5 +83,16 @@ public class ImageDetailActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    private int calcMaxImageSide() {
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(displaymetrics);
+
+        int width = displaymetrics.widthPixels;
+        int height = displaymetrics.heightPixels;
+
+        return width > height ? width : height;
     }
 }

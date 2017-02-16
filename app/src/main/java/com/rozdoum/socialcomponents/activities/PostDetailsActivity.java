@@ -25,6 +25,10 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.ApplicationHelper;
@@ -45,7 +49,6 @@ import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 import java.util.List;
 
@@ -84,7 +87,6 @@ public class PostDetailsActivity extends BaseActivity {
 
     private PostManager postManager;
     private ProfileManager profileManager;
-    private ImageUtil imageUtil;
     private LikeController likeController;
     private boolean postRemovingProcess = false;
     private boolean isPostExist;
@@ -99,7 +101,6 @@ public class PostDetailsActivity extends BaseActivity {
 
         profileManager = ProfileManager.getInstance(this);
         postManager = PostManager.getInstance(this);
-        imageUtil = ImageUtil.getInstance(this);
 
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
         postId = post.getId();
@@ -296,7 +297,24 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void loadPostDetailsImage() {
         String imageUrl = post.getImagePath();
-        imageUtil.getFullImage(imageUrl, postImageView, R.drawable.ic_stub);
+        Glide.with(this)
+                .load(imageUrl)
+                .error(R.drawable.ic_stub)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .crossFade()
+                .centerCrop()
+                .into(postImageView);
     }
 
     private void loadAuthorImage() {
@@ -328,8 +346,12 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onObjectChanged(Profile obj) {
                 if (obj.getPhotoUrl() != null) {
-                    imageUtil.getImageThumb(obj.getPhotoUrl(),
-                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+//                    imageUtil.getImageThumb(obj.getPhotoUrl(),
+//                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
+                    Glide.with(PostDetailsActivity.this)
+                            .load(obj.getPhotoUrl())
+                            .crossFade()
+                            .into(authorImageView);
                 }
 
                 authorTextView.setText(obj.getUsername());
