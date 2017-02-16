@@ -3,6 +3,7 @@ package com.rozdoum.socialcomponents.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,6 +56,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     private String userID;
 
     private PostsByUserAdapter postsAdapter;
+    private SwipeRefreshLayout swipeContainer;
     private TextView likesCountersTextView;
     private ProfileManager profileManager;
 
@@ -85,6 +87,14 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         postsCounterTextView = (TextView) findViewById(R.id.postsCounterTextView);
         likesCountersTextView = (TextView) findViewById(R.id.likesCountersTextView);
         postsLabelTextView = (TextView) findViewById(R.id.postsLabelTextView);
+
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                onRefreshAction();
+            }
+        });
 
         loadPostsList();
     }
@@ -147,6 +157,11 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         profileManager.closeListeners(this);
     }
 
+    private void onRefreshAction() {
+        postsAdapter.loadPosts();
+        ProfileManager.getInstance(this).getProfileSingleValue(userID, createOnProfileChangedListener());
+    }
+
     private void loadPostsList() {
         if (recyclerView == null) {
 
@@ -174,7 +189,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
                     if (postsCount > 0) {
                         postsLabelTextView.setVisibility(View.VISIBLE);
-                        likesCountersTextView.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -230,6 +244,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             likesCountersTextView.setText(buildCounterSpannable(likesLabel, likesCount));
         }
         hideProgress();
+        swipeContainer.setRefreshing(false);
     }
 
     private void startMainActivity() {
@@ -266,7 +281,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             return true;
         }
 
-        return false;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

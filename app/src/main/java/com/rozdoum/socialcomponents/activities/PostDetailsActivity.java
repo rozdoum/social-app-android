@@ -86,7 +86,7 @@ public class PostDetailsActivity extends BaseActivity {
     private ProfileManager profileManager;
     private ImageUtil imageUtil;
     private LikeController likeController;
-    private boolean postRemoving = false;
+    private boolean postRemovingProcess = false;
     private boolean isPostExist;
 
     @Override
@@ -244,7 +244,7 @@ public class PostDetailsActivity extends BaseActivity {
                     fillPostFields();
                     updateCounters();
                     initLikeButtonState();
-                } else {
+                } else if (!postRemovingProcess) {
                     isPostExist = false;
                     Intent intent = getIntent();
                     setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.REMOVED));
@@ -527,7 +527,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void attemptToRemovePost() {
         if (hasInternetConnection()) {
-            if (!postRemoving) {
+            if (!postRemovingProcess) {
                 openConfirmDeletingDialog();
             }
         } else {
@@ -542,15 +542,18 @@ public class PostDetailsActivity extends BaseActivity {
                 if (success) {
                     Intent intent = getIntent();
                     setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.REMOVED));
-                    postRemoving = false;
                     finish();
                 } else {
+                    postRemovingProcess = false;
                     showSnackBar(R.string.error_fail_remove_post);
                 }
+
+                hideProgress();
             }
         });
 
-        postRemoving = true;
+        showProgress(R.string.removing);
+        postRemovingProcess = true;
     }
 
     private void openEditPostActivity() {
