@@ -23,6 +23,7 @@ public class Post implements Serializable, LazyLoading {
     private String authorId;
     private long commentsCount;
     private long likesCount;
+    private long watchersCount;
     private boolean hasComplain;
     private ItemType itemType;
 
@@ -107,6 +108,14 @@ public class Post implements Serializable, LazyLoading {
         this.likesCount = likesCount;
     }
 
+    public long getWatchersCount() {
+        return watchersCount;
+    }
+
+    public void setWatchersCount(long watchersCount) {
+        this.watchersCount = watchersCount;
+    }
+
     public boolean isHasComplain() {
         return hasComplain;
     }
@@ -126,6 +135,7 @@ public class Post implements Serializable, LazyLoading {
         result.put("authorId", authorId);
         result.put("commentsCount", commentsCount);
         result.put("likesCount", likesCount);
+        result.put("watchersCount", watchersCount);
         result.put("hasComplain", hasComplain);
         result.put("createdDateText", FormatterUtil.getFirebaseDateFormat().format(new Date(createdDate)));
 

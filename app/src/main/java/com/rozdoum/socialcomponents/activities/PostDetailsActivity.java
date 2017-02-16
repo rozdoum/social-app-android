@@ -64,6 +64,7 @@ public class PostDetailsActivity extends BaseActivity {
     private TextView commentsLabel;
     private TextView likeCounterTextView;
     private TextView commentsCountTextView;
+    private TextView watcherCounterTextView;
     private TextView authorTextView;
     private TextView dateTextView;
     private ImageView authorImageView;
@@ -104,6 +105,8 @@ public class PostDetailsActivity extends BaseActivity {
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
         postId = post.getId();
 
+        incrementWatchersCount();
+
         titleTextView = (TextView) findViewById(R.id.titleTextView);
         descriptionEditText = (TextView) findViewById(R.id.descriptionEditText);
         postImageView = (ImageView) findViewById(R.id.postImageView);
@@ -118,6 +121,7 @@ public class PostDetailsActivity extends BaseActivity {
         authorTextView = (TextView) findViewById(R.id.authorTextView);
         likeCounterTextView = (TextView) findViewById(R.id.likeCounterTextView);
         commentsCountTextView = (TextView) findViewById(R.id.commentsCountTextView);
+        watcherCounterTextView = (TextView) findViewById(R.id.watcherCounterTextView);
         dateTextView = (TextView) findViewById(R.id.dateTextView);
         commentsProgressBar = (ProgressBar) findViewById(R.id.commentsProgressBar);
         warningCommentsTextView = (TextView) findViewById(R.id.warningCommentsTextView);
@@ -223,17 +227,6 @@ public class PostDetailsActivity extends BaseActivity {
         return super.dispatchTouchEvent(event);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == EditPostActivity.EDIT_POST_REQUEST) {
-                Intent intent = getIntent();
-                setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
-            }
-        }
-    }
-
     private OnPostChangedListener createOnPostChangeListener() {
         return new OnPostChangedListener() {
             @Override
@@ -268,6 +261,12 @@ public class PostDetailsActivity extends BaseActivity {
         };
     }
 
+    private void incrementWatchersCount() {
+        postManager.incrementWatchersCount(postId);
+        Intent intent = getIntent();
+        setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
+    }
+
     private void showPostWasRemovedDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(PostDetailsActivity.this);
         builder.setMessage(R.string.error_post_was_removed);
@@ -290,6 +289,7 @@ public class PostDetailsActivity extends BaseActivity {
     private void fillPostFields() {
         titleTextView.setText(post.getTitle());
         descriptionEditText.setText(post.getDescription());
+
         loadPostDetailsImage();
         loadAuthorImage();
     }
@@ -311,6 +311,8 @@ public class PostDetailsActivity extends BaseActivity {
         commentsLabel.setText(String.format(getString(R.string.label_comments), commentsCount));
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         likeController.setUpdatingLikeCounter(false);
+
+        watcherCounterTextView.setText(String.valueOf(post.getWatchersCount()));
 
         CharSequence date = FormatterUtil.getRelativeTimeSpanStringShort(this, post.getCreatedDate());
         dateTextView.setText(date);
@@ -402,8 +404,6 @@ public class PostDetailsActivity extends BaseActivity {
             public void onClick(View v) {
                 if (isPostExist) {
                     likeController.handleLikeClickAction(PostDetailsActivity.this, post);
-                    Intent intent = getIntent();
-                    setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
                 }
             }
         });
@@ -442,8 +442,6 @@ public class PostDetailsActivity extends BaseActivity {
             commentEditText.setText(null);
             commentEditText.clearFocus();
             hideKeyBoard();
-            Intent intent = getIntent();
-            setResult(RESULT_OK, intent.putExtra(POST_STATUS_EXTRA_KEY, PostStatus.UPDATED));
         }
     }
 
