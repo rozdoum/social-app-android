@@ -4,8 +4,9 @@ import android.support.v7.widget.RecyclerView;
 
 import com.rozdoum.socialcomponents.activities.BaseActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,12 +40,17 @@ public abstract class BasePostsAdapter extends RecyclerView.Adapter<RecyclerView
         return postList.get(position);
     }
 
-    protected OnObjectChangedListener<Post> createOnPostChangeListener(final int postPosition) {
-        return new OnObjectChangedListener<Post>() {
+    private OnPostChangedListener createOnPostChangeListener(final int postPosition) {
+        return new OnPostChangedListener() {
             @Override
             public void onObjectChanged(Post obj) {
                 postList.set(postPosition, obj);
                 notifyItemChanged(postPosition);
+            }
+
+            @Override
+            public void onError(String errorText) {
+                LogUtil.logDebug(TAG, errorText);
             }
         };
     }
