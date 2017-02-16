@@ -102,8 +102,8 @@
     </plurals>
 
     <plurals name="likes_counter_format">
-        <item quantity="one">%d\nlike</item>
-        <item quantity="other">%d\nlikes</item>
+        <item quantity="one">like</item>
+        <item quantity="other">likes</item>
     </plurals>
 
     <string name="posts_label">Posts:</string>

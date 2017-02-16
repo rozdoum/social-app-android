@@ -60,6 +60,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     private PostsByUserAdapter postsAdapter;
     private SwipeRefreshLayout swipeContainer;
+    private TextView likesCountersTextView;
+    private ProfileManager profileManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         imageView = (ImageView) findViewById(R.id.imageView);
         nameEditText = (TextView) findViewById(R.id.nameEditText);
         postsCounterTextView = (TextView) findViewById(R.id.postsCounterTextView);
+        likesCountersTextView = (TextView) findViewById(R.id.likesCountersTextView);
         postsLabelTextView = (TextView) findViewById(R.id.postsLabelTextView);
 
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
@@ -151,6 +154,12 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        profileManager.closeListeners(this);
+    }
+
     private void onRefreshAction() {
         postsAdapter.loadPosts();
         ProfileManager.getInstance(this).getProfileSingleValue(userID, createOnProfileChangedListener());
@@ -178,8 +187,11 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
                 @Override
                 public void onPostsListChanged(int postsCount) {
-                    String label = getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount);
-                    postsCounterTextView.setText(buildCounterSpannable(label, postsCount));
+                    String postsLabel = getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount);
+                    postsCounterTextView.setText(buildCounterSpannable(postsLabel, postsCount));
+
+                    likesCountersTextView.setVisibility(View.VISIBLE);
+                    postsCounterTextView.setVisibility(View.VISIBLE);
 
                     if (postsCount > 0) {
                         postsLabelTextView.setVisibility(View.VISIBLE);
@@ -212,7 +224,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     private void loadProfile() {
         showProgress();
-        ProfileManager.getInstance(this).getProfileSingleValue(userID, createOnProfileChangedListener());
+        profileManager = ProfileManager.getInstance(this);
+        profileManager.getProfileValue(userID, createOnProfileChangedListener());
     }
 
     private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
@@ -251,6 +264,10 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 progressBar.setVisibility(View.GONE);
                 imageView.setImageResource(R.drawable.ic_stub);
             }
+
+            int likesCount = (int) profile.getLikesCount();
+            String likesLabel = getResources().getQuantityString(R.plurals.likes_counter_format, likesCount, likesCount);
+            likesCountersTextView.setText(buildCounterSpannable(likesLabel, likesCount));
         }
         hideProgress();
         swipeContainer.setRefreshing(false);

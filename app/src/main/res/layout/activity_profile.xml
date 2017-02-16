@@ -99,7 +99,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="@dimen/profile_screen_margin_between_counters"
                             android:gravity="center"
-                            android:textAppearance="@style/TextAppearance.Title" />
+                            android:textAppearance="@style/TextAppearance.Title"
+                            android:visibility="invisible" />
 
                         <TextView
                             android:id="@+id/likesCountersTextView"
@@ -107,7 +108,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:textAppearance="@style/TextAppearance.Title"
-                            android:visibility="gone" />
+                            android:visibility="invisible" />
 
                     </LinearLayout>
 

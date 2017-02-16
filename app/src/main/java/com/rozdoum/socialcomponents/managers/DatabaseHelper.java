@@ -199,7 +199,7 @@ public class DatabaseHelper {
         }
     }
 
-    public void createOrUpdateLike(final String postId) {
+    public void createOrUpdateLike(final String postId, final String postAuthorId) {
         try {
             String authorId = firebaseAuth.getCurrentUser().getUid();
             DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
@@ -212,14 +212,17 @@ public class DatabaseHelper {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                     if (databaseError == null) {
-                        incrementLikesCount(postId);
+                        DatabaseReference postRef = database.getReference("posts/" + postId + "/likesCount");
+                        incrementLikesCount(postRef);
+
+                        DatabaseReference profileRef = database.getReference("profiles/" + postAuthorId + "/likesCount");
+                        incrementLikesCount(profileRef);
                     } else {
                         LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
                     }
                 }
 
-                private void incrementLikesCount(String postId) {
-                    DatabaseReference postRef = database.getReference("posts/" + postId + "/likesCount");
+                private void incrementLikesCount(DatabaseReference postRef) {
                     postRef.runTransaction(new Transaction.Handler() {
                         @Override
                         public Transaction.Result doTransaction(MutableData mutableData) {
@@ -269,21 +272,24 @@ public class DatabaseHelper {
         });
     }
 
-    public void removeLike(final String postId) {
+    public void removeLike(final String postId, final String postAuthorId) {
         String authorId = firebaseAuth.getCurrentUser().getUid();
         DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
         mLikesReference.removeValue(new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError == null) {
-                    decrementLikesCount(postId);
+                    DatabaseReference postRef = database.getReference("posts/" + postId + "/likesCount");
+                    decrementLikesCount(postRef);
+
+                    DatabaseReference profileRef = database.getReference("profiles/" + postAuthorId + "/likesCount");
+                    decrementLikesCount(profileRef);
                 } else {
                     LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
                 }
             }
 
-            private void decrementLikesCount(String postId) {
-                DatabaseReference postRef = database.getReference("posts/" + postId + "/likesCount");
+            private void decrementLikesCount(DatabaseReference postRef) {
                 postRef.runTransaction(new Transaction.Handler() {
                     @Override
                     public Transaction.Result doTransaction(MutableData mutableData) {

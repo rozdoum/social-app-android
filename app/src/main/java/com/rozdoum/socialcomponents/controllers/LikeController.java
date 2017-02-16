@@ -36,6 +36,7 @@ public class LikeController {
 
     private Context context;
     private String postId;
+    private String postAuthorId;
 
     private AnimationType likeAnimationType = LikeController.AnimationType.BOUNCE_ANIM;
 
@@ -47,10 +48,11 @@ public class LikeController {
     private boolean isLiked = false;
     private boolean updatingLikeCounter = true;
 
-    public LikeController(Context context, String postId, TextView likeCounterTextView,
+    public LikeController(Context context, Post post, TextView likeCounterTextView,
                           ImageView likesImageView, boolean isListView) {
         this.context = context;
-        this.postId = postId;
+        this.postId = post.getId();
+        this.postAuthorId = post.getAuthorId();
         this.likeCounterTextView = likeCounterTextView;
         this.likesImageView = likesImageView;
         this.isListView = isListView;
@@ -78,14 +80,14 @@ public class LikeController {
         updatingLikeCounter = true;
         isLiked = true;
         likeCounterTextView.setText(String.valueOf(prevValue + 1));
-        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(postId);
+        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(postId, postAuthorId);
     }
 
     private void removeLike(long prevValue) {
         updatingLikeCounter = true;
         isLiked = false;
         likeCounterTextView.setText(String.valueOf(prevValue - 1));
-        ApplicationHelper.getDatabaseHelper().removeLike(postId);
+        ApplicationHelper.getDatabaseHelper().removeLike(postId, postAuthorId);
     }
 
     private void startAnimateLikeButton(AnimationType animationType) {

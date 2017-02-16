@@ -115,6 +115,11 @@ public class ProfileManager extends FirebaseListenersManager {
         }
     }
 
+    public void getProfileValue(String id, final OnObjectChangedListener<Profile> listener) {
+        ValueEventListener valueEventListener = databaseHelper.getProfile(id, listener);
+        addListenerToMap(context, valueEventListener);
+    }
+
     public void getProfileSingleValue(String id, final OnObjectChangedListener<Profile> listener) {
         databaseHelper.getProfileSingleValue(id, listener);
     }
