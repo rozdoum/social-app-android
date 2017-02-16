@@ -187,6 +187,9 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                     String postsLabel = getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount);
                     postsCounterTextView.setText(buildCounterSpannable(postsLabel, postsCount));
 
+                    likesCountersTextView.setVisibility(View.VISIBLE);
+                    postsCounterTextView.setVisibility(View.VISIBLE);
+
                     if (postsCount > 0) {
                         postsLabelTextView.setVisibility(View.VISIBLE);
                     }
