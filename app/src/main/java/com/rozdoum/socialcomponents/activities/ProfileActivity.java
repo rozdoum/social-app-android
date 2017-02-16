@@ -236,6 +236,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                         .listener(new RequestListener<String, GlideDrawable>() {
                             @Override
                             public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
                                 return false;
                             }
 
@@ -246,6 +247,9 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                             }
                         })
                         .into(imageView);
+            } else {
+                progressBar.setVisibility(View.GONE);
+                imageView.setImageResource(R.drawable.ic_stub);
             }
         }
         hideProgress();

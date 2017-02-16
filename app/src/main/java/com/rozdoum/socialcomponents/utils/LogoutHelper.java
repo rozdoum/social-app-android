@@ -23,6 +23,7 @@ import com.google.firebase.auth.UserInfo;
 public class LogoutHelper {
 
     private static final String TAG = LogoutHelper.class.getSimpleName();
+    private static ClearImageCacheAsyncTask clearImageCacheAsyncTask;
 
     public static void signOut(GoogleApiClient mGoogleApiClient, FragmentActivity fragmentActivity) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -34,7 +35,10 @@ public class LogoutHelper {
             logoutFirebase(fragmentActivity.getApplicationContext());
         }
 
-        new ClearImageCacheAsyncTask(fragmentActivity.getApplicationContext()).execute();
+        if (clearImageCacheAsyncTask == null) {
+            clearImageCacheAsyncTask = new ClearImageCacheAsyncTask(fragmentActivity.getApplicationContext());
+            clearImageCacheAsyncTask.execute();
+        }
     }
 
     private static void logoutByProvider(String providerId, GoogleApiClient mGoogleApiClient, FragmentActivity fragmentActivity) {
@@ -109,8 +113,8 @@ public class LogoutHelper {
         @Override
         protected void onPostExecute(Void o) {
             super.onPostExecute(o);
+            clearImageCacheAsyncTask = null;
             Glide.get(context.getApplicationContext()).clearMemory();
-
         }
     }
 }
