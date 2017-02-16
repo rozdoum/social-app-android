@@ -53,7 +53,6 @@
                 android:layout_toStartOf="@+id/authorImageView"
                 android:paddingLeft="@dimen/large_intrinsic_padding"
                 android:paddingRight="@dimen/large_intrinsic_padding"
-                android:text="Title"
                 android:textAppearance="@style/TextAppearance.Title"
                 android:layout_alignEnd="@+id/authorImageView" />
 
@@ -103,7 +102,6 @@
                 android:paddingLeft="@dimen/large_intrinsic_padding"
                 android:paddingRight="@dimen/large_intrinsic_padding"
                 android:autoLink="all"
-                android:text="description"
                 android:textAppearance="@style/TextAppearance.Second" />
 
             <TextView

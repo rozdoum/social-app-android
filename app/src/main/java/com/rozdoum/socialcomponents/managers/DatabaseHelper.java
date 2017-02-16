@@ -320,7 +320,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logError(TAG, "getPostList(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
     }
@@ -340,7 +340,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logError(TAG, "getPostListByUser(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
     }
@@ -367,8 +367,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
-
+                LogUtil.logError(TAG, "getPost(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
 
@@ -392,8 +391,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
-
+                LogUtil.logError(TAG, "getSinglePost(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
     }
@@ -479,8 +477,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
-
+                LogUtil.logError(TAG, "getProfileSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
     }
@@ -496,8 +493,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
-
+                LogUtil.logError(TAG, "getProfile(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
         activeListeners.put(valueEventListener, databaseReference);
@@ -528,7 +524,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logError(TAG, "getCommentsList(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
 
@@ -546,7 +542,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logDebug(TAG, "hasCurrentUserLike(), onCancelled: " + databaseError);
+                LogUtil.logError(TAG, "hasCurrentUserLike(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
 
@@ -564,7 +560,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logDebug(TAG, "hasCurrentUserLikeSingleValue(), onCancelled: " + databaseError);
+                LogUtil.logError(TAG, "hasCurrentUserLikeSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
     }
@@ -584,7 +580,7 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logDebug(TAG, "isPostExistSingleValue(), onCancelled: " + databaseError);
+                LogUtil.logError(TAG, "isPostExistSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
     }

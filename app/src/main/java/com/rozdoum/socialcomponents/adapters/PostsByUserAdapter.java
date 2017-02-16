@@ -15,25 +15,21 @@ import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
-import java.util.LinkedList;
 import java.util.List;
 
 
-public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PostsByUserAdapter extends BasePostsAdapter {
     public static final String TAG = PostsByUserAdapter.class.getSimpleName();
 
-    private List<Post> postList = new LinkedList<>();
-    private CallBack callBack;
-    private BaseActivity activity;
     private String userId;
-    private int selectedPostPosition = -1;
+    private CallBack callBack;
 
     public PostsByUserAdapter(final BaseActivity activity, String userId) {
-        this.activity = activity;
+        super(activity);
         this.userId = userId;
     }
 
-    public void setOnItemClickListener(CallBack callBack) {
+    public void setCallBack(CallBack callBack) {
         this.callBack = callBack;
     }
 
@@ -42,10 +38,10 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.post_item_list_view, parent, false);
 
-        return new PostViewHolder(view, createOnItemClickListener(), false);
+        return new PostViewHolder(view, createOnClickListener(), false);
     }
 
-    private PostViewHolder.OnClickListener createOnItemClickListener() {
+    private PostViewHolder.OnClickListener createOnClickListener() {
         return new PostViewHolder.OnClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -73,15 +69,6 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         ((PostViewHolder) holder).bindData(postList.get(position));
     }
 
-    @Override
-    public int getItemCount() {
-        return postList.size();
-    }
-
-    private Post getItemByPosition(int position) {
-        return postList.get(position);
-    }
-
     private void setList(List<Post> list) {
         postList.clear();
         postList.addAll(list);
@@ -105,37 +92,15 @@ public class PostsByUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         PostManager.getInstance(activity).getPostsListByUser(onPostsDataChangedListener, userId);
     }
 
-    public interface CallBack {
-        void onItemClick(Post post);
-
-        void onPostsListChanged(int postsCount);
-    }
-
-    private OnPostChangedListener createOnPostChangeListener(final int postPosition) {
-        return new OnPostChangedListener() {
-            @Override
-            public void onObjectChanged(Post obj) {
-                postList.set(postPosition, obj);
-                notifyItemChanged(postPosition);
-            }
-
-            @Override
-            public void onError(String errorText) {
-                LogUtil.logDebug(TAG, errorText);
-            }
-        };
-    }
-
-    public void updateSelectedPost() {
-        if (selectedPostPosition != -1) {
-            Post selectedPost = getItemByPosition(selectedPostPosition);
-            PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
-        }
-    }
-
     public void removeSelectedPost() {
         postList.remove(selectedPostPosition);
         callBack.onPostsListChanged(postList.size());
         notifyItemRemoved(selectedPostPosition);
+    }
+
+    public interface CallBack {
+        void onItemClick(Post post);
+
+        void onPostsListChanged(int postsCount);
     }
 }

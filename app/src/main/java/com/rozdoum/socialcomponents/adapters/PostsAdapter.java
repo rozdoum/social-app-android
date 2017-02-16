@@ -18,27 +18,25 @@ import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.PostListResult;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by Kristina on 10/31/16.
  */
 
-public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PostsAdapter extends BasePostsAdapter {
     public static final String TAG = PostsAdapter.class.getSimpleName();
 
-    private List<Post> postList = new LinkedList<>();
     private Callback callback;
-    private MainActivity activity;
     private boolean isLoading = false;
     private boolean isMoreDataAvailable = true;
     private long lastLoadedItemCreatedDate;
     private SwipeRefreshLayout swipeContainer;
-    private int selectedPostPosition = -1;
+    private MainActivity mainActivity;
 
     public PostsAdapter(final MainActivity activity, SwipeRefreshLayout swipeContainer) {
-        this.activity = activity;
+        super(activity);
+        this.mainActivity = activity;
         this.swipeContainer = swipeContainer;
         initRefreshLayout();
     }
@@ -60,12 +58,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             cleanSelectedPostInformation();
         } else {
             swipeContainer.setRefreshing(false);
-            activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
+            mainActivity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
         }
-    }
-
-    private void cleanSelectedPostInformation() {
-        selectedPostPosition = -1;
     }
 
     public void setCallback(Callback callback) {
@@ -77,13 +71,13 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == ItemType.ITEM.getTypeCode()) {
             return new PostViewHolder(inflater.inflate(R.layout.post_item_list_view, parent, false),
-                    createOnItemClickListener());
+                    createOnClickListener());
         } else {
             return new LoadViewHolder(inflater.inflate(R.layout.loading_view, parent, false));
         }
     }
 
-    private PostViewHolder.OnClickListener createOnItemClickListener() {
+    private PostViewHolder.OnClickListener createOnClickListener() {
         return new PostViewHolder.OnClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -121,7 +115,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         notifyItemInserted(postList.size());
                         loadNext(lastLoadedItemCreatedDate - 1);
                     } else {
-                        activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
+                        mainActivity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
                     }
                 }
             });
@@ -132,25 +126,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (getItemViewType(position) != ItemType.LOAD.getTypeCode()) {
             ((PostViewHolder) holder).bindData(postList.get(position));
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return postList.size();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        // TODO: 09.12.16 remove after clearing DB
-        if (postList.get(position).getItemType() == null) {
-            return ItemType.ITEM.getTypeCode();
-        }
-
-        return postList.get(position).getItemType().getTypeCode();
-    }
-
-    private Post getItemByPosition(int position) {
-        return postList.get(position);
     }
 
     private void addList(List<Post> list) {
@@ -166,7 +141,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private void loadNext(final long nextItemCreatedDate) {
 
         if (!activity.hasInternetConnection()) {
-            activity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
+            mainActivity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
             hideProgress();
             callback.onListLoadingFinished();
             return;
@@ -207,28 +182,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    private OnPostChangedListener createOnPostChangeListener(final int postPosition) {
-        return new OnPostChangedListener() {
-            @Override
-            public void onObjectChanged(Post obj) {
-                postList.set(postPosition, obj);
-                notifyItemChanged(postPosition);
-            }
-
-            @Override
-            public void onError(String errorText) {
-                LogUtil.logDebug(TAG, errorText);
-            }
-        };
-    }
-
-    public void updateSelectedPost() {
-        if (selectedPostPosition != -1) {
-            Post selectedPost = getItemByPosition(selectedPostPosition);
-            PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
-        }
-    }
-
     public void removeSelectedPost() {
         postList.remove(selectedPostPosition);
         notifyItemRemoved(selectedPostPosition);
@@ -236,9 +189,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public interface Callback {
         void onItemClick(Post post);
-
         void onListLoadingFinished();
-
         void onAuthorClick(String authorId);
     }
 }
