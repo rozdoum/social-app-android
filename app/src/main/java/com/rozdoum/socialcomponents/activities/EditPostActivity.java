@@ -105,6 +105,10 @@ public class EditPostActivity extends CreatePostActivity {
             post.setCommentsCount(updatedPost.getCommentsCount());
         }
 
+        if (post.getWatchersCount() != updatedPost.getWatchersCount()) {
+            post.setWatchersCount(updatedPost.getWatchersCount());
+        }
+
         if (post.isHasComplain() != updatedPost.isHasComplain()) {
             post.setHasComplain(updatedPost.isHasComplain());
         }

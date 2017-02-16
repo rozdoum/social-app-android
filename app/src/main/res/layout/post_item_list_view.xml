@@ -76,6 +76,8 @@
                 layout="@layout/counters_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/intrinsic_padding"
+                android:layout_marginLeft="@dimen/intrinsic_padding"
                 android:layout_below="@+id/detailsTextView"
                 android:layout_toStartOf="@+id/authorImageView" />
 

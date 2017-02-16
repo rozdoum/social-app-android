@@ -36,6 +36,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private TextView likeCounterTextView;
     private ImageView likesImageView;
     private TextView commentsCountTextView;
+    private TextView watcherCounterTextView;
     private TextView dateTextView;
     private ImageView authorImageView;
     private ViewGroup likeViewGroup;
@@ -59,6 +60,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         likeCounterTextView = (TextView) view.findViewById(R.id.likeCounterTextView);
         likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
         commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
+        watcherCounterTextView = (TextView) view.findViewById(R.id.watcherCounterTextView);
         dateTextView = (TextView) view.findViewById(R.id.dateTextView);
         titleTextView = (TextView) view.findViewById(R.id.titleTextView);
         detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
@@ -104,6 +106,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         detailsTextView.setText(description);
         likeCounterTextView.setText(String.valueOf(post.getLikesCount()));
         commentsCountTextView.setText(String.valueOf(post.getCommentsCount()));
+        watcherCounterTextView.setText(String.valueOf(post.getWatchersCount()));
 
         CharSequence date = FormatterUtil.getRelativeTimeSpanStringShort(context, post.getCreatedDate());
         dateTextView.setText(date);

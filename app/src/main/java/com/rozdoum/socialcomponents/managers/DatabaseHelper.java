@@ -247,6 +247,28 @@ public class DatabaseHelper {
 
     }
 
+    public void incrementWatchersCount(String postId) {
+        DatabaseReference postRef = database.getReference("posts/" + postId + "/watchersCount");
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Integer currentValue = mutableData.getValue(Integer.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentValue + 1);
+                }
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                LogUtil.logInfo(TAG, "Updating Watchers count transaction is completed.");
+            }
+        });
+    }
+
     public void removeLike(final String postId) {
         String authorId = firebaseAuth.getCurrentUser().getUid();
         DatabaseReference mLikesReference = database.getReference().child("post-likes").child(postId).child(authorId);
@@ -436,6 +458,9 @@ public class DatabaseHelper {
                         }
                         if (mapObj.containsKey("likesCount")) {
                             post.setLikesCount((long) mapObj.get("likesCount"));
+                        }
+                        if (mapObj.containsKey("watchersCount")) {
+                            post.setWatchersCount((long) mapObj.get("watchersCount"));
                         }
                         list.add(post);
                     }

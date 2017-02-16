@@ -163,4 +163,9 @@ public class PostManager extends FirebaseListenersManager {
         DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
         databaseHelper.isPostExistSingleValue(postId, onObjectExistListener);
     }
+
+    public void incrementWatchersCount(String postId) {
+        DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
+        databaseHelper.incrementWatchersCount(postId);
+    }
 }
