@@ -283,7 +283,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         if (hasInternetConnection()) {
             Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
             startActivity(intent);
-            imageView.setImageResource(R.drawable.ic_stub);
         } else {
             showSnackBar(R.string.internet_connection_failed);
         }
