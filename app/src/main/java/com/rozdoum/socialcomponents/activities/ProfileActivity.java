@@ -121,6 +121,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     @Override
     public void onStop() {
         super.onStop();
+        profileManager.closeListeners(this);
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.stopAutoManage(this);
@@ -152,12 +153,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                     break;
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        profileManager.closeListeners(this);
     }
 
     private void onRefreshAction() {
@@ -225,7 +220,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     private void loadProfile() {
         showProgress();
         profileManager = ProfileManager.getInstance(this);
-        profileManager.getProfileValue(userID, createOnProfileChangedListener());
+        profileManager.getProfileValue(ProfileActivity.this, userID, createOnProfileChangedListener());
     }
 
     private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
