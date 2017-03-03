@@ -143,6 +143,29 @@ public class DatabaseHelper {
         return postRef.removeValue();
     }
 
+    public void updateProfileLikeCountAfterRemovingPost(Post post) {
+        DatabaseReference profileRef = database.getReference("profiles/" + post.getAuthorId() + "/likesCount");
+        final long likesByPostCount = post.getLikesCount();
+
+        profileRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Integer currentValue = mutableData.getValue(Integer.class);
+                if (currentValue != null && currentValue >= likesByPostCount) {
+                    mutableData.setValue(currentValue - likesByPostCount);
+                }
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                LogUtil.logInfo(TAG, "Updating likes count transaction is completed.");
+            }
+        });
+
+    }
+
     public Task<Void> removeImage(String imageTitle) {
         StorageReference storageRef = storage.getReferenceFromUrl("gs://socialcomponents.appspot.com");
         StorageReference desertRef = storageRef.child("images/" + imageTitle);
