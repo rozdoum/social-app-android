@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.rozdoum.socialcomponents.R;
@@ -63,7 +64,9 @@ public class ImageDetailActivity extends BaseActivity {
         Glide.with(this)
                 .load(imageUrl)
                 .asBitmap()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .fitCenter()
+                .error(R.drawable.ic_stub)
                 .into(new SimpleTarget<Bitmap>(maxImageSide, maxImageSide) {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {

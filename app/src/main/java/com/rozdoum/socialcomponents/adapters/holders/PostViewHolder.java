@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.Constants;
@@ -115,6 +116,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
         Glide.with(context)
                 .load(imageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .crossFade()
                 .error(R.drawable.ic_stub)
@@ -144,6 +146,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
                     Glide.with(context)
                             .load(obj.getPhotoUrl())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .centerCrop()
                             .crossFade()
                             .into(authorImageView);

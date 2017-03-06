@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
@@ -61,6 +62,7 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
         if (profile.getPhotoUrl() != null) {
             Glide.with(this)
                     .load(profile.getPhotoUrl())
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .crossFade()
                     .error(R.drawable.ic_stub)
                     .into(imageView);
@@ -177,4 +179,3 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
         }
     }
 }
-

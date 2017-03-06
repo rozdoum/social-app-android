@@ -26,6 +26,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -299,6 +300,7 @@ public class PostDetailsActivity extends BaseActivity {
         String imageUrl = post.getImagePath();
         Glide.with(this)
                 .load(imageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .error(R.drawable.ic_stub)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
@@ -348,10 +350,9 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onObjectChanged(Profile obj) {
                 if (obj.getPhotoUrl() != null) {
-//                    imageUtil.getImageThumb(obj.getPhotoUrl(),
-//                            authorImageView, R.drawable.ic_stub, R.drawable.ic_stub);
                     Glide.with(PostDetailsActivity.this)
                             .load(obj.getPhotoUrl())
+                            .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                             .crossFade()
                             .into(authorImageView);
                 }

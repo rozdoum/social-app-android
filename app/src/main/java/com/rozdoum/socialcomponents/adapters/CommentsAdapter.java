@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
@@ -90,6 +91,7 @@ public class CommentsAdapter {
                 if (obj.getPhotoUrl() != null) {
                     Glide.with(parent.getContext())
                             .load(obj.getPhotoUrl())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .crossFade()
                             .error(R.drawable.ic_stub)
                             .into(avatarImageView);
