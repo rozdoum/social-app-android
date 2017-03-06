@@ -84,7 +84,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/large_intrinsic_padding"
-                        android:text="@string/prompt_name"
                         android:paddingTop="@dimen/intrinsic_padding"
                         android:textAppearance="@style/TextAppearance.Title" />
 
