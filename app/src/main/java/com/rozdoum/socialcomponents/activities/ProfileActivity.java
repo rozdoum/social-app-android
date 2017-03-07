@@ -157,7 +157,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     private void onRefreshAction() {
         postsAdapter.loadPosts();
-        ProfileManager.getInstance(this).getProfileSingleValue(userID, createOnProfileChangedListener());
     }
 
     private void loadPostsList() {
@@ -191,6 +190,13 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                     if (postsCount > 0) {
                         postsLabelTextView.setVisibility(View.VISIBLE);
                     }
+
+                    swipeContainer.setRefreshing(false);
+                }
+
+                @Override
+                public void onPostLoadingCanceled() {
+                    swipeContainer.setRefreshing(false);
                 }
             });
 
@@ -265,7 +271,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             likesCountersTextView.setText(buildCounterSpannable(likesLabel, likesCount));
         }
         hideProgress();
-        swipeContainer.setRefreshing(false);
     }
 
     private void startMainActivity() {
