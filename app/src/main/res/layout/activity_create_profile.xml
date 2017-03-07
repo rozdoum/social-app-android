@@ -29,14 +29,12 @@
                     android:id="@+id/progressBar"
                     android:layout_width="@dimen/progress_bar_size"
                     android:layout_height="@dimen/progress_bar_size"
-                    android:layout_centerInParent="true"
-                    android:visibility="visible" />
+                    android:layout_centerInParent="true" />
 
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone" />
+                    android:layout_height="match_parent" />
 
             </RelativeLayout>
 
