@@ -12,11 +12,10 @@ import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.enums.ItemType;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.PostListResult;
-import com.rozdoum.socialcomponents.utils.LogUtil;
+import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
 import java.util.List;
 
@@ -140,7 +139,7 @@ public class PostsAdapter extends BasePostsAdapter {
 
     private void loadNext(final long nextItemCreatedDate) {
 
-        if (!activity.hasInternetConnection()) {
+        if (!PreferencesUtil.isPostWasLoadedAtLeastOnce(mainActivity) && !activity.hasInternetConnection()) {
             mainActivity.showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
             hideProgress();
             callback.onListLoadingFinished();
@@ -164,6 +163,10 @@ public class PostsAdapter extends BasePostsAdapter {
 
                 if (!list.isEmpty()) {
                     addList(list);
+
+                    if (!PreferencesUtil.isPostWasLoadedAtLeastOnce(mainActivity)) {
+                        PreferencesUtil.setPostWasLoadedAtLeastOnce(mainActivity, true);
+                    }
                 } else {
                     isLoading = false;
                 }
