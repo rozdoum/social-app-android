@@ -26,6 +26,7 @@ Implemented elements and features:
 
 
 ![Opening app](https://wiki.rozdoum.com/download/attachments/28906670/1491222691574.jpg?version=1&modificationDate=1491222725959&api=v2)
+
 ---
 
 ### Registration screen
