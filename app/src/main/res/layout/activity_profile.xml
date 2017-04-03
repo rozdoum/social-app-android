@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/white"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:titleEnabled="false">
 
             <LinearLayout
@@ -90,7 +90,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/large_intrinsic_padding"
                             android:paddingTop="@dimen/intrinsic_padding"
-                            android:text="@string/prompt_name"
                             android:textAppearance="@style/TextAppearance.Title" />
 
                         <LinearLayout
