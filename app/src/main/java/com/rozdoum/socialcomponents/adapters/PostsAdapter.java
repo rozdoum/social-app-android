@@ -38,6 +38,7 @@ public class PostsAdapter extends BasePostsAdapter {
         this.mainActivity = activity;
         this.swipeContainer = swipeContainer;
         initRefreshLayout();
+        setHasStableIds(true);
     }
 
     private void initRefreshLayout() {
@@ -188,6 +189,11 @@ public class PostsAdapter extends BasePostsAdapter {
     public void removeSelectedPost() {
         postList.remove(selectedPostPosition);
         notifyItemRemoved(selectedPostPosition);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     public interface Callback {
