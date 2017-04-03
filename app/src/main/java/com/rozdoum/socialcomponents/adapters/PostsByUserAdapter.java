@@ -76,6 +76,7 @@ public class PostsByUserAdapter extends BasePostsAdapter {
     public void loadPosts() {
         if (!activity.hasInternetConnection()) {
             activity.showSnackBar(R.string.internet_connection_failed);
+            callBack.onPostLoadingCanceled();
             return;
         }
 
@@ -98,7 +99,8 @@ public class PostsByUserAdapter extends BasePostsAdapter {
 
     public interface CallBack {
         void onItemClick(Post post);
-
         void onPostsListChanged(int postsCount);
+
+        void onPostLoadingCanceled();
     }
 }

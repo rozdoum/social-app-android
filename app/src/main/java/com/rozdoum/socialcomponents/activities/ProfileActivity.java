@@ -122,6 +122,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     @Override
     public void onStop() {
         super.onStop();
+        profileManager.closeListeners(this);
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.stopAutoManage(this);
@@ -155,15 +156,8 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        profileManager.closeListeners(this);
-    }
-
     private void onRefreshAction() {
         postsAdapter.loadPosts();
-        ProfileManager.getInstance(this).getProfileSingleValue(userID, createOnProfileChangedListener());
     }
 
     private void loadPostsList() {
@@ -197,6 +191,13 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                     if (postsCount > 0) {
                         postsLabelTextView.setVisibility(View.VISIBLE);
                     }
+
+                    swipeContainer.setRefreshing(false);
+                }
+
+                @Override
+                public void onPostLoadingCanceled() {
+                    swipeContainer.setRefreshing(false);
                 }
             });
 
@@ -226,7 +227,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     private void loadProfile() {
         showProgress();
         profileManager = ProfileManager.getInstance(this);
-        profileManager.getProfileValue(userID, createOnProfileChangedListener());
+        profileManager.getProfileValue(ProfileActivity.this, userID, createOnProfileChangedListener());
     }
 
     private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
@@ -272,7 +273,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             likesCountersTextView.setText(buildCounterSpannable(likesLabel, likesCount));
         }
         hideProgress();
-        swipeContainer.setRefreshing(false);
     }
 
     private void startMainActivity() {
@@ -285,7 +285,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         if (hasInternetConnection()) {
             Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
             startActivity(intent);
-            imageView.setImageResource(R.drawable.ic_stub);
         } else {
             showSnackBar(R.string.internet_connection_failed);
         }

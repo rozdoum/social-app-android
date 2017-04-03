@@ -73,26 +73,33 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         profileManager = ProfileManager.getInstance(context.getApplicationContext());
         postManager = PostManager.getInstance(context.getApplicationContext());
 
-        if (onClickListener != null) {
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = getAdapterPosition();
+                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
                     onClickListener.onItemClick(getAdapterPosition());
                 }
-            });
-        }
+            }
+        });
 
         likeViewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onClickListener.onLikeClick(likeController, getAdapterPosition());
+                int position = getAdapterPosition();
+                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
+                    onClickListener.onLikeClick(likeController, position);
+                }
             }
         });
 
         authorImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickListener.onAuthorClick(getAdapterPosition());
+                int position = getAdapterPosition();
+                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
+                    onClickListener.onAuthorClick(getAdapterPosition());
+                }
             }
         });
     }
