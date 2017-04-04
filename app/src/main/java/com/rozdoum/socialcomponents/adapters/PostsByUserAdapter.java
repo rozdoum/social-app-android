@@ -36,16 +36,16 @@ public class PostsByUserAdapter extends BasePostsAdapter {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.post_item_list_view, parent, false);
 
-        return new PostViewHolder(view, createOnClickListener(), false);
+        return new PostViewHolder(view, createOnClickListener());
     }
 
     private PostViewHolder.OnClickListener createOnClickListener() {
         return new PostViewHolder.OnClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(int position, View view) {
                 if (callBack != null) {
                     selectedPostPosition = position;
-                    callBack.onItemClick(getItemByPosition(position));
+                    callBack.onItemClick(getItemByPosition(position), view);
                 }
             }
 
@@ -98,7 +98,7 @@ public class PostsByUserAdapter extends BasePostsAdapter {
     }
 
     public interface CallBack {
-        void onItemClick(Post post);
+        void onItemClick(Post post, View view);
         void onPostsListChanged(int postsCount);
 
         void onPostLoadingCanceled();

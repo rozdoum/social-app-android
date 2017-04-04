@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,6 +51,7 @@ import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
+import com.rozdoum.socialcomponents.utils.Utils;
 
 import java.util.List;
 
@@ -199,6 +201,8 @@ public class PostDetailsActivity extends BaseActivity {
         authorImageView.setOnClickListener(onAuthorClickListener);
 
         authorTextView.setOnClickListener(onAuthorClickListener);
+
+        supportPostponeEnterTransition();
     }
 
     @Override
@@ -300,23 +304,37 @@ public class PostDetailsActivity extends BaseActivity {
         String imageUrl = post.getImagePath();
         Glide.with(this)
                 .load(imageUrl)
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .centerCrop()
+                .override(Utils.getDisplayWidth(this), (int) getResources().getDimension(R.dimen.post_detail_image_height))
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .error(R.drawable.ic_stub)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        scheduleStartPostponedTransition(postImageView);
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        scheduleStartPostponedTransition(postImageView);
                         progressBar.setVisibility(View.GONE);
                         return false;
                     }
                 })
                 .crossFade()
-                .centerCrop()
                 .into(postImageView);
+    }
+
+    private void scheduleStartPostponedTransition(final ImageView imageView) {
+        imageView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                imageView.getViewTreeObserver().removeOnPreDrawListener(this);
+                supportStartPostponedEnterTransition();
+                return true;
+            }
+        });
     }
 
     private void loadAuthorImage() {
