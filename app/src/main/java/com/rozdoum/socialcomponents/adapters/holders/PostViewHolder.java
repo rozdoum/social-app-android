@@ -49,6 +49,10 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private LikeController likeController;
 
     public PostViewHolder(View view, final OnClickListener onClickListener) {
+        this(view, onClickListener, true);
+    }
+
+    public PostViewHolder(View view, final OnClickListener onClickListener, boolean isAuthorNeeded) {
         super(view);
         this.context = view.getContext();
 
@@ -62,6 +66,8 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
         authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
         likeViewGroup = (ViewGroup) view.findViewById(R.id.likesContainer);
+
+        authorImageView.setVisibility(isAuthorNeeded ? View.VISIBLE : View.GONE);
 
         profileManager = ProfileManager.getInstance(context.getApplicationContext());
         postManager = PostManager.getInstance(context.getApplicationContext());
