@@ -23,6 +23,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -146,7 +147,7 @@ public class MainActivity extends BaseActivity {
             });
 
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
             recyclerView.setAdapter(postsAdapter);
             postsAdapter.loadFirstPage();
         }
