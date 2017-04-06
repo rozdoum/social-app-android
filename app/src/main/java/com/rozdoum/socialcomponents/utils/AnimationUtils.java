@@ -7,6 +7,7 @@ import android.view.ViewPropertyAnimator;
 public class AnimationUtils {
 
     public final static int DEFAULT_DELAY = 0;
+    public final static int SHORT_DURATION = 200;
 
     /**
      * Reduces the X & Y
@@ -17,7 +18,7 @@ public class AnimationUtils {
      */
     public static ViewPropertyAnimator hideViewByScale (View v) {
 
-        ViewPropertyAnimator propertyAnimator = v.animate().setStartDelay(DEFAULT_DELAY)
+        ViewPropertyAnimator propertyAnimator = v.animate().setStartDelay(DEFAULT_DELAY).setDuration(SHORT_DURATION)
           .scaleX(0).scaleY(0);
 
         return propertyAnimator;
