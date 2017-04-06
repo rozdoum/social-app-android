@@ -210,7 +210,7 @@ public class PostsAdapter extends BasePostsAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return getItemByPosition(position).getId().hashCode();
     }
 
     public interface Callback {

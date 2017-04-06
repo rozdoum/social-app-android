@@ -50,6 +50,7 @@ public class Post implements Serializable, LazyLoading {
 
     public Post(ItemType itemType) {
         this.itemType = itemType;
+        setId(itemType.toString());
     }
 
     public String getId() {
