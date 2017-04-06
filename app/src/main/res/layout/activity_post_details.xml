@@ -2,6 +2,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true"
@@ -39,7 +40,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    android:transitionName="@string/post_image_transition_name"
+                    tools:targetApi="lollipop"/>
 
             </RelativeLayout>
 
@@ -160,7 +163,9 @@
                 app:border="false"
                 app:shadow="true"
                 app:shadow_color="@color/circle_image_shadow"
-                app:shadow_radius="@dimen/circle_image_shadow_radius" />
+                app:shadow_radius="@dimen/circle_image_shadow_radius"
+                android:transitionName="@string/post_author_image_transition_name"
+                tools:targetApi="lollipop"/>
 
         </RelativeLayout>
     </ScrollView>

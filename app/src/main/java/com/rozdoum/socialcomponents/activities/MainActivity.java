@@ -16,7 +16,9 @@
 
 package com.rozdoum.socialcomponents.activities;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -121,12 +123,12 @@ public class MainActivity extends BaseActivity {
             postsAdapter = new PostsAdapter(this, swipeContainer);
             postsAdapter.setCallback(new PostsAdapter.Callback() {
                 @Override
-                public void onItemClick(final Post post) {
+                public void onItemClick(final Post post, final View view) {
                     PostManager.getInstance(MainActivity.this).isPostExistSingleValue(post.getId(), new OnObjectExistListener<Post>() {
                         @Override
                         public void onDataChanged(boolean exist) {
                             if (exist) {
-                                openPostDetailsActivity(post);
+                                openPostDetailsActivity(post, view);
                             } else {
                                 showFloatButtonRelatedSnackBar(R.string.error_post_was_removed);
                             }
@@ -152,10 +154,24 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void openPostDetailsActivity(Post post) {
+    private void openPostDetailsActivity(Post post, View v) {
         Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
         intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
-        startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            View imageView = v.findViewById(R.id.postImageView);
+            View authorImageView = v.findViewById(R.id.authorImageView);
+
+            ActivityOptions options = ActivityOptions.
+                    makeSceneTransitionAnimation(MainActivity.this,
+                            new android.util.Pair<>(imageView, getString(R.string.post_image_transition_name)),
+                            new android.util.Pair<>(authorImageView, getString(R.string.post_author_image_transition_name))
+                    );
+            startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST, options.toBundle());
+        } else {
+            startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
+        }
     }
 
     public void showFloatButtonRelatedSnackBar(int messageId) {

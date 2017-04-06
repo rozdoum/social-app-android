@@ -1,17 +1,18 @@
 /*
- * Copyright 2017 Rozdoum
+ *  Copyright 2017 Rozdoum
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 package com.rozdoum.socialcomponents.activities;
@@ -32,6 +33,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -66,6 +68,7 @@ import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
+import com.rozdoum.socialcomponents.utils.Utils;
 
 import java.util.List;
 
@@ -215,6 +218,8 @@ public class PostDetailsActivity extends BaseActivity {
         authorImageView.setOnClickListener(onAuthorClickListener);
 
         authorTextView.setOnClickListener(onAuthorClickListener);
+
+        supportPostponeEnterTransition();
     }
 
     @Override
@@ -314,25 +319,41 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void loadPostDetailsImage() {
         String imageUrl = post.getImagePath();
+        int width = Utils.getDisplayWidth(this);
+        int height = (int) getResources().getDimension(R.dimen.post_detail_image_height);
         Glide.with(this)
                 .load(imageUrl)
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .centerCrop()
+                .override(width, height)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .error(R.drawable.ic_stub)
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        scheduleStartPostponedTransition(postImageView);
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        scheduleStartPostponedTransition(postImageView);
                         progressBar.setVisibility(View.GONE);
                         return false;
                     }
                 })
                 .crossFade()
-                .centerCrop()
                 .into(postImageView);
+    }
+
+    private void scheduleStartPostponedTransition(final ImageView imageView) {
+        imageView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                imageView.getViewTreeObserver().removeOnPreDrawListener(this);
+                supportStartPostponedEnterTransition();
+                return true;
+            }
+        });
     }
 
     private void loadAuthorImage() {
