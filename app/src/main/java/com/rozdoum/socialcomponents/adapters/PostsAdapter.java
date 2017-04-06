@@ -19,6 +19,7 @@ package com.rozdoum.socialcomponents.adapters;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.rozdoum.socialcomponents.R;
@@ -96,10 +97,10 @@ public class PostsAdapter extends BasePostsAdapter {
     private PostViewHolder.OnClickListener createOnClickListener() {
         return new PostViewHolder.OnClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(int position, View view) {
                 if (callback != null) {
                     selectedPostPosition = position;
-                    callback.onItemClick(getItemByPosition(position));
+                    callback.onItemClick(getItemByPosition(position), view);
                 }
             }
 
@@ -209,11 +210,11 @@ public class PostsAdapter extends BasePostsAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return getItemByPosition(position).getId().hashCode();
     }
 
     public interface Callback {
-        void onItemClick(Post post);
+        void onItemClick(Post post, View view);
         void onListLoadingFinished();
         void onAuthorClick(String authorId);
     }
