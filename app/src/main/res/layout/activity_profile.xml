@@ -15,11 +15,24 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="@dimen/intrinsic_padding" />
+            android:layout_height="match_parent">
+
+            <ProgressBar
+                android:id="@+id/postsProgressBar"
+                android:layout_width="@dimen/progress_bar_size"
+                android:layout_height="@dimen/progress_bar_size"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_marginTop="@dimen/profile_screen_margin_top_progress_bar"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/intrinsic_padding" />
+
+        </FrameLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -54,8 +67,8 @@
 
                     <RelativeLayout
                         android:id="@+id/imageContainer"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="@dimen/profile_screen_avatar_size"
+                        android:layout_height="@dimen/profile_screen_avatar_size"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true">
 
@@ -71,7 +84,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:border="false"
-                            app:shadow="false" />
+                            app:shadow="false"
+                            android:transitionName="@string/post_author_image_transition_name"
+                            tools:targetApi="lollipop"/>
 
                     </RelativeLayout>
 

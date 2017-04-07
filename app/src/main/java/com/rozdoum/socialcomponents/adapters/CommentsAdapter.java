@@ -90,7 +90,7 @@ public class CommentsAdapter {
         avatarImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onAuthorClickListener.onAuthorClick(authorId);
+                onAuthorClickListener.onAuthorClick(authorId, v);
             }
         });
 
@@ -130,6 +130,6 @@ public class CommentsAdapter {
     }
 
     public interface OnAuthorClickListener {
-        public void onAuthorClick(String authorId);
+        public void onAuthorClick(String authorId, View view);
     }
 }

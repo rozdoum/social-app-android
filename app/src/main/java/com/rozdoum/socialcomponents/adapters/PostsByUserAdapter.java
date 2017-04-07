@@ -72,7 +72,7 @@ public class PostsByUserAdapter extends BasePostsAdapter {
             }
 
             @Override
-            public void onAuthorClick(int position) {
+            public void onAuthorClick(int position, View view) {
 
             }
         };

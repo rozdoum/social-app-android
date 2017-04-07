@@ -71,7 +71,6 @@ public class MainActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case ProfileActivity.OPEN_PROFILE_REQUEST:
-                    refreshPostList();
                     break;
 
                 case CreatePostActivity.CREATE_NEW_POST_REQUEST:
@@ -143,8 +142,8 @@ public class MainActivity extends BaseActivity {
                 }
 
                 @Override
-                public void onAuthorClick(String authorId) {
-                    openProfileActivity(authorId);
+                public void onAuthorClick(String authorId, View view) {
+                    openProfileActivity(authorId, view);
                 }
             });
 
@@ -195,9 +194,24 @@ public class MainActivity extends BaseActivity {
     }
 
     private void openProfileActivity(String userId) {
+        openProfileActivity(userId, null);
+    }
+
+    private void openProfileActivity(String userId, View view) {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         intent.putExtra(ProfileActivity.USER_ID_EXTRA_KEY, userId);
-        startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && view != null) {
+
+            View authorImageView = view.findViewById(R.id.authorImageView);
+
+            ActivityOptions options = ActivityOptions.
+                    makeSceneTransitionAnimation(MainActivity.this,
+                            new android.util.Pair<>(authorImageView, getString(R.string.post_author_image_transition_name)));
+            startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST, options.toBundle());
+        } else {
+            startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
+        }
     }
 
     @Override

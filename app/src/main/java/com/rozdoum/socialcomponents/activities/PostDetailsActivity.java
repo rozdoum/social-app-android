@@ -17,10 +17,12 @@
 
 package com.rozdoum.socialcomponents.activities;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -151,8 +153,8 @@ public class PostDetailsActivity extends BaseActivity {
 
         commentsAdapter = new CommentsAdapter(commentsContainer, new CommentsAdapter.OnAuthorClickListener() {
             @Override
-            public void onAuthorClick(String authorId) {
-                openProfileActivity(authorId);
+            public void onAuthorClick(String authorId, View view) {
+                openProfileActivity(authorId, view);
             }
         });
         initLikes();
@@ -211,7 +213,7 @@ public class PostDetailsActivity extends BaseActivity {
         View.OnClickListener onAuthorClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openProfileActivity(post.getAuthorId());
+                openProfileActivity(post.getAuthorId(), v);
             }
         };
 
@@ -434,10 +436,19 @@ public class PostDetailsActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    private void openProfileActivity(String authorId) {
+    private void openProfileActivity(String userId, View view) {
         Intent intent = new Intent(PostDetailsActivity.this, ProfileActivity.class);
-        intent.putExtra(ProfileActivity.USER_ID_EXTRA_KEY, authorId);
-        startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
+        intent.putExtra(ProfileActivity.USER_ID_EXTRA_KEY, userId);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && view != null) {
+
+            ActivityOptions options = ActivityOptions.
+                    makeSceneTransitionAnimation(PostDetailsActivity.this,
+                            new android.util.Pair<>(view, getString(R.string.post_author_image_transition_name)));
+            startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST, options.toBundle());
+        } else {
+            startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
+        }
     }
 
     private OnObjectExistListener<Like> createOnLikeObjectExistListener() {

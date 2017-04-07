@@ -1,3 +1,4 @@
 <resources>
     <dimen name="login_screen_content_offset_center_top">0dp</dimen>
+    <dimen name="profile_screen_margin_top_progress_bar">60dp</dimen>
 </resources>
