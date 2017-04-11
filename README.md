@@ -76,9 +76,8 @@ Implemented elements and features:
 * Collapse/expand text in the long comments
 * Add complain for the post
 * Page is updated in real time
-* Complain about post
 
-![post_detail](https://cloud.githubusercontent.com/assets/2683612/24905281/0d04c506-1ebc-11e7-9e50-f7430e1994ff.gif)
+![post_detail](https://cloud.githubusercontent.com/assets/2683612/24911820/f25559a0-1ed4-11e7-972f-aaf93c8c63b3.gif)
 
 ---
 
