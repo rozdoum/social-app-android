@@ -25,7 +25,7 @@ Implemented elements and features:
 * Loading posts by parts (Progress bar in the bottom of the screen for loading next part of posts)
 
 
-![Opening app](https://wiki.rozdoum.com/download/attachments/28906670/1491222691574.jpg?version=1&modificationDate=1491222725959&api=v2)
+![main_screen](https://cloud.githubusercontent.com/assets/2683612/24905715/849ca6d2-1ebd-11e7-8684-2568c9f665ad.gif)
 
 ---
 
@@ -36,7 +36,7 @@ Implemented elements and effects:
 * Facebook Sign-In
 * Google Sign-In
 
-![Registration screen](https://wiki.rozdoum.com/download/attachments/28906670/1491217946628.jpg?version=1&modificationDate=1491217976996&api=v2)
+![login_screen](https://cloud.githubusercontent.com/assets/2683612/24905279/0c8b9dd4-1ebc-11e7-860f-46a83eb71f80.gif)
 
 ---
 
@@ -49,7 +49,7 @@ Implemented elements and features:
 * Pick image or take photo
 * Manage App Permissions on Android 6.0
 
-![Create profile](https://wiki.rozdoum.com/download/attachments/28906670/1491218016795.jpg?version=1&modificationDate=1491218041360&api=v2)
+![create_profile](https://cloud.githubusercontent.com/assets/2683612/24905276/0c87f382-1ebc-11e7-8587-9ff4af64f3cf.gif)
 
 ---
 
@@ -61,7 +61,7 @@ Implemented elements and features:
 * Pick image or take photo
 * Manage App Permissions on Android 6.0
 
-![Create post](https://wiki.rozdoum.com/download/attachments/28906670/1491218085241.jpg?version=1&modificationDate=1491218093688&api=v2)
+![create_post](https://cloud.githubusercontent.com/assets/2683612/24905275/0c8727a4-1ebc-11e7-94a4-0d9a3d419748.gif)
 
 ---
 
