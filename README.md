@@ -2,15 +2,15 @@ SocialComponents
 =============
 
 ## Summary
-The summary of making of SocialComponents project is 
+This application demonstrates the example of social components as posts, likes, comments, watchers and etc. It based on firebase and used such firebase features as database, storage and authentication. Our app shows the work of firebase queries. For example data pagination, filter data by author. Also here is the example of working with firebase transaction for counting likes, watchers, comments. It is great example of material design. You can see the friendly animation by opening screens of details and user profile.
 
 ### Current build 
 
-The most recent app version is available [here](https://github.com/)
+The most recent app version is available on [Google Play](https://play.google.com/store/apps/details?id=com.rozdoum.socialcomponents)
 
-### Full showcase of application
+ <!-- ### Full showcase of application -->
 
-[App video should be here](https://)
+ <!-- [App video should be here](https://) -->
 
 ## Blog posts
 ### Getting started - opening the app
@@ -20,7 +20,7 @@ Implemented elements and features:
 * Hiding Toolbar when list is scrolling down and showing it again when it’s scrolling up.
 * RecyclerView with CardViews
 * Float Action Button
-* nack Bar for messages
+* Snack Bar for messages
 * Refresh screen
 * Loading posts by parts (Progress bar in the bottom of the screen for loading next part of posts)
 
@@ -76,8 +76,9 @@ Implemented elements and features:
 * Collapse/expand text in the long comments
 * Add complain for the post
 * Page is updated in real time
+* Complain about post
 
-![Post Detailss](https://wiki.rozdoum.com/download/attachments/28906670/1491218115512.jpg?version=1&modificationDate=1491218123790&api=v2)
+![post_detail](https://cloud.githubusercontent.com/assets/2683612/24905281/0d04c506-1ebc-11e7-9e50-f7430e1994ff.gif)
 
 ---
 
@@ -87,7 +88,7 @@ Implemented elements and features:
 
 * Zooming image
 
-![Image Details](https://wiki.rozdoum.com/download/attachments/28906670/1491218155295.jpg?version=1&modificationDate=1491218168963&api=v2)
+![image_detail](https://cloud.githubusercontent.com/assets/2683612/24905278/0c8b031a-1ebc-11e7-86f9-c7b3ec276d63.gif)
 
 ---
 
@@ -99,7 +100,7 @@ Implemented elements and features:
 * Collapse / expand text of large comment
 * Date of commen
 
-![Post Details. Comments](https://wiki.rozdoum.com/download/attachments/28906670/1491218199606.jpg?version=1&modificationDate=1491218205884&api=v2)
+![comments](https://cloud.githubusercontent.com/assets/2683612/24905274/0c849db8-1ebc-11e7-9407-bdfa25c3a818.gif)
 
 ---
 
@@ -116,7 +117,7 @@ Implemented elements and features:
     * edit profile
     * create a post
 
-![Profile](https://wiki.rozdoum.com/download/attachments/28906670/1491218230285.jpg?version=1&modificationDate=1491218237083&api=v2)
+![profile](https://cloud.githubusercontent.com/assets/2683612/24905714/849c725c-1ebd-11e7-9533-a3ae31cb066d.gif)
 
 ---
 
@@ -129,7 +130,7 @@ Implemented elements and features:
 * Possibility to add like by click on “like” button
 * Animation of like button
 
-![Panel of Counters](https://lh5.googleusercontent.com/Y5g_2PtQhLTpV3yO5iXAuF2xgH_Nj_YuUx6QcODX7_1Zys778iZVF0I3uOyJC3UmprIzrnJfVGmowdwYULBwYIEodFwP0GQRVcvXeneve-VgxVkH3Zo53eLsklghOTf1xRqLSizN)
+![counters_panel](https://cloud.githubusercontent.com/assets/2683612/24905991/ae28f824-1ebe-11e7-8f9a-91cd988f0b07.jpg)
 
 ---
 
@@ -142,4 +143,4 @@ Implemented elements and features:
 * Pick image or take photo
 * Manage App Permissions on Android 6.0
 
-![Panel of Counters](https://wiki.rozdoum.com/download/attachments/28906670/1491218269436.jpg?version=1&modificationDate=1491218275661&api=v2)
+![edit_profile](https://cloud.githubusercontent.com/assets/2683612/24905277/0c89a1dc-1ebc-11e7-912e-8ffbb6223e52.gif)
