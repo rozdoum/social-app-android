@@ -17,22 +17,27 @@
 
 package com.rozdoum.socialcomponents.activities;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -56,6 +61,7 @@ import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.listeners.CustomTransitionListener;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
@@ -75,6 +81,7 @@ import java.util.List;
 public class PostDetailsActivity extends BaseActivity {
 
     public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
+    public static final String AUTHOR_ANIMATION_NEEDED_EXTRA_KEY = "PostDetailsActivity.AUTHOR_ANIMATION_NEEDED_EXTRA_KEY";
     private static final int TIME_OUT_LOADING_COMMENTS = 30000;
     public static final int UPDATE_POST_REQUEST = 1;
     public static final String POST_STATUS_EXTRA_KEY = "PostDetailsActivity.POST_STATUS_EXTRA_KEY";
@@ -112,6 +119,8 @@ public class PostDetailsActivity extends BaseActivity {
     private boolean postRemovingProcess = false;
     private boolean isPostExist;
 
+    private boolean isAuthorAnimationRequired;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,6 +132,7 @@ public class PostDetailsActivity extends BaseActivity {
         profileManager = ProfileManager.getInstance(this);
         postManager = PostManager.getInstance(this);
 
+        isAuthorAnimationRequired = getIntent().getBooleanExtra(AUTHOR_ANIMATION_NEEDED_EXTRA_KEY, false);
         post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
         postId = post.getId();
 
@@ -146,6 +156,21 @@ public class PostDetailsActivity extends BaseActivity {
         dateTextView = (TextView) findViewById(R.id.dateTextView);
         commentsProgressBar = (ProgressBar) findViewById(R.id.commentsProgressBar);
         warningCommentsTextView = (TextView) findViewById(R.id.warningCommentsTextView);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && isAuthorAnimationRequired) {
+            authorImageView.setScaleX(0);
+            authorImageView.setScaleY(0);
+
+            // Add a listener to get noticed when the transition ends to animate the fab button
+            getWindow().getSharedElementEnterTransition().addListener(new CustomTransitionListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    super.onTransitionEnd(transition);
+                    com.rozdoum.socialcomponents.utils.AnimationUtils.showViewByScale(authorImageView).start();
+                }
+            });
+        }
 
         final Button sendButton = (Button) findViewById(R.id.sendButton);
 
@@ -248,6 +273,22 @@ public class PostDetailsActivity extends BaseActivity {
             }
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && isAuthorAnimationRequired) {
+            ViewPropertyAnimator hideAuthorAnimator = com.rozdoum.socialcomponents.utils.AnimationUtils.hideViewByScale(authorImageView);
+            hideAuthorAnimator.withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    PostDetailsActivity.super.onBackPressed();
+                }
+            });
+
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private OnPostChangedListener createOnPostChangeListener() {
