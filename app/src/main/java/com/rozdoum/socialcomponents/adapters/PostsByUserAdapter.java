@@ -52,7 +52,7 @@ public class PostsByUserAdapter extends BasePostsAdapter {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.post_item_list_view, parent, false);
 
-        return new PostViewHolder(view, createOnClickListener());
+        return new PostViewHolder(view, createOnClickListener(), false);
     }
 
     private PostViewHolder.OnClickListener createOnClickListener() {
