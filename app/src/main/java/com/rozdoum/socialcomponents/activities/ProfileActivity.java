@@ -240,16 +240,15 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     private void openPostDetailsActivity(Post post, View v) {
         Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
         intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+        intent.putExtra(PostDetailsActivity.AUTHOR_ANIMATION_NEEDED_EXTRA_KEY, true);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
             View imageView = v.findViewById(R.id.postImageView);
-            View authorImageView = v.findViewById(R.id.authorImageView);
 
             ActivityOptions options = ActivityOptions.
                     makeSceneTransitionAnimation(ProfileActivity.this,
-                            new android.util.Pair<>(imageView, getString(R.string.post_image_transition_name)),
-                            new android.util.Pair<>(authorImageView, getString(R.string.post_author_image_transition_name))
+                            new android.util.Pair<>(imageView, getString(R.string.post_image_transition_name))
                     );
             startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST, options.toBundle());
         } else {
