@@ -111,9 +111,9 @@ public class PostsAdapter extends BasePostsAdapter {
             }
 
             @Override
-            public void onAuthorClick(int position) {
+            public void onAuthorClick(int position, View view) {
                 if (callback != null) {
-                    callback.onAuthorClick(getItemByPosition(position).getAuthorId());
+                    callback.onAuthorClick(getItemByPosition(position).getAuthorId(), view);
                 }
             }
         };
@@ -216,6 +216,6 @@ public class PostsAdapter extends BasePostsAdapter {
     public interface Callback {
         void onItemClick(Post post, View view);
         void onListLoadingFinished();
-        void onAuthorClick(String authorId);
+        void onAuthorClick(String authorId, View view);
     }
 }

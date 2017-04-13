@@ -114,7 +114,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
             public void onClick(View v) {
                 int position = getAdapterPosition();
                 if (onClickListener != null && position != RecyclerView.NO_POSITION) {
-                    onClickListener.onAuthorClick(getAdapterPosition());
+                    onClickListener.onAuthorClick(getAdapterPosition(), v);
                 }
             }
         });
@@ -196,6 +196,6 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
         void onLikeClick(LikeController likeController, int position);
 
-        void onAuthorClick(int position);
+        void onAuthorClick(int position, View view);
     }
 }

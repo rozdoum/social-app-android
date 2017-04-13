@@ -42,6 +42,10 @@
 
     <dimen name="post_card_elevation">3dp</dimen>
 
+    <dimen name="profile_screen_avatar_size">100dp</dimen>
+
+    <dimen name="profile_screen_margin_top_progress_bar">120dp</dimen>
+
     <!--post card content_padding left = card_elevation + card_padding-->
     <dimen name="post_card_content_padding_left">11dp</dimen>
 </resources>
