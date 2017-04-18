@@ -42,8 +42,10 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Profile;
@@ -182,7 +184,7 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
         }
     }
 
-    private void checkIsProfileExist(String userId) {
+    private void checkIsProfileExist(final String userId) {
         ProfileManager.getInstance(this).isProfileExist(userId, new OnObjectExistListener<Profile>() {
             @Override
             public void onDataChanged(boolean exist) {
@@ -190,6 +192,8 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
                     startCreateProfileActivity();
                 } else {
                     PreferencesUtil.setProfileCreated(LoginActivity.this, true);
+                    DatabaseHelper.getInstance(LoginActivity.this.getApplicationContext())
+                            .addRegistrationToken(FirebaseInstanceId.getInstance().getToken(), userId);
                 }
                 hideProgress();
                 finish();
