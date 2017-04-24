@@ -39,7 +39,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
@@ -186,6 +188,8 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
         if (success) {
             finish();
             PreferencesUtil.setProfileCreated(this, success);
+            DatabaseHelper.getInstance(CreateProfileActivity.this.getApplicationContext())
+                    .addRegistrationToken(FirebaseInstanceId.getInstance().getToken(), profile.getId());
         } else {
             showSnackBar(R.string.error_fail_create_profile);
         }

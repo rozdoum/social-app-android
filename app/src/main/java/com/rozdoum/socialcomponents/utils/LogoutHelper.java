@@ -35,6 +35,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 
 public class LogoutHelper {
 
@@ -44,6 +46,9 @@ public class LogoutHelper {
     public static void signOut(GoogleApiClient mGoogleApiClient, FragmentActivity fragmentActivity) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
+            DatabaseHelper.getInstance(fragmentActivity.getApplicationContext())
+                    .removeRegistrationToken(FirebaseInstanceId.getInstance().getToken(), user.getUid());
+
             for (UserInfo profile : user.getProviderData()) {
                 String providerId = profile.getProviderId();
                 logoutByProvider(providerId, mGoogleApiClient, fragmentActivity);
