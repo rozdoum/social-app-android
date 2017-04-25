@@ -22,12 +22,17 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.activities.PostDetailsActivity;
 import com.rozdoum.socialcomponents.utils.LogUtil;
@@ -39,7 +44,7 @@ import com.rozdoum.socialcomponents.utils.LogUtil;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
-    private static final String TAG = "FirebaseMessagingServce";
+    private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
 
     private static final String POST_ID_KEY = "postId";
     private static final String ACTION_TYPE_KEY = "actionType";
@@ -82,14 +87,32 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Intent intent = new Intent(this, PostDetailsActivity.class);
             intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, postId);
 
-            sendNotification(notificationTitle, notificationBody, notificationImageUrl, intent);
+            Bitmap bitmap = getBitmapFromUrl(notificationImageUrl);
+
+            sendNotification(notificationTitle, notificationBody, bitmap, intent);
         } else {
             LogUtil.logError(TAG, "parseCommentOrLike()", new RuntimeException("FCM remoteMessage doesn't contains Notification"));
         }
     }
 
+    public Bitmap getBitmapFromUrl(String imageUrl) {
+        try {
+            return Glide.with(this)
+                    .load(imageUrl)
+                    .asBitmap()
+                    .centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .into(Constants.PushNotification.LARGE_ICONE_SIZE, Constants.PushNotification.LARGE_ICONE_SIZE)
+                    .get();
 
-    private void sendNotification(String notificationTitle, String notificationBody, String largeImageUrl, Intent intent) {
+        } catch (Exception e) {
+            LogUtil.logError(TAG, "getBitmapfromUrl", e);
+            return null;
+
+        }
+    }
+
+    private void sendNotification(String notificationTitle, String notificationBody, Bitmap bitmap, Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -101,6 +124,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setContentIntent(pendingIntent)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationBody)
+                .setLargeIcon(bitmap)
                 .setSound(defaultSoundUri);
 
 
