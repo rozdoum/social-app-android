@@ -48,6 +48,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String POST_ID_KEY = "postId";
     private static final String ACTION_TYPE_KEY = "actionType";
+    private static final String TITLE_KEY = "title";
+    private static final String BODY_KEY = "body";
+    private static final String ICON_KEY = "icon";
     private static final String ACTION_TYPE_NEW_LIKE = "new_like";
     private static final String ACTION_TYPE_NEW_COMMENT = "new_comment";
 
@@ -76,23 +79,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void parseCommentOrLike(RemoteMessage remoteMessage) {
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            LogUtil.logDebug(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            String notificationTitle = remoteMessage.getNotification().getTitle();
-            String notificationBody = remoteMessage.getNotification().getBody();
-            String notificationImageUrl = remoteMessage.getNotification().getIcon();
-            String postId = remoteMessage.getData().get(POST_ID_KEY);
+        String notificationTitle = remoteMessage.getData().get(TITLE_KEY);
+        String notificationBody = remoteMessage.getData().get(BODY_KEY);
+        String notificationImageUrl = remoteMessage.getData().get(ICON_KEY);
+        String postId = remoteMessage.getData().get(POST_ID_KEY);
 
-            Intent intent = new Intent(this, PostDetailsActivity.class);
-            intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, postId);
+        Intent intent = new Intent(this, PostDetailsActivity.class);
+        intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, postId);
 
-            Bitmap bitmap = getBitmapFromUrl(notificationImageUrl);
+        Bitmap bitmap = getBitmapFromUrl(notificationImageUrl);
 
-            sendNotification(notificationTitle, notificationBody, bitmap, intent);
-        } else {
-            LogUtil.logError(TAG, "parseCommentOrLike()", new RuntimeException("FCM remoteMessage doesn't contains Notification"));
-        }
+        sendNotification(notificationTitle, notificationBody, bitmap, intent);
+
+        LogUtil.logDebug(TAG, "Message Notification Body: " + remoteMessage.getData().get(BODY_KEY));
     }
 
     public Bitmap getBitmapFromUrl(String imageUrl) {
@@ -108,7 +107,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         } catch (Exception e) {
             LogUtil.logError(TAG, "getBitmapfromUrl", e);
             return null;
-
         }
     }
 

@@ -40,14 +40,11 @@ exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{au
 
             // Create a notification
             const payload = {
-                notification: {
+                data : {
+                    actionType: actionTypeNewLike,
                     title: notificationTitle,
                     body: `${likeAuthorProfile.username} liked your post`,
                     icon: post.val().imagePath,
-                    sound: 'default'
-                },
-                data : {
-                    actionType: actionTypeNewLike,
                     postId: postId,
 
                 },
@@ -112,14 +109,11 @@ exports.pushNotificationComments = functions.database.ref('/post-comments/{postI
 
             // Create a notification
             const payload = {
-                notification: {
+                data : {
+                    actionType: actionTypeNewComment,
                     title: notificationTitle,
                     body: `${commentAuthorProfile.username} commented your post`,
                     icon: post.val().imagePath,
-                    sound: 'default'
-                },
-                data : {
-                    actionType: actionTypeNewComment,
                     postId: postId,
                 },
             };
