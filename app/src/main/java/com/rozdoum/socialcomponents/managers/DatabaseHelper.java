@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +35,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -89,6 +91,7 @@ public class DatabaseHelper {
     public DatabaseHelper(Context context) {
         this.context = context;
         firebaseAuth = FirebaseAuth.getInstance();
+
     }
 
     public void init() {
@@ -281,6 +284,11 @@ public class DatabaseHelper {
         } catch (Exception e) {
             LogUtil.logError(TAG, "createOrUpdateComment()", e);
         }
+    }
+
+    public void onNewLikeAddedListener(ChildEventListener childEventListener) {
+        DatabaseReference mLikesReference = database.getReference().child("post-likes");
+        mLikesReference.addChildEventListener(childEventListener);
     }
 
     public void createOrUpdateLike(final String postId, final String postAuthorId) {
@@ -698,5 +706,9 @@ public class DatabaseHelper {
                 LogUtil.logError(TAG, "isPostExistSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
+    }
+
+    public void subscribeToNewPosts() {
+        FirebaseMessaging.getInstance().subscribeToTopic("postsTopic");
     }
 }

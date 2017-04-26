@@ -5,7 +5,10 @@ admin.initializeApp(functions.config().firebase);
 
 const actionTypeNewLike = "new_like"
 const actionTypeNewComment = "new_comment"
+const actionTypeNewPost = "new_post"
 const notificationTitle = "Social App"
+
+const postsTopic = "postsTopic"
 
 exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{authorId}/{likeId}').onWrite(event => {
 
@@ -142,4 +145,38 @@ exports.pushNotificationComments = functions.database.ref('/post-comments/{postI
         });
     })
 });
+
+exports.pushNotificationNewPost = functions.database.ref('/posts/{postId}').onWrite(event => {
+    // Only edit data when it is first created.
+    if (event.data.previous.exists()) {
+        console.log('Post was changed');
+        return;
+    }
+    // Exit when the data is deleted.
+    if (!event.data.exists()) {
+        console.log('Post was removed');
+        return;
+    }
+
+     console.log('New post was created');
+
+      // Create a notification
+    const payload = {
+        data : {
+            actionType: actionTypeNewPost,
+        },
+    };
+
+    // Send a message to devices subscribed to the provided topic.
+    return admin.messaging().sendToTopic(postsTopic, payload)
+             .then(function(response) {
+               // See the MessagingTopicResponse reference documentation for the
+               // contents of response.
+               console.log("Successfully sent info about new post :", response);
+             })
+             .catch(function(error) {
+               console.log("Error sending info about new post:", error);
+             });
+});
+
 

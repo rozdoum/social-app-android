@@ -26,6 +26,7 @@ import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -34,6 +35,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.activities.PostDetailsActivity;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
@@ -53,6 +55,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String ICON_KEY = "icon";
     private static final String ACTION_TYPE_NEW_LIKE = "new_like";
     private static final String ACTION_TYPE_NEW_COMMENT = "new_comment";
+    private static final String ACTION_TYPE_NEW_POST = "new_post";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -75,7 +78,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             case ACTION_TYPE_NEW_COMMENT:
                 parseCommentOrLike(remoteMessage);
                 break;
+            case ACTION_TYPE_NEW_POST:
+                handleNewPostCreatedAction();
+                break;
         }
+    }
+
+    private void handleNewPostCreatedAction() {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.NEW_POST_CREATED_ACTION));
     }
 
     private void parseCommentOrLike(RemoteMessage remoteMessage) {

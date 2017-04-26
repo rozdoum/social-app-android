@@ -17,12 +17,15 @@
 package com.rozdoum.socialcomponents.activities;
 
 import android.app.ActivityOptions;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -34,23 +37,31 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 public class MainActivity extends BaseActivity {
-    private static final String TAG = LoginActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String NEW_POST_CREATED_ACTION = "MainActivity.NEW_POST_CREATED_ACTION";
 
     private PostsAdapter postsAdapter;
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
 
     private ProfileManager profileManager;
+    private final ServiceReceiver serviceReceiver = new ServiceReceiver();
+    private int counter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +73,59 @@ public class MainActivity extends BaseActivity {
 
         profileManager = ProfileManager.getInstance(this);
         initContentView();
+
+//        setOnLikeAddedListener();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(NEW_POST_CREATED_ACTION);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(serviceReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        try {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceReceiver);
+        } catch (Exception ex) {
+            LogUtil.logError(TAG, "Error unregistering ServiceReceiver", ex);
+        }
+    }
+
+    private void setOnLikeAddedListener() {
+        DatabaseHelper.getInstance(this).onNewLikeAddedListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                counter++;
+                showSnackBar("You have " + counter + " new likes");
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -238,6 +302,15 @@ public class MainActivity extends BaseActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    // region ServiceReceiver
+    private class ServiceReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showFloatButtonRelatedSnackBar(R.string.message_new_post_was_created);
         }
     }
 }
