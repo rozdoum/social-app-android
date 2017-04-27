@@ -1,17 +1,18 @@
 /*
- * Copyright 2017 Rozdoum
+ *  Copyright 2017 Rozdoum
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 package com.rozdoum.socialcomponents.activities;
@@ -32,6 +33,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -62,7 +65,7 @@ public class MainActivity extends BaseActivity {
     private int counter;
     private TextView newPostsCounterTextView;
     private PostManager.PostCounterWatcher postCounterWatcher;
-    private boolean counterAnimationInProgress;
+    private boolean counterAnimationInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,37 +227,36 @@ public class MainActivity extends BaseActivity {
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
                     hideCounterView();
+                    super.onScrolled(recyclerView, dx, dy);
                 }
             });
         }
     }
 
     private void hideCounterView() {
-        if (!counterAnimationInProgress) {
+        if (!counterAnimationInProgress && newPostsCounterTextView.getVisibility() == View.VISIBLE) {
             counterAnimationInProgress = true;
-            AnimationUtils.hideViewByScaleAndVisibility(newPostsCounterTextView).setListener(new Animator.AnimatorListener() {
+            AlphaAnimation alphaAnimation = AnimationUtils.hideViewByAlpha(newPostsCounterTextView);
+            alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
-                public void onAnimationStart(Animator animation) {
+                public void onAnimationStart(Animation animation) {
 
                 }
 
                 @Override
-                public void onAnimationEnd(Animator animation) {
+                public void onAnimationEnd(Animation animation) {
                     counterAnimationInProgress = false;
+                    newPostsCounterTextView.setVisibility(View.GONE);
                 }
 
                 @Override
-                public void onAnimationCancel(Animator animation) {
-                    counterAnimationInProgress = false;
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
+                public void onAnimationRepeat(Animation animation) {
 
                 }
             });
+
+            alphaAnimation.start();
         }
     }
 
@@ -331,13 +333,11 @@ public class MainActivity extends BaseActivity {
 
                 if (newPostsCounterTextView != null) {
                     if (newPostsQuantity > 0) {
-//                        newPostsCounterTextView.setVisibility(View.VISIBLE);
                         showCounterView();
 
                         String counterFormat = getResources().getQuantityString(R.plurals.new_posts_counter_format, newPostsQuantity, newPostsQuantity);
                         newPostsCounterTextView.setText(String.format(counterFormat, newPostsQuantity));
                     } else {
-//                        newPostsCounterTextView.setVisibility(View.GONE);
                         hideCounterView();
                     }
                 }

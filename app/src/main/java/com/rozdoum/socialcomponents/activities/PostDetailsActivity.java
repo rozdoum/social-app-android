@@ -590,12 +590,12 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void updateOptionMenuVisibility() {
-        if (hasAccess()) {
+        if (hasAccess() && editActionMenuItem != null && deleteActionMenuItem != null) {
             editActionMenuItem.setVisible(true);
             deleteActionMenuItem.setVisible(true);
         }
 
-        if (post != null && !post.isHasComplain()) {
+        if (post != null && !post.isHasComplain() && complainActionMenuItem != null) {
             complainActionMenuItem.setVisible(true);
         }
     }
