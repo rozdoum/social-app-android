@@ -52,6 +52,18 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
+        <TextView
+            android:id="@+id/newPostsCounterTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:padding="@dimen/intrinsic_padding"
+            android:background="@drawable/posts_counter_bg"
+            android:textColor="@android:color/white"
+            android:gravity="center_vertical"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -60,9 +72,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/large_intrinsic_padding"
         android:clickable="true"
-
         android:src="@drawable/ic_add_white_48dp"
-
         android:layout_gravity="bottom|right" />
 
 </android.support.design.widget.CoordinatorLayout>

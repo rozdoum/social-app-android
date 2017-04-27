@@ -38,4 +38,26 @@ public class AnimationUtils {
 
         return propertyAnimator;
     }
+
+    public static ViewPropertyAnimator hideViewByScaleAndVisibility (final View v) {
+
+        ViewPropertyAnimator propertyAnimator = v.animate().setStartDelay(DEFAULT_DELAY).setDuration(SHORT_DURATION)
+                .scaleX(0).scaleY(0).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        v.setVisibility(View.GONE);
+                    }
+                });
+
+        return propertyAnimator;
+    }
+
+    public static ViewPropertyAnimator showViewByScaleAndVisibility (View v) {
+        v.setVisibility(View.VISIBLE);
+
+        ViewPropertyAnimator propertyAnimator = v.animate().setStartDelay(DEFAULT_DELAY)
+                .scaleX(1).scaleY(1);
+
+        return propertyAnimator;
+    }
 }

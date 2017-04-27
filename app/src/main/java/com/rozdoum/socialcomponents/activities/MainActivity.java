@@ -16,15 +16,13 @@
 
 package com.rozdoum.socialcomponents.activities;
 
+import android.animation.Animator;
 import android.app.ActivityOptions;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +33,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -49,19 +48,21 @@ import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
-import com.rozdoum.socialcomponents.utils.LogUtil;
+import com.rozdoum.socialcomponents.utils.AnimationUtils;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final String NEW_POST_CREATED_ACTION = "MainActivity.NEW_POST_CREATED_ACTION";
 
     private PostsAdapter postsAdapter;
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
 
     private ProfileManager profileManager;
-    private final ServiceReceiver serviceReceiver = new ServiceReceiver();
+    private PostManager postManager;
     private int counter;
+    private TextView newPostsCounterTextView;
+    private PostManager.PostCounterWatcher postCounterWatcher;
+    private boolean counterAnimationInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,17 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         profileManager = ProfileManager.getInstance(this);
+        postManager = PostManager.getInstance(this);
         initContentView();
+
+        postCounterWatcher = new PostManager.PostCounterWatcher() {
+            @Override
+            public void onPostCounterChanged(int newValue) {
+                updateNewPostCounter();
+            }
+        };
+
+        postManager.setPostCounterWatcher(postCounterWatcher);
 
 //        setOnLikeAddedListener();
     }
@@ -80,22 +91,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(NEW_POST_CREATED_ACTION);
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(serviceReceiver, intentFilter);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        try {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceReceiver);
-        } catch (Exception ex) {
-            LogUtil.logError(TAG, "Error unregistering ServiceReceiver", ex);
-        }
+        updateNewPostCounter();
     }
 
     private void setOnLikeAddedListener() {
@@ -181,6 +177,14 @@ public class MainActivity extends BaseActivity {
                 });
             }
 
+            newPostsCounterTextView = (TextView) findViewById(R.id.newPostsCounterTextView);
+            newPostsCounterTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    refreshPostList();
+                }
+            });
+
             final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
             SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -215,7 +219,47 @@ public class MainActivity extends BaseActivity {
             ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
             recyclerView.setAdapter(postsAdapter);
             postsAdapter.loadFirstPage();
+            updateNewPostCounter();
+
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    hideCounterView();
+                }
+            });
         }
+    }
+
+    private void hideCounterView() {
+        if (!counterAnimationInProgress) {
+            counterAnimationInProgress = true;
+            AnimationUtils.hideViewByScaleAndVisibility(newPostsCounterTextView).setListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    counterAnimationInProgress = false;
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    counterAnimationInProgress = false;
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+        }
+    }
+
+    private void showCounterView() {
+        AnimationUtils.showViewByScaleAndVisibility(newPostsCounterTextView);
     }
 
     private void openPostDetailsActivity(Post post, View v) {
@@ -278,6 +322,29 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void updateNewPostCounter() {
+        Handler mainHandler = new Handler(this.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                int newPostsQuantity = postManager.getNewPostsCounter();
+
+                if (newPostsCounterTextView != null) {
+                    if (newPostsQuantity > 0) {
+//                        newPostsCounterTextView.setVisibility(View.VISIBLE);
+                        showCounterView();
+
+                        String counterFormat = getResources().getQuantityString(R.plurals.new_posts_counter_format, newPostsQuantity, newPostsQuantity);
+                        newPostsCounterTextView.setText(String.format(counterFormat, newPostsQuantity));
+                    } else {
+//                        newPostsCounterTextView.setVisibility(View.GONE);
+                        hideCounterView();
+                    }
+                }
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -302,15 +369,6 @@ public class MainActivity extends BaseActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    // region ServiceReceiver
-    private class ServiceReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            showFloatButtonRelatedSnackBar(R.string.message_new_post_was_created);
         }
     }
 }
