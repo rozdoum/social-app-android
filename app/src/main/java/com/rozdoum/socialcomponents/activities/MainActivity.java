@@ -156,7 +156,7 @@ public class MainActivity extends BaseActivity {
 
     private void openPostDetailsActivity(Post post, View v) {
         Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
-        intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+        intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 

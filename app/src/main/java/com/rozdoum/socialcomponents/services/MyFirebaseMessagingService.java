@@ -29,7 +29,7 @@ import android.support.v4.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.MainActivity;
+import com.rozdoum.socialcomponents.activities.PostDetailsActivity;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
 /**
@@ -41,26 +41,55 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "FirebaseMessagingServce";
 
+    private static final String POST_ID_KEY = "postId";
+    private static final String ACTION_TYPE_KEY = "actionType";
+    private static final String ACTION_TYPE_NEW_LIKE = "new_like";
+    private static final String ACTION_TYPE_NEW_COMMENT = "new_comment";
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        String notificationTitle = null, notificationBody = null;
+        if (remoteMessage.getData() != null && remoteMessage.getData().get(ACTION_TYPE_KEY) != null) {
+            handleRemoteMessage(remoteMessage);
+        } else {
+            LogUtil.logError(TAG, "onMessageReceived()", new RuntimeException("FCM remoteMessage doesn't contains Action Type"));
+        }
+    }
 
+    private void handleRemoteMessage(RemoteMessage remoteMessage) {
+        String receivedActionType = remoteMessage.getData().get(ACTION_TYPE_KEY);
+        LogUtil.logDebug(TAG, "Message Notification Action Type: " + receivedActionType);
+
+        switch (receivedActionType) {
+            case ACTION_TYPE_NEW_LIKE:
+                parseCommentOrLike(remoteMessage);
+                break;
+            case ACTION_TYPE_NEW_COMMENT:
+                parseCommentOrLike(remoteMessage);
+                break;
+        }
+    }
+
+    private void parseCommentOrLike(RemoteMessage remoteMessage) {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             LogUtil.logDebug(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            notificationTitle = remoteMessage.getNotification().getTitle();
-            notificationBody = remoteMessage.getNotification().getBody();
-        }
+            String notificationTitle = remoteMessage.getNotification().getTitle();
+            String notificationBody = remoteMessage.getNotification().getBody();
+            String notificationImageUrl = remoteMessage.getNotification().getIcon();
+            String postId = remoteMessage.getData().get(POST_ID_KEY);
 
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
-        sendNotification(notificationTitle, notificationBody);
+            Intent intent = new Intent(this, PostDetailsActivity.class);
+            intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, postId);
+
+            sendNotification(notificationTitle, notificationBody, notificationImageUrl, intent);
+        } else {
+            LogUtil.logError(TAG, "parseCommentOrLike()", new RuntimeException("FCM remoteMessage doesn't contains Notification"));
+        }
     }
 
 
-    private void sendNotification(String notificationTitle, String notificationBody) {
-        Intent intent = new Intent(this, MainActivity.class);
+    private void sendNotification(String notificationTitle, String notificationBody, String largeImageUrl, Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);

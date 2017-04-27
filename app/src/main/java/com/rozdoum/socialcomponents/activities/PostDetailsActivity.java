@@ -17,8 +17,8 @@
 
 package com.rozdoum.socialcomponents.activities;
 
-import android.app.ActivityOptions;
 import android.annotation.TargetApi;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,7 +26,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
@@ -81,13 +81,14 @@ import java.util.List;
 
 public class PostDetailsActivity extends BaseActivity {
 
-    public static final String POST_EXTRA_KEY = "PostDetailsActivity.POST_EXTRA_KEY";
+    public static final String POST_ID_EXTRA_KEY = "PostDetailsActivity.POST_ID_EXTRA_KEY";
     public static final String AUTHOR_ANIMATION_NEEDED_EXTRA_KEY = "PostDetailsActivity.AUTHOR_ANIMATION_NEEDED_EXTRA_KEY";
     private static final int TIME_OUT_LOADING_COMMENTS = 30000;
     public static final int UPDATE_POST_REQUEST = 1;
     public static final String POST_STATUS_EXTRA_KEY = "PostDetailsActivity.POST_STATUS_EXTRA_KEY";
 
     private EditText commentEditText;
+    @Nullable
     private Post post;
     private ScrollView scrollView;
     private ViewGroup likesContainer;
@@ -111,6 +112,8 @@ public class PostDetailsActivity extends BaseActivity {
     private CommentsAdapter commentsAdapter;
 
     private MenuItem complainActionMenuItem;
+    private MenuItem editActionMenuItem;
+    private MenuItem deleteActionMenuItem;
 
     private String postId;
 
@@ -134,8 +137,7 @@ public class PostDetailsActivity extends BaseActivity {
         postManager = PostManager.getInstance(this);
 
         isAuthorAnimationRequired = getIntent().getBooleanExtra(AUTHOR_ANIMATION_NEEDED_EXTRA_KEY, false);
-        post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
-        postId = post.getId();
+        postId = getIntent().getStringExtra(POST_ID_EXTRA_KEY);
 
         incrementWatchersCount();
 
@@ -181,7 +183,6 @@ public class PostDetailsActivity extends BaseActivity {
                 openProfileActivity(authorId, view);
             }
         });
-        initLikes();
 
         postManager.getPost(this, postId, createOnPostChangeListener());
         postManager.getCommentsList(this, postId, createOnCommentsChangedDataListener(commentsAdapter));
@@ -237,7 +238,9 @@ public class PostDetailsActivity extends BaseActivity {
         View.OnClickListener onAuthorClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openProfileActivity(post.getAuthorId(), v);
+                if (post != null) {
+                    openProfileActivity(post.getAuthorId(), v);
+                }
             }
         };
 
@@ -252,12 +255,6 @@ public class PostDetailsActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         postManager.closeListeners(this);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        getIntent().putExtra(POST_EXTRA_KEY, post);
     }
 
     @Override
@@ -297,11 +294,8 @@ public class PostDetailsActivity extends BaseActivity {
             @Override
             public void onObjectChanged(Post obj) {
                 if (obj != null) {
-                    isPostExist = true;
                     post = obj;
-                    fillPostFields();
-                    updateCounters();
-                    initLikeButtonState();
+                    afterPostLoaded();
                 } else if (!postRemovingProcess) {
                     isPostExist = false;
                     Intent intent = getIntent();
@@ -326,6 +320,15 @@ public class PostDetailsActivity extends BaseActivity {
         };
     }
 
+    private void afterPostLoaded() {
+        isPostExist = true;
+        initLikes();
+        fillPostFields();
+        updateCounters();
+        initLikeButtonState();
+        updateOptionMenuVisibility();
+    }
+
     private void incrementWatchersCount() {
         postManager.incrementWatchersCount(postId);
         Intent intent = getIntent();
@@ -346,20 +349,26 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void scrollToFirstComment() {
-        if (post.getCommentsCount() > 0) {
+        if (post != null && post.getCommentsCount() > 0) {
             scrollView.smoothScrollTo(0, commentsLabel.getTop());
         }
     }
 
     private void fillPostFields() {
-        titleTextView.setText(post.getTitle());
-        descriptionEditText.setText(post.getDescription());
+        if (post != null) {
+            titleTextView.setText(post.getTitle());
+            descriptionEditText.setText(post.getDescription());
 
-        loadPostDetailsImage();
-        loadAuthorImage();
+            loadPostDetailsImage();
+            loadAuthorImage();
+        }
     }
 
     private void loadPostDetailsImage() {
+        if (post == null) {
+            return;
+        }
+
         String imageUrl = post.getImagePath();
         int width = Utils.getDisplayWidth(this);
         int height = (int) getResources().getDimension(R.dimen.post_detail_image_height);
@@ -399,12 +408,16 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void loadAuthorImage() {
-        if (post.getAuthorId() != null) {
+        if (post != null && post.getAuthorId() != null) {
             profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener());
         }
     }
 
     private void updateCounters() {
+        if (post == null) {
+            return;
+        }
+
         long commentsCount = post.getCommentsCount();
         commentsCountTextView.setText(String.valueOf(commentsCount));
         commentsLabel.setText(String.format(getString(R.string.label_comments), commentsCount));
@@ -471,9 +484,11 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void openImageDetailScreen() {
-        Intent intent = new Intent(this, ImageDetailActivity.class);
-        intent.putExtra(ImageDetailActivity.IMAGE_URL_EXTRA_KEY, post.getImagePath());
-        startActivity(intent);
+        if (post != null) {
+            Intent intent = new Intent(this, ImageDetailActivity.class);
+            intent.putExtra(ImageDetailActivity.IMAGE_URL_EXTRA_KEY, post.getImagePath());
+            startActivity(intent);
+        }
     }
 
     private void openProfileActivity(String userId, View view) {
@@ -502,7 +517,7 @@ public class PostDetailsActivity extends BaseActivity {
 
     private void initLikeButtonState() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser != null) {
+        if (firebaseUser != null && post != null) {
             postManager.hasCurrentUserLike(this, post.getId(), firebaseUser.getUid(), createOnLikeObjectExistListener());
         }
     }
@@ -539,6 +554,10 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void sendComment() {
+        if (post == null) {
+            return;
+        }
+
         String commentText = commentEditText.getText().toString();
 
         if (commentText.length() > 0 && isPostExist) {
@@ -567,20 +586,18 @@ public class PostDetailsActivity extends BaseActivity {
 
     private boolean hasAccess() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        return currentUser != null && post.getAuthorId().equals(currentUser.getUid());
+        return currentUser != null && post != null && post.getAuthorId().equals(currentUser.getUid());
     }
 
-    private void updateOptionMenuVisibility(Menu menu) {
-        if (hasAccess()) {
-            menu.findItem(R.id.edit_post_action).setVisible(true);
-            menu.findItem(R.id.delete_post_action).setVisible(true);
+    private void updateOptionMenuVisibility() {
+        if (editActionMenuItem != null && deleteActionMenuItem != null && hasAccess()) {
+            editActionMenuItem.setVisible(true);
+            deleteActionMenuItem.setVisible(true);
         }
-    }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        updateOptionMenuVisibility(menu);
-        return super.onPrepareOptionsMenu(menu);
+        if (complainActionMenuItem != null && post != null && !post.isHasComplain()) {
+            complainActionMenuItem.setVisible(true);
+        }
     }
 
     @Override
@@ -588,11 +605,12 @@ public class PostDetailsActivity extends BaseActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.post_details_menu, menu);
         complainActionMenuItem = menu.findItem(R.id.complain_action);
-        if (post.isHasComplain()) {
-            complainActionMenuItem.setVisible(false);
-        }
+        editActionMenuItem = menu.findItem(R.id.edit_post_action);
+        deleteActionMenuItem = menu.findItem(R.id.delete_post_action);
 
-        updateOptionMenuVisibility(menu);
+        if (post != null) {
+            updateOptionMenuVisibility();
+        }
         return true;
     }
 

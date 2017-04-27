@@ -244,7 +244,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     private void openPostDetailsActivity(Post post, View v) {
         Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
-        intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+        intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
         intent.putExtra(PostDetailsActivity.AUTHOR_ANIMATION_NEEDED_EXTRA_KEY, true);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

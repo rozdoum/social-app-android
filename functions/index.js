@@ -3,6 +3,9 @@ var functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
+const actionTypeNewLike = "new_like"
+const actionTypeNewComment = "new_comment"
+
 exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{authorId}/{likeId}').onWrite(event => {
 
     console.log('New like was added');
@@ -32,14 +35,20 @@ exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{au
             }
 
             console.log('There are', tokensSnapshot.numChildren(), 'tokens to send notifications to.');
-            console.log('Fetched Post Author profile', likeAuthorProfile);
+            console.log('Fetched like Author profile', likeAuthorProfile);
 
             // Create a notification
             const payload = {
                 notification: {
                     title: 'You have a new like!',
                     body: `${likeAuthorProfile.username} liked your post`,
+                    icon: post.val().imagePath,
                     sound: 'default'
+                },
+                data : {
+                    actionType: actionTypeNewLike,
+                    postId: postId,
+
                 },
             };
 
@@ -105,7 +114,12 @@ exports.pushNotificationComments = functions.database.ref('/post-comments/{postI
                 notification: {
                     title: 'You have a new comment!',
                     body: `${commentAuthorProfile.username} commented your post`,
+                    icon: post.val().imagePath,
                     sound: 'default'
+                },
+                data : {
+                    actionType: actionTypeNewComment,
+                    postId: postId,
                 },
             };
 
