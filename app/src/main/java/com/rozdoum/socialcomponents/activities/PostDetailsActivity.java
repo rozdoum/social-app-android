@@ -590,12 +590,12 @@ public class PostDetailsActivity extends BaseActivity {
     }
 
     private void updateOptionMenuVisibility() {
-        if (hasAccess()) {
+        if (editActionMenuItem != null && deleteActionMenuItem != null && hasAccess()) {
             editActionMenuItem.setVisible(true);
             deleteActionMenuItem.setVisible(true);
         }
 
-        if (post != null && !post.isHasComplain()) {
+        if (complainActionMenuItem != null && post != null && !post.isHasComplain()) {
             complainActionMenuItem.setVisible(true);
         }
     }
@@ -607,6 +607,10 @@ public class PostDetailsActivity extends BaseActivity {
         complainActionMenuItem = menu.findItem(R.id.complain_action);
         editActionMenuItem = menu.findItem(R.id.edit_post_action);
         deleteActionMenuItem = menu.findItem(R.id.delete_post_action);
+
+        if (post != null) {
+            updateOptionMenuVisibility();
+        }
         return true;
     }
 
