@@ -48,4 +48,6 @@
 
     <!--post card content_padding left = card_elevation + card_padding-->
     <dimen name="post_card_content_padding_left">11dp</dimen>
+
+    <dimen name="post_counter_radius">16dp</dimen>
 </resources>

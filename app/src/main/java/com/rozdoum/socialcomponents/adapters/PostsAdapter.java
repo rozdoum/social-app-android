@@ -153,6 +153,7 @@ public class PostsAdapter extends BasePostsAdapter {
 
     public void loadFirstPage() {
         loadNext(0);
+        PostManager.getInstance(mainActivity.getApplicationContext()).clearNewPostsCounter();
     }
 
     private void loadNext(final long nextItemCreatedDate) {

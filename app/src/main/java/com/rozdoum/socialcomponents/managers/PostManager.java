@@ -49,6 +49,8 @@ public class PostManager extends FirebaseListenersManager {
 
     private static final String TAG = PostManager.class.getSimpleName();
     private static PostManager instance;
+    private int newPostsCounter = 0;
+    private PostCounterWatcher postCounterWatcher;
 
     private Context context;
 
@@ -184,5 +186,33 @@ public class PostManager extends FirebaseListenersManager {
     public void incrementWatchersCount(String postId) {
         DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
         databaseHelper.incrementWatchersCount(postId);
+    }
+
+    public void incrementNewPostsCounter() {
+        newPostsCounter++;
+        notifyPostCounterWatcher();
+    }
+
+    public void clearNewPostsCounter() {
+        newPostsCounter = 0;
+        notifyPostCounterWatcher();
+    }
+
+    public int getNewPostsCounter() {
+        return newPostsCounter;
+    }
+
+    public void setPostCounterWatcher(PostCounterWatcher postCounterWatcher) {
+        this.postCounterWatcher = postCounterWatcher;
+    }
+
+    private void notifyPostCounterWatcher() {
+        if (postCounterWatcher != null) {
+            postCounterWatcher.onPostCounterChanged(newPostsCounter);
+        }
+    }
+
+    public interface PostCounterWatcher {
+        void onPostCounterChanged(int newValue);
     }
 }

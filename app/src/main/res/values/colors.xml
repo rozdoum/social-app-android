@@ -18,6 +18,7 @@
     <color name="send_button_color">@color/primary</color>
 
     <color name="light_gray">#d8d6d5</color>
+    <color name="posts_counter_bg">#df3e3e3e</color>
 
     <color name="like_icon_activated">#FF5252</color>
     <color name="icons_counter_color">#828181</color>

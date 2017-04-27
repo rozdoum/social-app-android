@@ -1,28 +1,30 @@
 /*
- * Copyright 2017 Rozdoum
+ *  Copyright 2017 Rozdoum
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 package com.rozdoum.socialcomponents.activities;
 
+import android.animation.Animator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -31,26 +33,39 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.AnimationUtils;
 
 public class MainActivity extends BaseActivity {
-    private static final String TAG = LoginActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private PostsAdapter postsAdapter;
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
 
     private ProfileManager profileManager;
+    private PostManager postManager;
+    private int counter;
+    private TextView newPostsCounterTextView;
+    private PostManager.PostCounterWatcher postCounterWatcher;
+    private boolean counterAnimationInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +76,55 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         profileManager = ProfileManager.getInstance(this);
+        postManager = PostManager.getInstance(this);
         initContentView();
+
+        postCounterWatcher = new PostManager.PostCounterWatcher() {
+            @Override
+            public void onPostCounterChanged(int newValue) {
+                updateNewPostCounter();
+            }
+        };
+
+        postManager.setPostCounterWatcher(postCounterWatcher);
+
+//        setOnLikeAddedListener();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateNewPostCounter();
+    }
+
+    private void setOnLikeAddedListener() {
+        DatabaseHelper.getInstance(this).onNewLikeAddedListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                counter++;
+                showSnackBar("You have " + counter + " new likes");
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -117,6 +180,14 @@ public class MainActivity extends BaseActivity {
                 });
             }
 
+            newPostsCounterTextView = (TextView) findViewById(R.id.newPostsCounterTextView);
+            newPostsCounterTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    refreshPostList();
+                }
+            });
+
             final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
             SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -151,7 +222,46 @@ public class MainActivity extends BaseActivity {
             ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
             recyclerView.setAdapter(postsAdapter);
             postsAdapter.loadFirstPage();
+            updateNewPostCounter();
+
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    hideCounterView();
+                    super.onScrolled(recyclerView, dx, dy);
+                }
+            });
         }
+    }
+
+    private void hideCounterView() {
+        if (!counterAnimationInProgress && newPostsCounterTextView.getVisibility() == View.VISIBLE) {
+            counterAnimationInProgress = true;
+            AlphaAnimation alphaAnimation = AnimationUtils.hideViewByAlpha(newPostsCounterTextView);
+            alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    counterAnimationInProgress = false;
+                    newPostsCounterTextView.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            alphaAnimation.start();
+        }
+    }
+
+    private void showCounterView() {
+        AnimationUtils.showViewByScaleAndVisibility(newPostsCounterTextView);
     }
 
     private void openPostDetailsActivity(Post post, View v) {
@@ -212,6 +322,27 @@ public class MainActivity extends BaseActivity {
         } else {
             startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
         }
+    }
+
+    private void updateNewPostCounter() {
+        Handler mainHandler = new Handler(this.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                int newPostsQuantity = postManager.getNewPostsCounter();
+
+                if (newPostsCounterTextView != null) {
+                    if (newPostsQuantity > 0) {
+                        showCounterView();
+
+                        String counterFormat = getResources().getQuantityString(R.plurals.new_posts_counter_format, newPostsQuantity, newPostsQuantity);
+                        newPostsCounterTextView.setText(String.format(counterFormat, newPostsQuantity));
+                    } else {
+                        hideCounterView();
+                    }
+                }
+            }
+        });
     }
 
     @Override

@@ -117,5 +117,11 @@
 
     <string name="post_image_transition_name" translatable="false">post_image_transition</string>
     <string name="post_author_image_transition_name" translatable="false">post_author_image_transition_name</string>
+    <string name="message_new_post_was_created">New post was created</string>
+
+    <plurals name="new_posts_counter_format">
+        <item quantity="one">%1$d new post</item>
+        <item quantity="other">%1$d new posts</item>
+    </plurals>
 
 </resources>
