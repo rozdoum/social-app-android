@@ -37,4 +37,8 @@ public class Constants {
     public static class Database {
         public static final int MAX_UPLOAD_RETRY_MILLIS = 60000; //1 minute
     }
+
+    public static class PushNotification {
+        public static final int LARGE_ICONE_SIZE = 256; //px
+    }
 }

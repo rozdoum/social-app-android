@@ -5,6 +5,7 @@ admin.initializeApp(functions.config().firebase);
 
 const actionTypeNewLike = "new_like"
 const actionTypeNewComment = "new_comment"
+const notificationTitle = "Social App"
 
 exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{authorId}/{likeId}').onWrite(event => {
 
@@ -39,14 +40,11 @@ exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{au
 
             // Create a notification
             const payload = {
-                notification: {
-                    title: 'You have a new like!',
-                    body: `${likeAuthorProfile.username} liked your post`,
-                    icon: post.val().imagePath,
-                    sound: 'default'
-                },
                 data : {
                     actionType: actionTypeNewLike,
+                    title: notificationTitle,
+                    body: `${likeAuthorProfile.username} liked your post`,
+                    icon: post.val().imagePath,
                     postId: postId,
 
                 },
@@ -111,14 +109,11 @@ exports.pushNotificationComments = functions.database.ref('/post-comments/{postI
 
             // Create a notification
             const payload = {
-                notification: {
-                    title: 'You have a new comment!',
-                    body: `${commentAuthorProfile.username} commented your post`,
-                    icon: post.val().imagePath,
-                    sound: 'default'
-                },
                 data : {
                     actionType: actionTypeNewComment,
+                    title: notificationTitle,
+                    body: `${commentAuthorProfile.username} commented your post`,
+                    icon: post.val().imagePath,
                     postId: postId,
                 },
             };
