@@ -28,6 +28,8 @@ import android.support.v4.app.NotificationCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rozdoum.socialcomponents.Constants;
@@ -46,6 +48,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
 
     private static final String POST_ID_KEY = "postId";
+    private static final String AUTHOR_ID_KEY = "authorId";
     private static final String ACTION_TYPE_KEY = "actionType";
     private static final String TITLE_KEY = "title";
     private static final String BODY_KEY = "body";
@@ -76,13 +79,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 parseCommentOrLike(remoteMessage);
                 break;
             case ACTION_TYPE_NEW_POST:
-                handleNewPostCreatedAction();
+                handleNewPostCreatedAction(remoteMessage);
                 break;
         }
     }
 
-    private void handleNewPostCreatedAction() {
-        PostManager.getInstance(this.getApplicationContext()).incrementNewPostsCounter();
+    private void handleNewPostCreatedAction(RemoteMessage remoteMessage) {
+        String postAuthorId = remoteMessage.getData().get(AUTHOR_ID_KEY);
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //Send notification for each users except author of post.
+        if (firebaseUser != null && !firebaseUser.getUid().equals(postAuthorId)) {
+            PostManager.getInstance(this.getApplicationContext()).incrementNewPostsCounter();
+        }
     }
 
     private void parseCommentOrLike(RemoteMessage remoteMessage) {

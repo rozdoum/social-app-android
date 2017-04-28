@@ -147,6 +147,8 @@ exports.pushNotificationComments = functions.database.ref('/post-comments/{postI
 });
 
 exports.pushNotificationNewPost = functions.database.ref('/posts/{postId}').onWrite(event => {
+    const postId = event.params.postId;
+
     // Only edit data when it is first created.
     if (event.data.previous.exists()) {
         console.log('Post was changed');
@@ -158,25 +160,36 @@ exports.pushNotificationNewPost = functions.database.ref('/posts/{postId}').onWr
         return;
     }
 
-     console.log('New post was created');
+    console.log('New post was created');
 
-      // Create a notification
-    const payload = {
-        data : {
-            actionType: actionTypeNewPost,
-        },
-    };
+    // Get post authorID.
+    const getAuthorIdTask = admin.database().ref(`/posts/${postId}/authorId`).once('value');
 
-    // Send a message to devices subscribed to the provided topic.
-    return admin.messaging().sendToTopic(postsTopic, payload)
-             .then(function(response) {
-               // See the MessagingTopicResponse reference documentation for the
-               // contents of response.
-               console.log("Successfully sent info about new post :", response);
-             })
-             .catch(function(error) {
-               console.log("Error sending info about new post:", error);
-             });
+     return getAuthorIdTask.then(authorId => {
+
+        console.log('post author id', authorId.val());
+
+          // Create a notification
+        const payload = {
+            data : {
+                actionType: actionTypeNewPost,
+                postId: postId,
+                authorId: authorId.val(),
+            },
+        };
+
+        // Send a message to devices subscribed to the provided topic.
+        return admin.messaging().sendToTopic(postsTopic, payload)
+                 .then(function(response) {
+                   // See the MessagingTopicResponse reference documentation for the
+                   // contents of response.
+                   console.log("Successfully sent info about new post :", response);
+                 })
+                 .catch(function(error) {
+                   console.log("Error sending info about new post:", error);
+                 });
+         });
+
 });
 
 
