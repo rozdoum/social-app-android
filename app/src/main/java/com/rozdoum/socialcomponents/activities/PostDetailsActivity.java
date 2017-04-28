@@ -500,9 +500,9 @@ public class PostDetailsActivity extends BaseActivity {
             ActivityOptions options = ActivityOptions.
                     makeSceneTransitionAnimation(PostDetailsActivity.this,
                             new android.util.Pair<>(view, getString(R.string.post_author_image_transition_name)));
-            startActivity(intent, options.toBundle());
+            startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST, options.toBundle());
         } else {
-            startActivity(intent);
+            startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
         }
     }
 

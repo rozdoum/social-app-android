@@ -132,6 +132,9 @@ public class MainActivity extends BaseActivity {
 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
+                case ProfileActivity.OPEN_PROFILE_REQUEST:
+                    break;
+
                 case CreatePostActivity.CREATE_NEW_POST_REQUEST:
                     refreshPostList();
                     showFloatButtonRelatedSnackBar(R.string.message_post_was_created);
@@ -314,9 +317,9 @@ public class MainActivity extends BaseActivity {
             ActivityOptions options = ActivityOptions.
                     makeSceneTransitionAnimation(MainActivity.this,
                             new android.util.Pair<>(authorImageView, getString(R.string.post_author_image_transition_name)));
-            startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST, options.toBundle());
+            startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST, options.toBundle());
         } else {
-            startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
+            startActivityForResult(intent, ProfileActivity.OPEN_PROFILE_REQUEST);
         }
     }
 
