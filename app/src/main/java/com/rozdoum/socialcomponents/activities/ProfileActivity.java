@@ -62,7 +62,6 @@ import com.rozdoum.socialcomponents.utils.LogoutHelper;
 
 public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = ProfileActivity.class.getSimpleName();
-    public static final int OPEN_PROFILE_REQUEST = 22;
     public static final String USER_ID_EXTRA_KEY = "ProfileActivity.USER_ID_EXTRA_KEY";
 
     // UI references.
@@ -126,12 +125,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        setResult(RESULT_OK);
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         loadProfile();
@@ -161,6 +154,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 case CreatePostActivity.CREATE_NEW_POST_REQUEST:
                     postsAdapter.loadPosts();
                     showSnackBar(R.string.message_post_was_created);
+                    setResult(RESULT_OK);
                     break;
 
                 case PostDetailsActivity.UPDATE_POST_REQUEST:
