@@ -47,6 +47,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
 
+    private static int notificationId = 0;
+
     private static final String POST_ID_KEY = "postId";
     private static final String AUTHOR_ID_KEY = "authorId";
     private static final String ACTION_TYPE_KEY = "actionType";
@@ -128,7 +130,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void sendNotification(String notificationTitle, String notificationBody, Bitmap bitmap, Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, notificationId++, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -144,6 +146,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0, notificationBuilder.build());
+        notificationManager.notify(notificationId++ /* ID of notification */, notificationBuilder.build());
     }
 }
