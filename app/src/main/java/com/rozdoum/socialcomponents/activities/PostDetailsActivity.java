@@ -17,6 +17,7 @@
 
 package com.rozdoum.socialcomponents.activities;
 
+import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.content.Context;
@@ -122,8 +123,10 @@ public class PostDetailsActivity extends BaseActivity {
     private LikeController likeController;
     private boolean postRemovingProcess = false;
     private boolean isPostExist;
+    private boolean authorAnimationInProgress = false;
 
     private boolean isAuthorAnimationRequired;
+    private boolean isEnterTransitionFinished = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +173,13 @@ public class PostDetailsActivity extends BaseActivity {
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     super.onTransitionEnd(transition);
-                    com.rozdoum.socialcomponents.utils.AnimationUtils.showViewByScale(authorImageView).start();
+                    //disable execution for exit transition
+                    if (!isEnterTransitionFinished) {
+                        isEnterTransitionFinished = true;
+                        com.rozdoum.socialcomponents.utils.AnimationUtils.showViewByScale(authorImageView)
+                                .setListener(authorAnimatorListener)
+                                .start();
+                    }
                 }
             });
         }
@@ -276,13 +285,16 @@ public class PostDetailsActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && isAuthorAnimationRequired) {
-            ViewPropertyAnimator hideAuthorAnimator = com.rozdoum.socialcomponents.utils.AnimationUtils.hideViewByScale(authorImageView);
-            hideAuthorAnimator.withEndAction(new Runnable() {
-                @Override
-                public void run() {
-                    PostDetailsActivity.super.onBackPressed();
-                }
-            });
+            if (!authorAnimationInProgress) {
+                ViewPropertyAnimator hideAuthorAnimator = com.rozdoum.socialcomponents.utils.AnimationUtils.hideViewByScale(authorImageView);
+                hideAuthorAnimator.setListener(authorAnimatorListener);
+                hideAuthorAnimator.withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        PostDetailsActivity.super.onBackPressed();
+                    }
+                });
+            }
 
         } else {
             super.onBackPressed();
@@ -727,5 +739,27 @@ public class PostDetailsActivity extends BaseActivity {
         complainActionMenuItem.setVisible(false);
         showSnackBar(R.string.complain_sent);
     }
+
+    Animator.AnimatorListener authorAnimatorListener = new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+            authorAnimationInProgress = true;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            authorAnimationInProgress = false;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            authorAnimationInProgress = false;
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+
+        }
+    };
 
 }
