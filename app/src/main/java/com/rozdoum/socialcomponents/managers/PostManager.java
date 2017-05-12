@@ -35,7 +35,6 @@ import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
-import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -89,11 +88,6 @@ public class PostManager extends FirebaseListenersManager {
 
     public void getSinglePostValue(String postId, OnPostChangedListener onPostChangedListener) {
         ApplicationHelper.getDatabaseHelper().getSinglePost(postId, onPostChangedListener);
-    }
-
-    public void getCommentsList(Context context, String postId, OnDataChangedListener<Comment> onDataChangedListener) {
-        ValueEventListener valueEventListener = ApplicationHelper.getDatabaseHelper().getCommentsList(postId, onDataChangedListener);
-        addListenerToMap(context, valueEventListener);
     }
 
     public void createOrUpdatePostWithImage(Uri imageUri, final OnPostCreatedListener onPostCreatedListener, final Post post) {

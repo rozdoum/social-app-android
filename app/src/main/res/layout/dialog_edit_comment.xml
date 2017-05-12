@@ -17,16 +17,19 @@
   ~
   -->
 
-<resources>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowEnterTransition">@transition/exclude_system_panel_animation</item>
-        <item name="actionModeBackground">@color/primary</item>
-    </style>
+    <EditText
+        android:id="@+id/editCommentEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="5"
+        android:layout_margin="@dimen/intrinsic_padding"
+        android:inputType="textMultiLine"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
 
-</resources>
+</LinearLayout>

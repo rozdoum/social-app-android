@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~
   ~ Copyright 2017 Rozdoum
   ~
@@ -17,16 +16,19 @@
   ~
   -->
 
-<resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/editMenuItem"
+        android:icon="@drawable/ic_edit_menu_item"
+        android:orderInCategory="2"
+        android:title="@string/edit_comment_menu_item"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/deleteMenuItem"
+        android:icon="@drawable/ic_delete_menu_item"
+        android:orderInCategory="3"
+        android:title="@string/delete_comment_menu_item"
+        app:showAsAction="ifRoom" />
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowEnterTransition">@transition/exclude_system_panel_animation</item>
-        <item name="actionModeBackground">@color/primary</item>
-    </style>
-
-</resources>
+</menu>

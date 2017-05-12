@@ -23,6 +23,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -237,7 +239,7 @@ public class DatabaseHelper {
         return desertRef.delete();
     }
 
-    public void createOrUpdateComment(String commentText, final String postId, final OnTaskCompleteListener onTaskCompleteListener) {
+    public void createComment(String commentText, final String postId, final OnTaskCompleteListener onTaskCompleteListener) {
         try {
             String authorId = firebaseAuth.getCurrentUser().getUid();
             DatabaseReference mCommentsReference = database.getReference().child("post-comments/" + postId);
@@ -282,8 +284,57 @@ public class DatabaseHelper {
                 }
             });
         } catch (Exception e) {
-            LogUtil.logError(TAG, "createOrUpdateComment()", e);
+            LogUtil.logError(TAG, "createComment()", e);
         }
+    }
+
+    public void updateComment(String commentId, String commentText, String postId, final OnTaskCompleteListener onTaskCompleteListener) {
+        DatabaseReference mCommentReference = database.getReference().child("post-comments").child(postId).child(commentId).child("text");
+        mCommentReference.setValue(commentText).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                if (onTaskCompleteListener != null) {
+                    onTaskCompleteListener.onTaskComplete(true);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (onTaskCompleteListener != null) {
+                    onTaskCompleteListener.onTaskComplete(false);
+                }
+                LogUtil.logError(TAG, "updateComment", e);
+            }
+        });
+    }
+
+    public void decrementCommentsCount(String postId, final OnTaskCompleteListener onTaskCompleteListener) {
+        DatabaseReference postRef = database.getReference("posts/" + postId + "/commentsCount");
+        postRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Integer currentValue = mutableData.getValue(Integer.class);
+                if (currentValue != null && currentValue >= 1) {
+                    mutableData.setValue(currentValue - 1);
+                }
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                LogUtil.logInfo(TAG, "Updating comments count transaction is completed.");
+                if (onTaskCompleteListener != null) {
+                    onTaskCompleteListener.onTaskComplete(true);
+                }
+            }
+        });
+    }
+
+    public Task<Void> removeComment(String commentId,  String postId) {
+        DatabaseReference databaseReference = database.getReference();
+        DatabaseReference postRef = databaseReference.child("post-comments").child(postId).child(commentId);
+        return postRef.removeValue();
     }
 
     public void onNewLikeAddedListener(ChildEventListener childEventListener) {
