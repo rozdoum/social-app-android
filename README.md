@@ -2,28 +2,27 @@ SocialComponents
 =============
 
 ## Summary
-This application demonstrates the example of social components as posts, likes, comments, watchers and etc. It based on firebase and used such firebase features as database, storage and authentication. Our app shows the work of firebase queries. For example data pagination, filter data by author. Also here is the example of working with firebase transaction for counting likes, watchers, comments. It is great example of material design. You can see the friendly animation by opening screens of details and user profile.
+This application is a pattern of social components comprising posts, likes, comments, views, and others that can be used for Android application development. It is Firebase-based  and uses such Firebase features as the database, storage, and authentication. Our app has Firebase queries implemented in it, i.e. data pagination, filtering data by an author. As well, it is the example of working with Firebase transaction for counting likes, views, and comments. Our application is the great example of material design. The user-friendly animation guides a person by opening screens of details and a user profile.
 
 ### Current build 
 
-The most recent app version is available on [Google Play](https://play.google.com/store/apps/details?id=com.rozdoum.socialcomponents)
+The latest app version is available on [Google Play](https://play.google.com/store/apps/details?id=com.rozdoum.socialcomponents)
 
  <!-- ### Full showcase of application -->
 
  <!-- [App video should be here](https://) -->
 
 ## Blog posts
-### Getting started - opening the app
+### Getting Started — Opening the App
 
 Implemented elements and features:
 
-* Hiding Toolbar when list is scrolling down and showing it again when it’s scrolling up.
+* Hiding Toolbar when the post list is scrolling down and showing it again when it’s scrolling up.
 * RecyclerView with CardViews
 * Float Action Button
 * Snack Bar for messages
-* Refresh screen
-* Loading posts by parts (Progress bar in the bottom of the screen for loading next part of posts)
-
+* Refresh a screen
+* Loading posts by parts (Progress bar in the bottom of the screen for loading the next portion of posts)
 
 ![main_screen](https://cloud.githubusercontent.com/assets/2683612/24905715/849ca6d2-1ebd-11e7-8684-2568c9f665ad.gif)
 
@@ -95,9 +94,9 @@ Implemented elements and features:
 
 Implemented elements and features:
 
-* Comments counte
+* Comments counter
 * Collapse / expand text of large comment
-* Date of commen
+* Date of a comment
 
 ![comments](https://cloud.githubusercontent.com/assets/2683612/24905274/0c849db8-1ebc-11e7-9407-bdfa25c3a818.gif)
 
@@ -143,3 +142,5 @@ Implemented elements and features:
 * Manage App Permissions on Android 6.0
 
 ![edit_profile](https://cloud.githubusercontent.com/assets/2683612/24905277/0c89a1dc-1ebc-11e7-912e-8ffbb6223e52.gif)
+
+The Social App is a Minimum Viable Product intended for building social features for an Android application. It is free to use for other developers. Though, our team is ready to create a mobile application for you implementing any social features you need, along with GPS-navigation functions, and an offline mode. Contact us to know more.
