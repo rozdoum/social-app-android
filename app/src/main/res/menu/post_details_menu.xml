@@ -6,7 +6,8 @@
         android:id="@+id/complain_action"
         android:title="@string/add_complain"
         app:showAsAction="never"
-        android:orderInCategory="1" />
+        android:orderInCategory="1"
+        android:visible="false"/>
 
     <item
         android:id="@+id/edit_post_action"

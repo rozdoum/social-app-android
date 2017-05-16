@@ -17,11 +17,8 @@
   ~
   -->
 
-<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
-    <fade>
-        <targets>
-            <target android:excludeId="@android:id/statusBarBackground" />
-            <target android:excludeId="@android:id/navigationBarBackground" />
-        </targets>
-    </fade>
-</transitionSet>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="@dimen/post_counter_radius" />
+    <solid android:color="@color/posts_counter_bg" />
+</shape>

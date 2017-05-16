@@ -1,17 +1,18 @@
 /*
- * Copyright 2017 Rozdoum
+ *  Copyright 2017 Rozdoum
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 package com.rozdoum.socialcomponents.managers;
@@ -24,6 +25,8 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,6 +35,8 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -122,14 +127,57 @@ public class DatabaseHelper {
         activeListeners.clear();
     }
 
-    public void createOrUpdateProfile(Profile profile, final OnProfileCreatedListener onProfileCreatedListener) {
+    public void createOrUpdateProfile(final Profile profile, final OnProfileCreatedListener onProfileCreatedListener) {
         DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
         Task<Void> task = databaseReference.child("profiles").child(profile.getId()).setValue(profile);
         task.addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 onProfileCreatedListener.onProfileCreated(task.isSuccessful());
+                addRegistrationToken(FirebaseInstanceId.getInstance().getToken(), profile.getId());
                 LogUtil.logDebug(TAG, "createOrUpdateProfile, success: " + task.isSuccessful());
+            }
+        });
+    }
+
+    public void updateRegistrationToken(final String token) {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            final String currentUserId = firebaseUser.getUid();
+
+            getProfileSingleValue(currentUserId, new OnObjectChangedListener<Profile>() {
+                @Override
+                public void onObjectChanged(Profile obj) {
+                    if(obj != null) {
+                        addRegistrationToken(token, currentUserId);
+                    } else {
+                        LogUtil.logError(TAG, "updateRegistrationToken",
+                                new RuntimeException("Profile is not found"));
+                    }
+                }
+            });
+        }
+    }
+
+    public void addRegistrationToken(String token, String userId) {
+        DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
+        Task<Void> task = databaseReference.child("profiles").child(userId).child("notificationTokens").child(token).setValue(true);
+        task.addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                LogUtil.logDebug(TAG, "addRegistrationToken, success: " + task.isSuccessful());
+            }
+        });
+    }
+
+    public void removeRegistrationToken(String token, String userId) {
+        DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
+        DatabaseReference tokenRef = databaseReference.child("profiles").child(userId).child("notificationTokens").child(token);
+        Task<Void> task = tokenRef.removeValue();
+        task.addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                LogUtil.logDebug(TAG, "removeRegistrationToken, success: " + task.isSuccessful());
             }
         });
     }
@@ -236,6 +284,11 @@ public class DatabaseHelper {
         } catch (Exception e) {
             LogUtil.logError(TAG, "createOrUpdateComment()", e);
         }
+    }
+
+    public void onNewLikeAddedListener(ChildEventListener childEventListener) {
+        DatabaseReference mLikesReference = database.getReference().child("post-likes");
+        mLikesReference.addChildEventListener(childEventListener);
     }
 
     public void createOrUpdateLike(final String postId, final String postAuthorId) {
@@ -653,5 +706,9 @@ public class DatabaseHelper {
                 LogUtil.logError(TAG, "isPostExistSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
+    }
+
+    public void subscribeToNewPosts() {
+        FirebaseMessaging.getInstance().subscribeToTopic("postsTopic");
     }
 }

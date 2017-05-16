@@ -22,7 +22,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -35,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -62,7 +62,7 @@ import com.rozdoum.socialcomponents.utils.LogoutHelper;
 
 public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = ProfileActivity.class.getSimpleName();
-    public static final int OPEN_PROFILE_REQUEST = 22;
+    public static final int CREATE_POST_FROM_PROFILE_REQUEST = 22;
     public static final String USER_ID_EXTRA_KEY = "ProfileActivity.USER_ID_EXTRA_KEY";
 
     // UI references.
@@ -72,6 +72,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     private ProgressBar progressBar;
     private TextView postsCounterTextView;
     private TextView postsLabelTextView;
+    private ProgressBar postsProgressBar;
 
     private FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
@@ -110,6 +111,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         postsCounterTextView = (TextView) findViewById(R.id.postsCounterTextView);
         likesCountersTextView = (TextView) findViewById(R.id.likesCountersTextView);
         postsLabelTextView = (TextView) findViewById(R.id.postsLabelTextView);
+        postsProgressBar = (ProgressBar) findViewById(R.id.postsProgressBar);
 
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -120,12 +122,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
         });
 
         loadPostsList();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setResult(RESULT_OK);
+        supportPostponeEnterTransition();
     }
 
     @Override
@@ -158,6 +155,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                 case CreatePostActivity.CREATE_NEW_POST_REQUEST:
                     postsAdapter.loadPosts();
                     showSnackBar(R.string.message_post_was_created);
+                    setResult(RESULT_OK);
                     break;
 
                 case PostDetailsActivity.UPDATE_POST_REQUEST:
@@ -212,11 +210,13 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                     }
 
                     swipeContainer.setRefreshing(false);
+                    hideLoadingPostsProgressBar();
                 }
 
                 @Override
                 public void onPostLoadingCanceled() {
                     swipeContainer.setRefreshing(false);
+                    hideLoadingPostsProgressBar();
                 }
             });
 
@@ -239,7 +239,7 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
 
     private void openPostDetailsActivity(Post post, View v) {
         Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
-        intent.putExtra(PostDetailsActivity.POST_EXTRA_KEY, post);
+        intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
         intent.putExtra(PostDetailsActivity.AUTHOR_ANIMATION_NEEDED_EXTRA_KEY, true);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -257,7 +257,6 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
     }
 
     private void loadProfile() {
-        showProgress();
         profileManager = ProfileManager.getInstance(this);
         profileManager.getProfileValue(ProfileActivity.this, userID, createOnProfileChangedListener());
     }
@@ -284,12 +283,14 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
                         .listener(new RequestListener<String, GlideDrawable>() {
                             @Override
                             public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                scheduleStartPostponedTransition(imageView);
                                 progressBar.setVisibility(View.GONE);
                                 return false;
                             }
 
                             @Override
                             public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                scheduleStartPostponedTransition(imageView);
                                 progressBar.setVisibility(View.GONE);
                                 return false;
                             }
@@ -304,7 +305,23 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             String likesLabel = getResources().getQuantityString(R.plurals.likes_counter_format, likesCount, likesCount);
             likesCountersTextView.setText(buildCounterSpannable(likesLabel, likesCount));
         }
-        hideProgress();
+    }
+
+    private void hideLoadingPostsProgressBar() {
+        if (postsProgressBar.getVisibility() != View.GONE) {
+            postsProgressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private void scheduleStartPostponedTransition(final ImageView imageView) {
+        imageView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                imageView.getViewTreeObserver().removeOnPreDrawListener(this);
+                supportStartPostponedEnterTransition();
+                return true;
+            }
+        });
     }
 
     private void startMainActivity() {
