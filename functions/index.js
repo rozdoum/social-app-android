@@ -22,6 +22,10 @@ exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{au
 
     return getPostTask.then(post => {
 
+        if (likeAuthorId == post.val().authorId) {
+            return console.log('User liked own post');
+        }
+
         // Get the list of device notification tokens.
         const getDeviceTokensTask = admin.database().ref(`/profiles/${post.val().authorId}/notificationTokens`).once('value');
         console.log('getDeviceTokensTask path: ', `/profiles/${post.val().authorId}/notificationTokens`)
@@ -91,6 +95,8 @@ exports.pushNotificationComments = functions.database.ref('/post-comments/{postI
 
     return getPostTask.then(post => {
 
+
+
         // Get the list of device notification tokens.
         const getDeviceTokensTask = admin.database().ref(`/profiles/${post.val().authorId}/notificationTokens`).once('value');
         console.log('getDeviceTokensTask path: ', `/profiles/${post.val().authorId}/notificationTokens`)
@@ -102,6 +108,10 @@ exports.pushNotificationComments = functions.database.ref('/post-comments/{postI
         Promise.all([getDeviceTokensTask, getCommentAuthorProfileTask]).then(results => {
             const tokensSnapshot = results[0];
             const commentAuthorProfile = results[1].val();
+
+            if (commentAuthorProfile.id == post.val().authorId) {
+                return console.log('User commented own post');
+            }
 
             // Check if there are any device tokens.
             if (!tokensSnapshot.hasChildren()) {
