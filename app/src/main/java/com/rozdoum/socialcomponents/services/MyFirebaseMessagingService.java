@@ -34,6 +34,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.activities.PostDetailsActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.utils.LogUtil;
@@ -100,12 +101,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String notificationImageUrl = remoteMessage.getData().get(ICON_KEY);
         String postId = remoteMessage.getData().get(POST_ID_KEY);
 
+        Intent backIntent = new Intent(this, MainActivity.class);
         Intent intent = new Intent(this, PostDetailsActivity.class);
         intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, postId);
 
         Bitmap bitmap = getBitmapFromUrl(notificationImageUrl);
 
-        sendNotification(notificationTitle, notificationBody, bitmap, intent);
+        sendNotification(notificationTitle, notificationBody, bitmap, intent, backIntent);
 
         LogUtil.logDebug(TAG, "Message Notification Body: " + remoteMessage.getData().get(BODY_KEY));
     }
@@ -127,9 +129,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendNotification(String notificationTitle, String notificationBody, Bitmap bitmap, Intent intent) {
+        sendNotification(notificationTitle, notificationBody, bitmap, intent, null);
+    }
+
+    private void sendNotification(String notificationTitle, String notificationBody, Bitmap bitmap, Intent intent, Intent backIntent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent;
+
+        if(backIntent != null) {
+            backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Intent[] intents = new Intent[] {backIntent, intent};
+            pendingIntent = PendingIntent.getActivities(this, 0, intents, PendingIntent.FLAG_ONE_SHOT);
+        } else {
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        }
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
