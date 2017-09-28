@@ -18,6 +18,7 @@ package com.rozdoum.socialcomponents.activities;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -82,12 +83,18 @@ public class ImageDetailActivity extends BaseActivity {
                 .asBitmap()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .fitCenter()
-                .error(R.drawable.ic_stub)
                 .into(new SimpleTarget<Bitmap>(maxImageSide, maxImageSide) {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         progressBar.setVisibility(View.GONE);
                         touchImageView.setImageBitmap(resource);
+                    }
+
+                    @Override
+                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        super.onLoadFailed(e, errorDrawable);
+                        progressBar.setVisibility(View.GONE);
+                        touchImageView.setImageResource(R.drawable.ic_stub);
                     }
                 });
 
