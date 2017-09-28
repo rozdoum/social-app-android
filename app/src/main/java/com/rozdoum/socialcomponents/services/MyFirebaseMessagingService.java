@@ -136,8 +136,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void sendNotification(String notificationTitle, String notificationBody, Bitmap bitmap, Intent intent, Intent backIntent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, notificationId++, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+
         PendingIntent pendingIntent;
 
         if(backIntent != null) {
