@@ -17,20 +17,10 @@
 
 buildscript {
     repositories {
-        maven { url 'https://maven.fabric.io/public' }
     }
 
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
-    }
 }
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
-
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-}
-
 
 android {
     compileSdkVersion 25
@@ -86,16 +76,11 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.1'
-
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.android.support:support-v4:25.1.0'
-
     compile 'com.google.firebase:firebase-auth:9.8.0'
     compile 'com.google.android.gms:play-services-auth:9.8.0'
     compile 'com.facebook.android:facebook-android-sdk:4.17.0'
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
-        transitive = true;
-    }
 }
 
 apply plugin: 'com.google.gms.google-services'
