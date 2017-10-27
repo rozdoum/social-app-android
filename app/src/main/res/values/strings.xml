@@ -124,4 +124,10 @@
         <item quantity="other">%1$d new posts</item>
     </plurals>
 
+    <string name="edit_comment_menu_item">Edit</string>
+    <string name="delete_comment_menu_item">Delete</string>
+    <string name="message_comment_was_removed">Comment was removed</string>
+    <string name="message_comment_was_edited">Comment was edited</string>
+    <string name="title_edit_comment">Edit comment</string>
+
 </resources>

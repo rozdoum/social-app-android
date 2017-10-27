@@ -34,6 +34,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.activities.PostDetailsActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.utils.LogUtil;
@@ -46,6 +47,8 @@ import com.rozdoum.socialcomponents.utils.LogUtil;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
+
+    private static int notificationId = 0;
 
     private static final String POST_ID_KEY = "postId";
     private static final String AUTHOR_ID_KEY = "authorId";
@@ -100,12 +103,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String notificationImageUrl = remoteMessage.getData().get(ICON_KEY);
         String postId = remoteMessage.getData().get(POST_ID_KEY);
 
+        Intent backIntent = new Intent(this, MainActivity.class);
         Intent intent = new Intent(this, PostDetailsActivity.class);
         intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, postId);
 
         Bitmap bitmap = getBitmapFromUrl(notificationImageUrl);
 
-        sendNotification(notificationTitle, notificationBody, bitmap, intent);
+        sendNotification(notificationTitle, notificationBody, bitmap, intent, backIntent);
 
         LogUtil.logDebug(TAG, "Message Notification Body: " + remoteMessage.getData().get(BODY_KEY));
     }
@@ -127,9 +131,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendNotification(String notificationTitle, String notificationBody, Bitmap bitmap, Intent intent) {
+        sendNotification(notificationTitle, notificationBody, bitmap, intent, null);
+    }
+
+    private void sendNotification(String notificationTitle, String notificationBody, Bitmap bitmap, Intent intent, Intent backIntent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+
+        PendingIntent pendingIntent;
+
+        if(backIntent != null) {
+            backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Intent[] intents = new Intent[] {backIntent, intent};
+            pendingIntent = PendingIntent.getActivities(this, notificationId++, intents, PendingIntent.FLAG_ONE_SHOT);
+        } else {
+            pendingIntent = PendingIntent.getActivity(this, notificationId++, intent, PendingIntent.FLAG_ONE_SHOT);
+        }
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
@@ -144,6 +160,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0, notificationBuilder.build());
+        notificationManager.notify(notificationId++ /* ID of notification */, notificationBuilder.build());
     }
 }

@@ -127,12 +127,14 @@
                 android:paddingLeft="@dimen/large_intrinsic_padding"
                 android:paddingRight="@dimen/large_intrinsic_padding">
 
-                <LinearLayout
-                    android:id="@+id/commentsContainer"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/commentsRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    app:layoutManager="LinearLayoutManager"
+                    tools:listitem="@layout/comment_list_item" />
 
                 <ProgressBar
                     android:id="@+id/commentsProgressBar"
