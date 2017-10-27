@@ -289,7 +289,8 @@ public class ExpandableTextView extends LinearLayout implements View.OnClickList
 
     private void findViews() {
         mTv = (TextView) findViewById(R.id.expandable_text);
-        mTv.setOnClickListener(this);
+        // TODO: 12.05.17 for enabling expand/collapse comment by click on text remove comment
+//        mTv.setOnClickListener(this);
         mButton = (TextView) findViewById(R.id.expand_collapse);
         mButton.setText(mCollapsed ? mExpandText : mCollapseText);
         mButton.setOnClickListener(this);

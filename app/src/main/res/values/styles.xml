@@ -5,6 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="actionModeBackground">@color/primary</item>
     </style>
 
     <style name="AppCompat.Black.NoActionBar" parent="Theme.AppCompat.NoActionBar">

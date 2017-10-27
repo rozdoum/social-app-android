@@ -17,6 +17,7 @@
 
 package com.rozdoum.socialcomponents.activities;
 
+import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.content.Context;
@@ -29,6 +30,10 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Transition;
@@ -44,7 +49,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -56,13 +60,14 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.controllers.LikeController;
+import com.rozdoum.socialcomponents.dialogs.EditCommentDialog;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.listeners.CustomTransitionListener;
+import com.rozdoum.socialcomponents.managers.CommentManager;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
@@ -79,7 +84,7 @@ import com.rozdoum.socialcomponents.utils.Utils;
 
 import java.util.List;
 
-public class PostDetailsActivity extends BaseActivity {
+public class PostDetailsActivity extends BaseActivity implements EditCommentDialog.CommentDialogCallback {
 
     public static final String POST_ID_EXTRA_KEY = "PostDetailsActivity.POST_ID_EXTRA_KEY";
     public static final String AUTHOR_ANIMATION_NEEDED_EXTRA_KEY = "PostDetailsActivity.AUTHOR_ANIMATION_NEEDED_EXTRA_KEY";
@@ -105,11 +110,10 @@ public class PostDetailsActivity extends BaseActivity {
     private TextView titleTextView;
     private TextView descriptionEditText;
     private ProgressBar commentsProgressBar;
-    private LinearLayout commentsContainer;
+    private RecyclerView commentsRecyclerView;
     private TextView warningCommentsTextView;
 
     private boolean attemptToLoadComments = false;
-    private CommentsAdapter commentsAdapter;
 
     private MenuItem complainActionMenuItem;
     private MenuItem editActionMenuItem;
@@ -118,12 +122,17 @@ public class PostDetailsActivity extends BaseActivity {
     private String postId;
 
     private PostManager postManager;
+    private CommentManager commentManager;
     private ProfileManager profileManager;
     private LikeController likeController;
     private boolean postRemovingProcess = false;
     private boolean isPostExist;
+    private boolean authorAnimationInProgress = false;
 
     private boolean isAuthorAnimationRequired;
+    private CommentsAdapter commentsAdapter;
+    private ActionMode mActionMode;
+    private boolean isEnterTransitionFinished = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +144,7 @@ public class PostDetailsActivity extends BaseActivity {
 
         profileManager = ProfileManager.getInstance(this);
         postManager = PostManager.getInstance(this);
+        commentManager = CommentManager.getInstance(this);
 
         isAuthorAnimationRequired = getIntent().getBooleanExtra(AUTHOR_ANIMATION_NEEDED_EXTRA_KEY, false);
         postId = getIntent().getStringExtra(POST_ID_EXTRA_KEY);
@@ -145,7 +155,7 @@ public class PostDetailsActivity extends BaseActivity {
         descriptionEditText = (TextView) findViewById(R.id.descriptionEditText);
         postImageView = (ImageView) findViewById(R.id.postImageView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        commentsContainer = (LinearLayout) findViewById(R.id.commentsContainer);
+        commentsRecyclerView = (RecyclerView) findViewById(R.id.commentsRecyclerView);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         commentsLabel = (TextView) findViewById(R.id.commentsLabel);
         commentEditText = (EditText) findViewById(R.id.commentEditText);
@@ -170,22 +180,23 @@ public class PostDetailsActivity extends BaseActivity {
                 @Override
                 public void onTransitionEnd(Transition transition) {
                     super.onTransitionEnd(transition);
-                    com.rozdoum.socialcomponents.utils.AnimationUtils.showViewByScale(authorImageView).start();
+                    //disable execution for exit transition
+                    if (!isEnterTransitionFinished) {
+                        isEnterTransitionFinished = true;
+                        com.rozdoum.socialcomponents.utils.AnimationUtils.showViewByScale(authorImageView)
+                                .setListener(authorAnimatorListener)
+                                .start();
+                    }
                 }
             });
         }
 
         final Button sendButton = (Button) findViewById(R.id.sendButton);
 
-        commentsAdapter = new CommentsAdapter(commentsContainer, new CommentsAdapter.OnAuthorClickListener() {
-            @Override
-            public void onAuthorClick(String authorId, View view) {
-                openProfileActivity(authorId, view);
-            }
-        });
+        initRecyclerView();
 
         postManager.getPost(this, postId, createOnPostChangeListener());
-        postManager.getCommentsList(this, postId, createOnCommentsChangedDataListener(commentsAdapter));
+
 
         postImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -276,16 +287,52 @@ public class PostDetailsActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && isAuthorAnimationRequired) {
-            ViewPropertyAnimator hideAuthorAnimator = com.rozdoum.socialcomponents.utils.AnimationUtils.hideViewByScale(authorImageView);
-            hideAuthorAnimator.withEndAction(new Runnable() {
-                @Override
-                public void run() {
-                    PostDetailsActivity.super.onBackPressed();
-                }
-            });
+            if (!authorAnimationInProgress) {
+                ViewPropertyAnimator hideAuthorAnimator = com.rozdoum.socialcomponents.utils.AnimationUtils.hideViewByScale(authorImageView);
+                hideAuthorAnimator.setListener(authorAnimatorListener);
+                hideAuthorAnimator.withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        PostDetailsActivity.super.onBackPressed();
+                    }
+                });
+            }
 
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void initRecyclerView() {
+        commentsAdapter = new CommentsAdapter();
+        commentsAdapter.setCallback(new CommentsAdapter.Callback() {
+            @Override
+            public void onLongItemClick(View view, int position) {
+                Comment selectedComment = commentsAdapter.getItemByPosition(position);
+                startActionMode(selectedComment);
+            }
+
+            @Override
+            public void onAuthorClick(String authorId, View view) {
+                openProfileActivity(authorId, view);
+            }
+        });
+        commentsRecyclerView.setAdapter(commentsAdapter);
+        commentsRecyclerView.setNestedScrollingEnabled(false);
+        commentsRecyclerView.addItemDecoration(new DividerItemDecoration(commentsRecyclerView.getContext(),
+                ((LinearLayoutManager) commentsRecyclerView.getLayoutManager()).getOrientation()));
+
+        commentManager.getCommentsList(this, postId, createOnCommentsChangedDataListener());
+    }
+
+    private void startActionMode(Comment selectedComment) {
+        if (mActionMode != null) {
+            return;
+        }
+
+        //check access to modify or remove post
+        if (hasAccessToEditComment(selectedComment.getAuthorId()) || hasAccessToModifyPost()) {
+            mActionMode = startSupportActionMode(new ActionModeCallback(selectedComment));
         }
     }
 
@@ -454,7 +501,7 @@ public class PostDetailsActivity extends BaseActivity {
         };
     }
 
-    private OnDataChangedListener<Comment> createOnCommentsChangedDataListener(final CommentsAdapter commentsAdapter) {
+    private OnDataChangedListener<Comment> createOnCommentsChangedDataListener() {
         attemptToLoadComments = true;
 
         final Handler handler = new Handler();
@@ -474,11 +521,9 @@ public class PostDetailsActivity extends BaseActivity {
             public void onListChanged(List<Comment> list) {
                 attemptToLoadComments = false;
                 commentsProgressBar.setVisibility(View.GONE);
-                if (list.size() > 0) {
-                    commentsContainer.setVisibility(View.VISIBLE);
-                    warningCommentsTextView.setVisibility(View.GONE);
-                    commentsAdapter.setList(list);
-                }
+                commentsRecyclerView.setVisibility(View.VISIBLE);
+                warningCommentsTextView.setVisibility(View.GONE);
+                commentsAdapter.setList(list);
             }
         };
     }
@@ -561,7 +606,7 @@ public class PostDetailsActivity extends BaseActivity {
         String commentText = commentEditText.getText().toString();
 
         if (commentText.length() > 0 && isPostExist) {
-            ApplicationHelper.getDatabaseHelper().createOrUpdateComment(commentText, post.getId(), new OnTaskCompleteListener() {
+            commentManager.createOrUpdateComment(commentText, post.getId(), new OnTaskCompleteListener() {
                 @Override
                 public void onTaskComplete(boolean success) {
                     if (success) {
@@ -584,13 +629,18 @@ public class PostDetailsActivity extends BaseActivity {
         }
     }
 
-    private boolean hasAccess() {
+    private boolean hasAccessToEditComment(String commentAuthorId) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        return currentUser != null && commentAuthorId.equals(currentUser.getUid());
+    }
+
+    private boolean hasAccessToModifyPost() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         return currentUser != null && post != null && post.getAuthorId().equals(currentUser.getUid());
     }
 
     private void updateOptionMenuVisibility() {
-        if (editActionMenuItem != null && deleteActionMenuItem != null && hasAccess()) {
+        if (editActionMenuItem != null && deleteActionMenuItem != null && hasAccessToModifyPost()) {
             editActionMenuItem.setVisible(true);
             deleteActionMenuItem.setVisible(true);
         }
@@ -627,13 +677,13 @@ public class PostDetailsActivity extends BaseActivity {
                 return true;
 
             case R.id.edit_post_action:
-                if (hasAccess()) {
+                if (hasAccessToModifyPost()) {
                     openEditPostActivity();
                 }
                 return true;
 
             case R.id.delete_post_action:
-                if (hasAccess()) {
+                if (hasAccessToModifyPost()) {
                     attemptToRemovePost();
                 }
                 return true;
@@ -727,5 +777,113 @@ public class PostDetailsActivity extends BaseActivity {
         complainActionMenuItem.setVisible(false);
         showSnackBar(R.string.complain_sent);
     }
+
+    private void removeComment(String commentId, final ActionMode mode, final int position) {
+        showProgress();
+        commentManager.removeComment(commentId, postId, new OnTaskCompleteListener() {
+            @Override
+            public void onTaskComplete(boolean success) {
+                hideProgress();
+                mode.finish(); // Action picked, so close the CAB
+                showSnackBar(R.string.message_comment_was_removed);
+            }
+        });
+    }
+
+    private void openEditCommentDialog(Comment comment) {
+        EditCommentDialog editCommentDialog = new EditCommentDialog();
+        Bundle args = new Bundle();
+        args.putString(EditCommentDialog.COMMENT_TEXT_KEY, comment.getText());
+        args.putString(EditCommentDialog.COMMENT_ID_KEY, comment.getId());
+        editCommentDialog.setArguments(args);
+        editCommentDialog.show(getFragmentManager(), EditCommentDialog.TAG);
+    }
+
+    private void updateComment(String newText, String commentId) {
+        showProgress();
+        commentManager.updateComment(commentId, newText, postId, new OnTaskCompleteListener() {
+            @Override
+            public void onTaskComplete(boolean success) {
+                hideProgress();
+                showSnackBar(R.string.message_comment_was_edited);
+            }
+        });
+    }
+
+    @Override
+    public void onCommentChanged(String newText, String commentId) {
+        updateComment(newText, commentId);
+    }
+
+    private class ActionModeCallback implements ActionMode.Callback {
+        Comment selectedComment;
+        int position;
+
+        ActionModeCallback(Comment selectedComment) {
+            this.selectedComment = selectedComment;
+        }
+
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.comment_context_menu, menu);
+
+            menu.findItem(R.id.editMenuItem).setVisible(hasAccessToEditComment(selectedComment.getAuthorId()));
+
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.editMenuItem:
+                    openEditCommentDialog(selectedComment);
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                case R.id.deleteMenuItem:
+                    removeComment(selectedComment.getId(), mode, position);
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+        }
+    }
+    Animator.AnimatorListener authorAnimatorListener = new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+            authorAnimationInProgress = true;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            authorAnimationInProgress = false;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            authorAnimationInProgress = false;
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+
+        }
+    };
 
 }
