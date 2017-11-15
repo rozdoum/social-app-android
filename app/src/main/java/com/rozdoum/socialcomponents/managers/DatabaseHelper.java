@@ -492,6 +492,7 @@ public class DatabaseHelper {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 LogUtil.logError(TAG, "getPostList(), onCancelled", new Exception(databaseError.getMessage()));
+                onDataChangedListener.onCanceled(context.getString(R.string.permission_denied_error));
             }
         });
     }

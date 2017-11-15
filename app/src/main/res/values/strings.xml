@@ -1,3 +1,20 @@
+<!--
+  ~  Copyright 2017 Rozdoum
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
 <resources>
     <string name="app_name">Social App</string>
     <string name="label_create_post_activity">Create post</string>
@@ -129,5 +146,8 @@
     <string name="message_comment_was_removed">Comment was removed</string>
     <string name="message_comment_was_edited">Comment was edited</string>
     <string name="title_edit_comment">Edit comment</string>
+
+    <!--Firebase errors-->
+    <string name="permission_denied_error">Please check your rules to access the Firebase Realtime Database</string>
 
 </resources>
