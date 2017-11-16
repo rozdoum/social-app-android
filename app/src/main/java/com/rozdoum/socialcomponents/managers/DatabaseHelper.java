@@ -456,7 +456,7 @@ public class DatabaseHelper {
     }
 
     public UploadTask uploadImage(Uri uri, String imageTitle) {
-        StorageReference storageRef = storage.getReferenceFromUrl("gs://socialcomponents.appspot.com");
+        StorageReference storageRef = storage.getReferenceFromUrl(context.getResources().getString(R.string.storage_link));
         StorageReference riversRef = storageRef.child("images/" + imageTitle);
         // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
