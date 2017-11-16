@@ -15,11 +15,11 @@ The latest app version is available on [Google Play](https://play.google.com/sto
 Setup steps
 ===========
 
- 1. First of all you need google-services.json. Create a Firebase project in the [Firebase console](https://console.firebase.google.com/), if you don't already have one. Go to your project and click ‘Add Firebase to your Android app’. Follow the setup steps. At the end, you'll download a google-services.json file which you add to your project.
+ 1. First of all you need google-services.json. Create a Firebase project in the [Firebase console](https://console.firebase.google.com/), if you don't already have one. Go to your project and click ‘Add Firebase to your Android app’. Follow the setup steps. At the end, you'll download a google-services.json file which you should add to your project.
 
  ![google_service_json](https://user-images.githubusercontent.com/7821425/32899277-30da3374-caf3-11e7-86e0-58cb1bfd59e2.png)
 
- 2. Setup realtime database. In firebase console go to DEVELOP->Database-> Get Started -> choose tab ‘RULES’ and paste this:
+ 2. Setup realtime database. In firebase console go to DEVELOP->Database-> Get Started -> choose tab ‘RULES’ and past this:
 
  ```
  {
@@ -30,7 +30,7 @@ Setup steps
  }
  ```
 
- 3. If you haven't yet specified your app's SHA-1 fingerprint, do so from the Settings page[Settings page](https://console.firebase.google.com/project/_/settings/general/) of the Firebase console. See [Authenticating Your Client](https://developers.google.com/android/guides/client-auth) for details on how to get your app's SHA-1 fingerprint.
+ 3. If you haven't yet specified your app's SHA-1 fingerprint, do so from the Settings page [Settings page](https://console.firebase.google.com/project/_/settings/general/) of the Firebase console. See [Authenticating Your Client](https://developers.google.com/android/guides/client-auth) for details on how to get your app's SHA-1 fingerprint.
 
  4. Enable the sign in method with google. Go to DEVELOP -> Authentication -> SIGN-IN METHODS. You will see Sign-in providers. Find Google and enable it.  Here you will see Web SDK configuration. Open it and copy Web client ID and put it in the project: /app/src/main/res/values/constants.xml to “google_web_client_id” property.
 
