@@ -36,6 +36,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -214,6 +215,12 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onAuthorClick(String authorId, View view) {
                     openProfileActivity(authorId, view);
+                }
+
+                @Override
+                public void onCanceled(String message) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
                 }
             });
 

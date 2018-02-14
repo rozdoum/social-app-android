@@ -12,6 +12,39 @@ The latest app version is available on [Google Play](https://play.google.com/sto
 
  <!-- [App video should be here](https://) -->
 
+Setup steps
+===========
+
+ 1. First of all you need google-services.json. Create a Firebase project in the [Firebase console](https://console.firebase.google.com/), if you don't already have one. Go to your project and click ‘Add Firebase to your Android app’. Follow the setup steps. At the end, you'll download a google-services.json file which you should add to your project.
+
+ ![google_service_json](https://user-images.githubusercontent.com/7821425/32899277-30da3374-caf3-11e7-86e0-58cb1bfd59e2.png)
+
+ 2. Setup realtime database. In firebase console go to DEVELOP->Database-> Get Started -> choose tab ‘RULES’ and past this:
+
+ ```
+ {
+   "rules": {
+     ".read": "true",
+     ".write": "true"
+   }
+ }
+ ```
+
+ 3. If you haven't yet specified your app's SHA-1 fingerprint, do so from the Settings page [Settings page](https://console.firebase.google.com/project/_/settings/general/) of the Firebase console. See [Authenticating Your Client](https://developers.google.com/android/guides/client-auth) for details on how to get your app's SHA-1 fingerprint.
+
+ 4. Enable the sign in method with google. Go to DEVELOP -> Authentication -> SIGN-IN METHODS. You will see Sign-in providers. Find Google and enable it.  Here you will see Web SDK configuration. Open it and copy Web client ID and put it in the project: /app/src/main/res/values/constants.xml to “google_web_client_id” property.
+
+ ![google_web_client_id](https://user-images.githubusercontent.com/7821425/32899597-12302680-caf4-11e7-9169-650982c0334e.png)
+
+ 5. Enable facebook sign in method. Follow this documentation https://firebase.google.com/docs/auth/android/facebook-login.
+
+ 6. Init storage. Go to [Firebase console](https://console.firebase.google.com/), DEVELOP->Storage. Follow instructions on this page. At the end you should see the link. It is like “gs://test-9eff4.appspot.com”. Put this link to the project /app/src/main/res/values/constants.xml to “storage_link” property.
+
+![storage_link_exp](https://user-images.githubusercontent.com/7821425/32899046-8811009c-caf2-11e7-905f-741174d26512.png)
+
+ Now you can install app, login and create a post.
+
+
 ## Blog posts
 ### Getting Started — Opening the App
 
