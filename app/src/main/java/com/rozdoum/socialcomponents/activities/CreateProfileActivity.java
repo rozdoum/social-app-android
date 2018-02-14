@@ -105,17 +105,6 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
             imageView.setImageResource(R.drawable.ic_stub);
         }
 
-        nameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.createProdile || id == EditorInfo.IME_NULL) {
-                    attemptCreateProfile();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         imageView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
