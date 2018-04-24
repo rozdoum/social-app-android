@@ -36,7 +36,21 @@ Setup steps
 
  ![google_web_client_id](https://user-images.githubusercontent.com/7821425/32899597-12302680-caf4-11e7-9169-650982c0334e.png)
 
- 5. Enable facebook sign in method. Follow this documentation https://firebase.google.com/docs/auth/android/facebook-login.
+ 5. Enable facebook sign in method.
+  - On the [Facebook for Developers](https://developers.facebook.com/) site, add new application. 
+ 
+  - Get the App ID and an App Secret for your app. 
+  
+  - Go to DEVELOP -> Authentication -> SIGN-IN METHODS. 
+  On the Sign in method tab, enable the Facebook sign-in method and specify the App ID and App Secret 
+  you got from Facebook. There you can fined OAuth redirect URL (e.g. my-app-12345.firebaseapp.com/__/auth/handler). 
+  You should use it on the next step.
+   
+  - Configure the Facebook Login on the [Facebook for Developers](https://developers.facebook.com/) site. 
+  You don't need  add extra lines to the project from the instruction! All necessary data is already there.
+  Define OAuth redirect URL you got from the firebase console on the previous step.
+  
+   - Finally, Put App ID from facebook to the project: /app/src/main/res/values/constants.xml to the “facebook_app_id” property.
 
  6. Init storage. Go to [Firebase console](https://console.firebase.google.com/), DEVELOP->Storage. Follow instructions on this page. At the end you should see the link. It is like “gs://test-9eff4.appspot.com”. Put this link to the project /app/src/main/res/values/constants.xml to “storage_link” property.
 
