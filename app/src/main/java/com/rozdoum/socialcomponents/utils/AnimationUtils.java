@@ -43,6 +43,10 @@ public class AnimationUtils {
         return propertyAnimator;
     }
 
+    public static boolean isViewHiddenByScale(View v) {
+        return v.getScaleX() == 0 && v.getScaleY() == 0;
+    }
+
     /**
      * Shows a view by scaling
      *
