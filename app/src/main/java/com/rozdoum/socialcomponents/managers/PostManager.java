@@ -142,6 +142,7 @@ public class PostManager extends FirebaseListenersManager {
                     public void onComplete(@NonNull Task<Void> task) {
                         onTaskCompleteListener.onTaskComplete(task.isSuccessful());
                         databaseHelper.updateProfileLikeCountAfterRemovingPost(post);
+                        removeObjectsRelatedToPost(post.getId());
                         LogUtil.logDebug(TAG, "removePost(), is success: " + task.isSuccessful());
                     }
                 });
@@ -152,6 +153,33 @@ public class PostManager extends FirebaseListenersManager {
             public void onFailure(@NonNull Exception exception) {
                 LogUtil.logError(TAG, "removeImage()", exception);
                 onTaskCompleteListener.onTaskComplete(false);
+            }
+        });
+    }
+
+    private void removeObjectsRelatedToPost(final String postId) {
+        final DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
+        databaseHelper.removeCommentsByPost(postId).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                LogUtil.logDebug(TAG, "Comments related to post with id: " + postId + " was removed");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                LogUtil.logError(TAG, "Failed to remove comments related to post with id: " + postId, e);
+            }
+        });
+
+        databaseHelper.removeLikesByPost(postId).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                LogUtil.logDebug(TAG, "Likes related to post with id: " + postId + " was removed");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                LogUtil.logError(TAG, "Failed to remove likes related to post with id: " + postId, e);
             }
         });
     }
