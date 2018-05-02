@@ -79,6 +79,7 @@ import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
+import com.rozdoum.socialcomponents.utils.AnimationUtils;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
 import com.rozdoum.socialcomponents.utils.Utils;
 
@@ -286,18 +287,19 @@ public class PostDetailsActivity extends BaseActivity implements EditCommentDial
 
     @Override
     public void onBackPressed() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && isAuthorAnimationRequired) {
-            if (!authorAnimationInProgress) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && isAuthorAnimationRequired
+                && !authorAnimationInProgress
+                && !AnimationUtils.isViewHiddenByScale(authorImageView)) {
+
                 ViewPropertyAnimator hideAuthorAnimator = com.rozdoum.socialcomponents.utils.AnimationUtils.hideViewByScale(authorImageView);
                 hideAuthorAnimator.setListener(authorAnimatorListener);
                 hideAuthorAnimator.withEndAction(new Runnable() {
                     @Override
                     public void run() {
-                        PostDetailsActivity.super.onBackPressed();
+                        PostDetailsActivity.this.onBackPressed();
                     }
                 });
-            }
-
         } else {
             super.onBackPressed();
         }
