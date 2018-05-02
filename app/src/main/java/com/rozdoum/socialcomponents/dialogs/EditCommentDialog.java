@@ -24,6 +24,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -68,6 +71,8 @@ public class EditCommentDialog extends DialogFragment {
             editCommentEditText.setText(commentText);
         }
 
+        configureDialogButtonState(editCommentEditText);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view)
                 .setTitle(R.string.title_edit_comment)
@@ -86,6 +91,30 @@ public class EditCommentDialog extends DialogFragment {
                 });
 
         return builder.create();
+    }
+
+    private void configureDialogButtonState(EditText editCommentEditText) {
+        editCommentEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Dialog dialog = getDialog();
+                if (dialog != null) {
+                    if (TextUtils.isEmpty(s)) {
+                        ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    } else {
+                        ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                    }
+                }
+            }
+        });
     }
 
     public interface CommentDialogCallback {
