@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,6 +45,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.createProfile.CreateProfileActivity;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
@@ -56,7 +58,7 @@ import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
 import java.util.Arrays;
 
-public class LoginActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> implements LoginView, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int SIGN_IN_GOOGLE = 9001;
 
@@ -159,6 +161,15 @@ public class LoginActivity extends BaseActivity implements GoogleApiClient.OnCon
             mGoogleApiClient.stopAutoManage(this);
             mGoogleApiClient.disconnect();
         }
+    }
+
+    @NonNull
+    @Override
+    public LoginPresenter createPresenter() {
+        if (presenter == null) {
+            return new LoginPresenter(this);
+        }
+        return presenter;
     }
 
     @Override

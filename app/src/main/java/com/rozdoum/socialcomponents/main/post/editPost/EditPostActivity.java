@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.post.editPost;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,16 +32,23 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
+import com.rozdoum.socialcomponents.main.post.BaseCreatePostActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
-public class EditPostActivity extends CreatePostActivity {
+public class EditPostActivity extends BaseCreatePostActivity<EditPostView, EditPostPresenter> implements EditPostView {
     private static final String TAG = EditPostActivity.class.getSimpleName();
     public static final String POST_EXTRA_KEY = "EditPostActivity.POST_EXTRA_KEY";
     public static final int EDIT_POST_REQUEST = 33;
 
     private Post post;
+
+    @Override
+    protected int getSaveFailMessage() {
+        return R.string.error_fail_update_post;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,22 +71,27 @@ public class EditPostActivity extends CreatePostActivity {
         postManager.closeListeners(this);
     }
 
+    @NonNull
     @Override
-    public void onPostSaved(boolean success) {
-        hideProgress();
-        creatingPost = false;
-
-        if (success) {
-            setResult(RESULT_OK);
-            finish();
-        } else {
-            showSnackBar(R.string.error_fail_update_post);
+    public EditPostPresenter createPresenter() {
+        if (presenter == null) {
+            return new EditPostPresenter(this);
         }
+        return presenter;
     }
 
     @Override
     protected void savePost(final String title, final String description) {
-        doSavePost(title, description);
+        showProgress(R.string.message_saving);
+        post.setTitle(title);
+        post.setDescription(description);
+
+        if (imageUri != null) {
+            postManager.createOrUpdatePostWithImage(imageUri, EditPostActivity.this, post);
+        } else {
+            postManager.createOrUpdatePost(post);
+            onPostSaved(true);
+        }
     }
 
     private void addCheckIsPostChangedListener() {
@@ -137,19 +150,6 @@ public class EditPostActivity extends CreatePostActivity {
         startActivity(intent);
     }
 
-    private void doSavePost(String title, String description) {
-        showProgress(R.string.message_saving);
-        post.setTitle(title);
-        post.setDescription(description);
-
-        if (imageUri != null) {
-            postManager.createOrUpdatePostWithImage(imageUri, EditPostActivity.this, post);
-        } else {
-            postManager.createOrUpdatePost(post);
-            onPostSaved(true);
-        }
-    }
-
     private void fillUIFields() {
         titleEditText.setText(post.getTitle());
         descriptionEditText.setText(post.getDescription());
@@ -191,14 +191,7 @@ public class EditPostActivity extends CreatePostActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.save:
-                if (!creatingPost) {
-                    if (hasInternetConnection()) {
-                        attemptCreatePost();
-                    } else {
-                        showSnackBar(R.string.internet_connection_failed);
-                    }
-                }
-
+                doSavePost();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

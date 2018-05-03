@@ -34,8 +34,8 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.MainActivity;
-import com.rozdoum.socialcomponents.activities.PostDetailsActivity;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
+import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 

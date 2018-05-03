@@ -5,7 +5,7 @@
     android:id="@+id/image_detail_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.rozdoum.socialcomponents.activities.ImageDetailActivity">
+    tools:context="com.rozdoum.socialcomponents.main.imageDetail.ImageDetailActivity">
 
     <ProgressBar
         android:id="@+id/progressBar"

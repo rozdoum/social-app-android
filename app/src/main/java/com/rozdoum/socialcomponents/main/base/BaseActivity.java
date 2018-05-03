@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.base;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -26,20 +26,21 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.login.LoginActivity;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 
 /**
  * Created by alexey on 05.12.16.
  */
 
-public class BaseActivity extends AppCompatActivity {
-
+public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V>> extends MvpActivity<V, P> implements BaseView {
+    public final String TAG = this.getClass().getSimpleName();
     public ProgressDialog progressDialog;
     public ActionBar actionBar;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.imageDetail;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -32,9 +33,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.views.TouchImageView;
 
-public class ImageDetailActivity extends BaseActivity {
+public class ImageDetailActivity extends BaseActivity<ImageDetailView, ImageDetailPresenter> implements ImageDetailView {
 
     private static final String TAG = ImageDetailActivity.class.getSimpleName();
 
@@ -109,6 +111,15 @@ public class ImageDetailActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    @NonNull
+    @Override
+    public ImageDetailPresenter createPresenter() {
+        if (presenter == null) {
+            return new ImageDetailPresenter(this);
+        }
+        return presenter;
     }
 
     private int calcMaxImageSide() {

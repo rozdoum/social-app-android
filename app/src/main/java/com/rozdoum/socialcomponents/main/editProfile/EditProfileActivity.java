@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.editProfile;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,13 +38,14 @@ import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.pickImageBase.PickImageActivity;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
-public class EditProfileActivity extends PickImageActivity implements OnProfileCreatedListener {
+public class EditProfileActivity extends PickImageActivity<EditProfileView, EditProfilePresenter> implements EditProfileView, OnProfileCreatedListener {
     private static final String TAG = EditProfileActivity.class.getSimpleName();
 
     // UI references.
@@ -76,6 +78,15 @@ public class EditProfileActivity extends PickImageActivity implements OnProfileC
                 onSelectImageClick(v);
             }
         });
+    }
+
+    @NonNull
+    @Override
+    public EditProfilePresenter createPresenter() {
+        if (presenter == null) {
+            return new EditProfilePresenter(this);
+        }
+        return presenter;
     }
 
     @Override

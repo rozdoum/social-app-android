@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/intrinsic_padding"
-    tools:context=".activities.CreatePostActivity">
+    tools:context=".main.post.createPost.CreatePostActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

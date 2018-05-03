@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,23 +14,21 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.createProfile;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -41,6 +39,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.pickImageBase.PickImageActivity;
 import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
@@ -48,8 +47,7 @@ import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
-public class CreateProfileActivity extends PickImageActivity implements OnProfileCreatedListener {
-    private static final String TAG = CreateProfileActivity.class.getSimpleName();
+public class CreateProfileActivity extends PickImageActivity<CreateProfileView, CreateProfilePresenter> implements CreateProfileView, OnProfileCreatedListener {
     public static final String LARGE_IMAGE_URL_EXTRA_KEY = "CreateProfileActivity.LARGE_IMAGE_URL_EXTRA_KEY";
 
     // UI references.
@@ -111,6 +109,15 @@ public class CreateProfileActivity extends PickImageActivity implements OnProfil
                 onSelectImageClick(v);
             }
         });
+    }
+
+    @NonNull
+    @Override
+    public CreateProfilePresenter createPresenter() {
+        if (presenter == null) {
+            return new CreateProfilePresenter(this);
+        }
+        return presenter;
     }
 
     @Override

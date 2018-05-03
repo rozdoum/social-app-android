@@ -15,7 +15,7 @@
  *
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.postDetails;
 
 import android.animation.Animator;
 import android.annotation.TargetApi;
@@ -27,6 +27,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -61,12 +62,16 @@ import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.post.editPost.EditPostActivity;
+import com.rozdoum.socialcomponents.main.imageDetail.ImageDetailActivity;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.dialogs.EditCommentDialog;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.listeners.CustomTransitionListener;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.profile.ProfileActivity;
 import com.rozdoum.socialcomponents.managers.CommentManager;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -85,7 +90,7 @@ import com.rozdoum.socialcomponents.utils.Utils;
 
 import java.util.List;
 
-public class PostDetailsActivity extends BaseActivity implements EditCommentDialog.CommentDialogCallback {
+public class PostDetailsActivity extends BaseActivity<PostDetailsView, PostDetailsPresenter> implements PostDetailsView, EditCommentDialog.CommentDialogCallback {
 
     public static final String POST_ID_EXTRA_KEY = "PostDetailsActivity.POST_ID_EXTRA_KEY";
     public static final String AUTHOR_ANIMATION_NEEDED_EXTRA_KEY = "PostDetailsActivity.AUTHOR_ANIMATION_NEEDED_EXTRA_KEY";
@@ -267,6 +272,15 @@ public class PostDetailsActivity extends BaseActivity implements EditCommentDial
     protected void onDestroy() {
         super.onDestroy();
         postManager.closeListeners(this);
+    }
+
+    @NonNull
+    @Override
+    public PostDetailsPresenter createPresenter() {
+        if (presenter == null) {
+            return new PostDetailsPresenter(this);
+        }
+        return presenter;
     }
 
     @Override
