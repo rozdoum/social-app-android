@@ -24,8 +24,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.Constants;
@@ -39,6 +37,8 @@ import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
+import com.rozdoum.socialcomponents.utils.GlideApp;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.Utils;
 
 /**
@@ -140,14 +140,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         int height = (int) context.getResources().getDimension(R.dimen.post_detail_image_height);
 
         // Displayed and saved to cache image, as needs for post detail.
-        Glide.with(context)
-                .load(imageUrl)
-                .centerCrop()
-                .override(width, height)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .crossFade()
-                .error(R.drawable.ic_stub)
-                .into(postImageView);
+        ImageUtil.loadImageCenterCrop(GlideApp.with(context), imageUrl, postImageView, width, height);
 
         if (post.getAuthorId() != null) {
             profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
@@ -170,13 +163,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onObjectChanged(final Profile obj) {
                 if (obj.getPhotoUrl() != null) {
-
-                    Glide.with(context)
-                            .load(obj.getPhotoUrl())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .centerCrop()
-                            .crossFade()
-                            .into(authorImageView);
+                    ImageUtil.loadImage(GlideApp.with(context), obj.getPhotoUrl(), authorImageView);
                 }
             }
         };

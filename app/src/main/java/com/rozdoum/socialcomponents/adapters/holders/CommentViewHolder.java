@@ -37,6 +37,8 @@ import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
+import com.rozdoum.socialcomponents.utils.GlideApp;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.views.ExpandableTextView;
 
 /**
@@ -106,12 +108,7 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
                 fillComment(userName, comment, expandableTextView);
 
                 if (obj.getPhotoUrl() != null) {
-                    Glide.with(context)
-                            .load(obj.getPhotoUrl())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .crossFade()
-                            .error(R.drawable.ic_stub)
-                            .into(avatarImageView);
+                    ImageUtil.loadImage(GlideApp.with(context), obj.getPhotoUrl(), avatarImageView);
                 }
             }
         };
