@@ -18,17 +18,18 @@ package com.rozdoum.socialcomponents.main.post.editPost;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.R;
@@ -37,6 +38,8 @@ import com.rozdoum.socialcomponents.main.post.BaseCreatePostActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.GlideApp;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 
 public class EditPostActivity extends BaseCreatePostActivity<EditPostView, EditPostPresenter> implements EditPostView {
     private static final String TAG = EditPostActivity.class.getSimpleName();
@@ -158,25 +161,19 @@ public class EditPostActivity extends BaseCreatePostActivity<EditPostView, EditP
     }
 
     private void loadPostDetailsImage() {
-        Glide.with(this)
-                .load(post.getImagePath())
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .crossFade()
-                .centerCrop()
-                .error(R.drawable.ic_stub)
-                .listener(new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        return false;
-                    }
+        ImageUtil.loadImageCenterCrop(GlideApp.with(this), post.getImagePath(), imageView, new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                progressBar.setVisibility(View.GONE);
+                return false;
+            }
 
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .into(imageView);
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                progressBar.setVisibility(View.GONE);
+                return false;
+            }
+        });
     }
 
     @Override

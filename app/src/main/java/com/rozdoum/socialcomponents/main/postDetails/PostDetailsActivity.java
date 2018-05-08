@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,16 +55,14 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.main.post.editPost.EditPostActivity;
-import com.rozdoum.socialcomponents.main.imageDetail.ImageDetailActivity;
 import com.rozdoum.socialcomponents.adapters.CommentsAdapter;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.dialogs.EditCommentDialog;
@@ -71,6 +70,8 @@ import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.listeners.CustomTransitionListener;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.imageDetail.ImageDetailActivity;
+import com.rozdoum.socialcomponents.main.post.editPost.EditPostActivity;
 import com.rozdoum.socialcomponents.main.profile.ProfileActivity;
 import com.rozdoum.socialcomponents.managers.CommentManager;
 import com.rozdoum.socialcomponents.managers.PostManager;
@@ -86,6 +87,8 @@ import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.AnimationUtils;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
+import com.rozdoum.socialcomponents.utils.GlideApp;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.Utils;
 
 import java.util.List;
@@ -435,28 +438,21 @@ public class PostDetailsActivity extends BaseActivity<PostDetailsView, PostDetai
         String imageUrl = post.getImagePath();
         int width = Utils.getDisplayWidth(this);
         int height = (int) getResources().getDimension(R.dimen.post_detail_image_height);
-        Glide.with(this)
-                .load(imageUrl)
-                .centerCrop()
-                .override(width, height)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .error(R.drawable.ic_stub)
-                .listener(new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        scheduleStartPostponedTransition(postImageView);
-                        return false;
-                    }
 
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        scheduleStartPostponedTransition(postImageView);
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .crossFade()
-                .into(postImageView);
+        ImageUtil.loadImageCenterCrop(GlideApp.with(this), imageUrl, postImageView, width, height, new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                scheduleStartPostponedTransition(postImageView);
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                scheduleStartPostponedTransition(postImageView);
+                progressBar.setVisibility(View.GONE);
+                return false;
+            }
+        });
     }
 
     private void scheduleStartPostponedTransition(final ImageView imageView) {
@@ -505,11 +501,7 @@ public class PostDetailsActivity extends BaseActivity<PostDetailsView, PostDetai
             @Override
             public void onObjectChanged(Profile obj) {
                 if (obj.getPhotoUrl() != null) {
-                    Glide.with(PostDetailsActivity.this)
-                            .load(obj.getPhotoUrl())
-                            .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                            .crossFade()
-                            .into(authorImageView);
+                    ImageUtil.loadImage(GlideApp.with(PostDetailsActivity.this), obj.getPhotoUrl(), authorImageView, DiskCacheStrategy.DATA);
                 }
 
                 authorTextView.setText(obj.getUsername());

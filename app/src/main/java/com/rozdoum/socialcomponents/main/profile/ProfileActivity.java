@@ -18,9 +18,11 @@ package com.rozdoum.socialcomponents.main.profile;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,9 +41,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
@@ -49,19 +50,21 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
-import com.rozdoum.socialcomponents.main.editProfile.EditProfileActivity;
-import com.rozdoum.socialcomponents.main.main.MainActivity;
-import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.editProfile.EditProfileActivity;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
+import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
+import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
+import com.rozdoum.socialcomponents.utils.GlideApp;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.LogoutHelper;
 
@@ -289,27 +292,21 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
             nameEditText.setText(profile.getUsername());
 
             if (profile.getPhotoUrl() != null) {
-                Glide.with(this)
-                        .load(profile.getPhotoUrl())
-                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                        .crossFade()
-                        .error(R.drawable.ic_stub)
-                        .listener(new RequestListener<String, GlideDrawable>() {
-                            @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                scheduleStartPostponedTransition(imageView);
-                                progressBar.setVisibility(View.GONE);
-                                return false;
-                            }
+                ImageUtil.loadImage(GlideApp.with(this), profile.getPhotoUrl(), imageView, new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        scheduleStartPostponedTransition(imageView);
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
 
-                            @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                scheduleStartPostponedTransition(imageView);
-                                progressBar.setVisibility(View.GONE);
-                                return false;
-                            }
-                        })
-                        .into(imageView);
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        scheduleStartPostponedTransition(imageView);
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                });
             } else {
                 progressBar.setVisibility(View.GONE);
                 imageView.setImageResource(R.drawable.ic_stub);
