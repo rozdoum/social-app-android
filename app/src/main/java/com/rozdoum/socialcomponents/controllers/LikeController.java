@@ -30,8 +30,8 @@ import android.widget.TextView;
 
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.BaseActivity;
-import com.rozdoum.socialcomponents.activities.MainActivity;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;

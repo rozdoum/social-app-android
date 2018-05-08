@@ -18,7 +18,7 @@ package com.rozdoum.socialcomponents.adapters;
 
 import android.support.v7.widget.RecyclerView;
 
-import com.rozdoum.socialcomponents.activities.BaseActivity;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;

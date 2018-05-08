@@ -22,7 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.BaseActivity;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.managers.PostManager;

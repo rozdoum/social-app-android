@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.pickImageBase;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -34,6 +34,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.base.BasePresenter;
+import com.rozdoum.socialcomponents.main.base.BaseView;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -41,8 +44,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 
-public abstract class PickImageActivity extends BaseActivity {
-    private static final String TAG = PickImageActivity.class.getSimpleName();
+public abstract class PickImageActivity<V extends BaseView, P extends BasePresenter<V>> extends BaseActivity<V, P> implements PickImageView {
     protected static final int MAX_FILE_SIZE_IN_BYTES = 10485760;   //10 Mb
     private static final String SAVED_STATE_IMAGE_URI = "RegistrationActivity.SAVED_STATE_IMAGE_URI";
 

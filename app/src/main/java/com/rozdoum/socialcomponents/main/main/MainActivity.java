@@ -1,27 +1,27 @@
 /*
- *  Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.main;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,6 +46,10 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
+import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
+import com.rozdoum.socialcomponents.main.profile.ProfileActivity;
 import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -53,8 +57,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.AnimationUtils;
 
-public class MainActivity extends BaseActivity {
-    private static final String TAG = MainActivity.class.getSimpleName();
+public class MainActivity extends BaseActivity<MainView, MainPresenter> implements MainView {
 
     private PostsAdapter postsAdapter;
     private RecyclerView recyclerView;
@@ -95,6 +98,15 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         updateNewPostCounter();
+    }
+
+    @NonNull
+    @Override
+    public MainPresenter createPresenter() {
+        if (presenter == null) {
+            return new MainPresenter(this);
+        }
+        return presenter;
     }
 
     private void setOnLikeAddedListener() {

@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.MainActivity;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.adapters.holders.LoadViewHolder;
 import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.controllers.LikeController;

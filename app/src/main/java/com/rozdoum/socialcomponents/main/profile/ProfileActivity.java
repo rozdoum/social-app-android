@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.profile;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
@@ -49,8 +49,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
+import com.rozdoum.socialcomponents.main.editProfile.EditProfileActivity;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
+import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
 import com.rozdoum.socialcomponents.enums.PostStatus;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
@@ -60,7 +65,7 @@ import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.LogoutHelper;
 
-public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter> implements ProfileView, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = ProfileActivity.class.getSimpleName();
     public static final int CREATE_POST_FROM_PROFILE_REQUEST = 22;
     public static final String USER_ID_EXTRA_KEY = "ProfileActivity.USER_ID_EXTRA_KEY";
@@ -144,6 +149,15 @@ public class ProfileActivity extends BaseActivity implements GoogleApiClient.OnC
             mGoogleApiClient.stopAutoManage(this);
             mGoogleApiClient.disconnect();
         }
+    }
+
+    @NonNull
+    @Override
+    public ProfilePresenter createPresenter() {
+        if (presenter == null) {
+            return new ProfilePresenter(this);
+        }
+        return presenter;
     }
 
     @Override

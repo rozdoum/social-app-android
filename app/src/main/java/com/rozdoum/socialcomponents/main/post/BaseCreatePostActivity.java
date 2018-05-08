@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,30 +14,31 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.activities;
+package com.rozdoum.socialcomponents.main.post;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.pickImageBase.PickImageActivity;
+import com.rozdoum.socialcomponents.main.post.editPost.EditPostActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
-import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
-public class CreatePostActivity extends PickImageActivity implements OnPostCreatedListener {
-    private static final String TAG = CreatePostActivity.class.getSimpleName();
-    public static final int CREATE_NEW_POST_REQUEST = 11;
+/**
+ * Created by Alexey on 03.05.18.
+ */
+public abstract class BaseCreatePostActivity<V extends BaseCreatePostView, P extends BaseCreatePostPresenter<V>>
+        extends PickImageActivity<V, P> implements BaseCreatePostView, OnPostCreatedListener {
 
     protected ImageView imageView;
     protected ProgressBar progressBar;
@@ -47,21 +48,27 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
     protected PostManager postManager;
     protected boolean creatingPost = false;
 
+    @StringRes
+    protected abstract int getSaveFailMessage();
+
+    protected abstract void savePost(final String title, final String description);
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.create_post_activity);
+        setContentView(R.layout.base_create_post_activity);
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        postManager = PostManager.getInstance(CreatePostActivity.this);
+        postManager = PostManager.getInstance(this);
 
-        titleEditText = (EditText) findViewById(R.id.titleEditText);
-        descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        titleEditText = findViewById(R.id.titleEditText);
+        descriptionEditText = findViewById(R.id.descriptionEditText);
+        progressBar = findViewById(R.id.progressBar);
 
-        imageView = (ImageView) findViewById(R.id.imageView);
+        imageView = findViewById(R.id.imageView);
 
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +82,7 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
             public boolean onTouch(View v, MotionEvent event) {
                 if (titleEditText.hasFocus() && titleEditText.getError() != null) {
                     titleEditText.setError(null);
+
                     return true;
                 }
                 return false;
@@ -83,17 +91,17 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
     }
 
     @Override
-    public ProgressBar getProgressView() {
+    protected ProgressBar getProgressView() {
         return progressBar;
     }
 
     @Override
-    public ImageView getImageView() {
+    protected ImageView getImageView() {
         return imageView;
     }
 
     @Override
-    public void onImagePikedAction() {
+    protected void onImagePikedAction() {
         loadImageToImageView();
     }
 
@@ -139,53 +147,28 @@ public class CreatePostActivity extends PickImageActivity implements OnPostCreat
         }
     }
 
-    protected void savePost(String title, String description) {
-        showProgress(R.string.message_creating_post);
-        Post post = new Post();
-        post.setTitle(title);
-        post.setDescription(description);
-        post.setAuthorId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        postManager.createOrUpdatePostWithImage(imageUri, CreatePostActivity.this, post);
-    }
-
     @Override
     public void onPostSaved(boolean success) {
         hideProgress();
+        creatingPost = false;
 
         if (success) {
             setResult(RESULT_OK);
-            CreatePostActivity.this.finish();
-            LogUtil.logDebug(TAG, "Post was created");
+            this.finish();
+            LogUtil.logDebug(TAG, "Post was saved");
         } else {
-            creatingPost = false;
-            showSnackBar(R.string.error_fail_create_post);
-            LogUtil.logDebug(TAG, "Failed to create a post");
+            showSnackBar(getSaveFailMessage());
+            LogUtil.logDebug(TAG, "Failed to save a post");
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.create_post_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.post:
-                if (!creatingPost) {
-                    if (hasInternetConnection()) {
-                        attemptCreatePost();
-                    } else {
-                        showSnackBar(R.string.internet_connection_failed);
-                    }
-                }
-
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    protected void doSavePost() {
+        if (!creatingPost) {
+            if (hasInternetConnection()) {
+                attemptCreatePost();
+            } else {
+                showSnackBar(R.string.internet_connection_failed);
+            }
         }
     }
 }
