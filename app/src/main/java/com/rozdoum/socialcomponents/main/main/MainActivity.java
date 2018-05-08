@@ -16,11 +16,11 @@
 
 package com.rozdoum.socialcomponents.main.main;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -36,24 +36,13 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsAdapter;
-import com.rozdoum.socialcomponents.enums.PostStatus;
-import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
 import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.main.profile.ProfileActivity;
-import com.rozdoum.socialcomponents.managers.DatabaseHelper;
-import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.AnimationUtils;
 
@@ -63,41 +52,26 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
 
-    private ProfileManager profileManager;
-    private PostManager postManager;
-    private int counter;
     private TextView newPostsCounterTextView;
-    private PostManager.PostCounterWatcher postCounterWatcher;
     private boolean counterAnimationInProgress = false;
+    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        profileManager = ProfileManager.getInstance(this);
-        postManager = PostManager.getInstance(this);
         initContentView();
-
-        postCounterWatcher = new PostManager.PostCounterWatcher() {
-            @Override
-            public void onPostCounterChanged(int newValue) {
-                updateNewPostCounter();
-            }
-        };
-
-        postManager.setPostCounterWatcher(postCounterWatcher);
-
-//        setOnLikeAddedListener();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateNewPostCounter();
+        presenter.updateNewPostCounter();
     }
 
     @NonNull
@@ -107,36 +81,6 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
             return new MainPresenter(this);
         }
         return presenter;
-    }
-
-    private void setOnLikeAddedListener() {
-        DatabaseHelper.getInstance(this).onNewLikeAddedListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                counter++;
-                showSnackBar("You have " + counter + " new likes");
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     @Override
@@ -149,110 +93,107 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
                     refreshPostList();
                     break;
                 case CreatePostActivity.CREATE_NEW_POST_REQUEST:
-                    refreshPostList();
-                    showFloatButtonRelatedSnackBar(R.string.message_post_was_created);
+                    presenter.onPostCreated();
                     break;
 
                 case PostDetailsActivity.UPDATE_POST_REQUEST:
-                    if (data != null) {
-                        PostStatus postStatus = (PostStatus) data.getSerializableExtra(PostDetailsActivity.POST_STATUS_EXTRA_KEY);
-                        if (postStatus.equals(PostStatus.REMOVED)) {
-                            postsAdapter.removeSelectedPost();
-                            showFloatButtonRelatedSnackBar(R.string.message_post_was_removed);
-                        } else if (postStatus.equals(PostStatus.UPDATED)) {
-                            postsAdapter.updateSelectedPost();
-                        }
-                    }
+                    presenter.onPostUpdated(data);
                     break;
             }
         }
     }
 
-    private void refreshPostList() {
+    public void refreshPostList() {
         postsAdapter.loadFirstPage();
         if (postsAdapter.getItemCount() > 0) {
             recyclerView.scrollToPosition(0);
         }
     }
 
+    @Override
+    public void removePost() {
+        postsAdapter.removeSelectedPost();
+    }
+
+    @Override
+    public void updatePost() {
+        postsAdapter.updateSelectedPost();
+    }
+
+    @Override
+    public void showCounterView(int count) {
+        AnimationUtils.showViewByScaleAndVisibility(newPostsCounterTextView);
+        String counterFormat = getResources().getQuantityString(R.plurals.new_posts_counter_format, count, count);
+        newPostsCounterTextView.setText(String.format(counterFormat, count));
+    }
+
     private void initContentView() {
         if (recyclerView == null) {
-            floatingActionButton = (FloatingActionButton) findViewById(R.id.addNewPostFab);
+            progressBar = findViewById(R.id.progressBar);
+            swipeContainer = findViewById(R.id.swipeContainer);
 
-            if (floatingActionButton != null) {
-                floatingActionButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (hasInternetConnection()) {
-                            addPostClickAction();
-                        } else {
-                            showFloatButtonRelatedSnackBar(R.string.internet_connection_failed);
-                        }
-                    }
-                });
-            }
-
-            newPostsCounterTextView = (TextView) findViewById(R.id.newPostsCounterTextView);
-            newPostsCounterTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    refreshPostList();
-                }
-            });
-
-            final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-            SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            postsAdapter = new PostsAdapter(this, swipeContainer);
-            postsAdapter.setCallback(new PostsAdapter.Callback() {
-                @Override
-                public void onItemClick(final Post post, final View view) {
-                    PostManager.getInstance(MainActivity.this).isPostExistSingleValue(post.getId(), new OnObjectExistListener<Post>() {
-                        @Override
-                        public void onDataChanged(boolean exist) {
-                            if (exist) {
-                                openPostDetailsActivity(post, view);
-                            } else {
-                                showFloatButtonRelatedSnackBar(R.string.error_post_was_removed);
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void onListLoadingFinished() {
-                    progressBar.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAuthorClick(String authorId, View view) {
-                    openProfileActivity(authorId, view);
-                }
-
-                @Override
-                public void onCanceled(String message) {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-                }
-            });
-
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-            recyclerView.setAdapter(postsAdapter);
-            postsAdapter.loadFirstPage();
-            updateNewPostCounter();
-
-            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    hideCounterView();
-                    super.onScrolled(recyclerView, dx, dy);
-                }
-            });
+            initFloatingActionButton();
+            initPostListRecyclerView();
+            initPostCounter();
         }
     }
 
-    private void hideCounterView() {
+    private void initFloatingActionButton() {
+        floatingActionButton = findViewById(R.id.addNewPostFab);
+        if (floatingActionButton != null) {
+            floatingActionButton.setOnClickListener(v -> presenter.onCreatePostClickAction(floatingActionButton));
+        }
+    }
+
+    private void initPostListRecyclerView() {
+        recyclerView = findViewById(R.id.recycler_view);
+        postsAdapter = new PostsAdapter(this, swipeContainer);
+        postsAdapter.setCallback(new PostsAdapter.Callback() {
+            @Override
+            public void onItemClick(final Post post, final View view) {
+                presenter.onPostClicked(post, view);
+            }
+
+            @Override
+            public void onListLoadingFinished() {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAuthorClick(String authorId, View view) {
+                openProfileActivity(authorId, view);
+            }
+
+            @Override
+            public void onCanceled(String message) {
+                progressBar.setVisibility(View.GONE);
+                showToast(message);
+            }
+        });
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        recyclerView.setAdapter(postsAdapter);
+        postsAdapter.loadFirstPage();
+    }
+
+    private void initPostCounter() {
+        newPostsCounterTextView = findViewById(R.id.newPostsCounterTextView);
+        newPostsCounterTextView.setOnClickListener(v -> refreshPostList());
+
+        presenter.initPostCounter();
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                hideCounterView();
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+    }
+
+    @Override
+    public void hideCounterView() {
         if (!counterAnimationInProgress && newPostsCounterTextView.getVisibility() == View.VISIBLE) {
             counterAnimationInProgress = true;
             AlphaAnimation alphaAnimation = AnimationUtils.hideViewByAlpha(newPostsCounterTextView);
@@ -278,11 +219,9 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         }
     }
 
-    private void showCounterView() {
-        AnimationUtils.showViewByScaleAndVisibility(newPostsCounterTextView);
-    }
-
-    private void openPostDetailsActivity(Post post, View v) {
+    @SuppressLint("RestrictedApi")
+    @Override
+    public void openPostDetailsActivity(Post post, View v) {
         Intent intent = new Intent(MainActivity.this, PostDetailsActivity.class);
         intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
 
@@ -306,26 +245,15 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         showSnackBar(floatingActionButton, messageId);
     }
 
-    private void addPostClickAction() {
-        ProfileStatus profileStatus = profileManager.checkProfile();
-
-        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-            openCreatePostActivity();
-        } else {
-            doAuthorization(profileStatus);
-        }
-    }
-
-    private void openCreatePostActivity() {
+    @Override
+    public void openCreatePostActivity() {
         Intent intent = new Intent(this, CreatePostActivity.class);
         startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
     }
 
-    private void openProfileActivity(String userId) {
-        openProfileActivity(userId, null);
-    }
-
-    private void openProfileActivity(String userId, View view) {
+    @SuppressLint("RestrictedApi")
+    @Override
+    public void openProfileActivity(String userId, View view) {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         intent.putExtra(ProfileActivity.USER_ID_EXTRA_KEY, userId);
 
@@ -342,27 +270,6 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         }
     }
 
-    private void updateNewPostCounter() {
-        Handler mainHandler = new Handler(this.getMainLooper());
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                int newPostsQuantity = postManager.getNewPostsCounter();
-
-                if (newPostsCounterTextView != null) {
-                    if (newPostsQuantity > 0) {
-                        showCounterView();
-
-                        String counterFormat = getResources().getQuantityString(R.plurals.new_posts_counter_format, newPostsQuantity, newPostsQuantity);
-                        newPostsCounterTextView.setText(String.format(counterFormat, newPostsQuantity));
-                    } else {
-                        hideCounterView();
-                    }
-                }
-            }
-        });
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -375,15 +282,7 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.profile:
-                ProfileStatus profileStatus = profileManager.checkProfile();
-
-                if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
-                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    openProfileActivity(userId);
-                } else {
-                    doAuthorization(profileStatus);
-                }
-
+                presenter.onProfileMenuActionClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -16,6 +16,9 @@
 
 package com.rozdoum.socialcomponents.main.base;
 
+import android.support.annotation.StringRes;
+import android.view.View;
+
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 /**
@@ -23,5 +26,29 @@ import com.hannesdorfmann.mosby3.mvp.MvpView;
  */
 
 public interface BaseView extends MvpView {
+
+    void showProgress();
+
+    void showProgress(int message);
+
+    void hideProgress();
+
+    void showSnackBar(String message);
+
+    void showSnackBar(int message);
+
+    void showSnackBar(View view, int messageId);
+
+    void showToast(@StringRes int messageId);
+
+    void showToast(String message);
+
+    void showWarningDialog(int messageId);
+
+    void showWarningDialog(String message);
+
+    boolean hasInternetConnection();
+
+    void startLoginActivity();
 
 }

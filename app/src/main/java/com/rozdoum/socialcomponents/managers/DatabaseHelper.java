@@ -340,11 +340,6 @@ public class DatabaseHelper {
         return postRef.removeValue();
     }
 
-    public void onNewLikeAddedListener(ChildEventListener childEventListener) {
-        DatabaseReference mLikesReference = getDatabaseReference().child(POST_LIKES_DB_KEY);
-        mLikesReference.addChildEventListener(childEventListener);
-    }
-
     public void createOrUpdateLike(final String postId, final String postAuthorId) {
         try {
             String authorId = firebaseAuth.getCurrentUser().getUid();
