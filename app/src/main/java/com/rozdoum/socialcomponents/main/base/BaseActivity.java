@@ -19,21 +19,21 @@ package com.rozdoum.socialcomponents.main.base;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.main.login.LoginActivity;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.main.login.LoginActivity;
 
 /**
  * Created by alexey on 05.12.16.
@@ -51,22 +51,19 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
 
     }
 
-    public void doAuthorization(ProfileStatus status) {
-        if (status.equals(ProfileStatus.NOT_AUTHORIZED) || status.equals(ProfileStatus.NO_PROFILE)) {
-            startLoginActivity();
-        }
-    }
-
-    private void startLoginActivity() {
+    @Override
+    public void startLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 
+    @Override
     public void showProgress() {
         showProgress(R.string.loading);
     }
 
-    public void showProgress(int message) {
+    @Override
+    public void showProgress(@StringRes int message) {
         hideProgress();
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(message));
@@ -74,6 +71,7 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         progressDialog.show();
     }
 
+    @Override
     public void hideProgress() {
         if (progressDialog != null) {
             progressDialog.dismiss();
@@ -90,21 +88,34 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         }
     }
 
+    @Override
     public void showSnackBar(String message) {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
                 message, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 
-    public void showSnackBar(int messageId) {
+    @Override
+    public void showSnackBar(@StringRes int messageId) {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
                 messageId, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 
-    public void showSnackBar(View view, int messageId) {
+    @Override
+    public void showSnackBar(View view, @StringRes int messageId) {
         Snackbar snackbar = Snackbar.make(view, messageId, Snackbar.LENGTH_LONG);
         snackbar.show();
+    }
+
+    @Override
+    public void showToast(@StringRes int messageId) {
+        Toast.makeText(this, messageId, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     public void showWarningDialog(int messageId) {
@@ -121,20 +132,16 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         builder.show();
     }
 
+    // TODO: REMOVE AFTER FULL IMPLEMENTATION OF MVP  **********************************
+    @Override
     public boolean hasInternetConnection() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return presenter.hasInternetConnection();
     }
 
-    public boolean checkInternetConnection() {
-        boolean hasInternetConnection = hasInternetConnection();
-        if (!hasInternetConnection) {
-            showWarningDialog(R.string.internet_connection_failed);
-        }
-
-        return hasInternetConnection;
+    public void doAuthorization(ProfileStatus status) {
+        presenter.doAuthorization(status);
     }
+    ////////////////////////////////////////////////////////////////
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
