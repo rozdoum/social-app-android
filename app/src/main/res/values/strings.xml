@@ -147,6 +147,13 @@
     <string name="message_comment_was_edited">Comment was edited</string>
     <string name="title_edit_comment">Edit comment</string>
 
+    <!--Follow-->
+    <string name="button_follow_title">Follow</string>
+    <string name="button_follow_back_title">Follow back</string>
+    <string name="button_following">Following</string>
+    <string name="unfollow_user_message">Unfollow %1$s?</string>
+    <string name="button_title_unfollow">Unfollow</string>
+
     <!--Firebase errors-->
     <string name="permission_denied_error">Please check your rules to access the Firebase Realtime Database</string>
 

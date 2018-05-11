@@ -16,6 +16,7 @@
 
 package com.rozdoum.socialcomponents.main.profile;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -51,6 +52,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
+import com.rozdoum.socialcomponents.dialogs.UnfollowConfirmationDialog;
+import com.rozdoum.socialcomponents.enums.FollowState;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.editProfile.EditProfileActivity;
@@ -67,8 +70,9 @@ import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.LogoutHelper;
+import com.rozdoum.socialcomponents.views.FollowButton;
 
-public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter> implements ProfileView, GoogleApiClient.OnConnectionFailedListener {
+public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter> implements ProfileView, GoogleApiClient.OnConnectionFailedListener, UnfollowConfirmationDialog.Callback {
     private static final String TAG = ProfileActivity.class.getSimpleName();
     public static final int CREATE_POST_FROM_PROFILE_REQUEST = 22;
     public static final String USER_ID_EXTRA_KEY = "ProfileActivity.USER_ID_EXTRA_KEY";
@@ -91,12 +95,15 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     private SwipeRefreshLayout swipeContainer;
     private TextView likesCountersTextView;
     private ProfileManager profileManager;
+    private FollowButton followButton;
+
+    private Profile profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
 
@@ -113,21 +120,23 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         }
 
         // Set up the login form.
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        imageView = (ImageView) findViewById(R.id.imageView);
-        nameEditText = (TextView) findViewById(R.id.nameEditText);
-        postsCounterTextView = (TextView) findViewById(R.id.postsCounterTextView);
-        likesCountersTextView = (TextView) findViewById(R.id.likesCountersTextView);
-        postsLabelTextView = (TextView) findViewById(R.id.postsLabelTextView);
-        postsProgressBar = (ProgressBar) findViewById(R.id.postsProgressBar);
+        progressBar = findViewById(R.id.progressBar);
+        imageView = findViewById(R.id.imageView);
+        nameEditText = findViewById(R.id.nameEditText);
+        postsCounterTextView = findViewById(R.id.postsCounterTextView);
+        likesCountersTextView = findViewById(R.id.likesCountersTextView);
+        postsLabelTextView = findViewById(R.id.postsLabelTextView);
+        postsProgressBar = findViewById(R.id.postsProgressBar);
+        followButton = findViewById(R.id.followButton);
 
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                onRefreshAction();
-            }
+        followButton.setOnClickListener(v -> {
+            presenter.onFollowButtonClick(followButton.getState(), userID);
         });
+
+        presenter.checkFollowState(userID);
+
+        swipeContainer = findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(() -> onRefreshAction());
 
         loadPostsList();
         supportPostponeEnterTransition();
@@ -254,6 +263,8 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         return contentString;
     }
 
+
+    @SuppressLint("RestrictedApi")
     private void openPostDetailsActivity(Post post, View v) {
         Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
         intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
@@ -282,6 +293,7 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         return new OnObjectChangedListener<Profile>() {
             @Override
             public void onObjectChanged(Profile obj) {
+                profile = obj;
                 fillUIFields(obj);
             }
         };
@@ -358,6 +370,31 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     private void openCreatePostActivity() {
         Intent intent = new Intent(this, CreatePostActivity.class);
         startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
+    }
+
+    public void openUnfollowConfirmDialog() {
+        if (profile != null) {
+            UnfollowConfirmationDialog unfollowConfirmationDialog = new UnfollowConfirmationDialog();
+            Bundle args = new Bundle();
+            args.putSerializable(UnfollowConfirmationDialog.PROFILE, profile);
+            unfollowConfirmationDialog.setArguments(args);
+            unfollowConfirmationDialog.show(getFragmentManager(), UnfollowConfirmationDialog.TAG);
+        }
+    }
+
+    @Override
+    public void showUnfollowConfirmation() {
+        openUnfollowConfirmDialog();
+    }
+
+    @Override
+    public void updateFollowButtonState(FollowState followState) {
+        followButton.setState(followState);
+    }
+
+    @Override
+    public void onUnfollowButtonClicked() {
+        presenter.unfollowUser(userID);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Rozdoum
+ * Copyright 2017 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.main.profile;
-
-import com.rozdoum.socialcomponents.enums.FollowState;
-import com.rozdoum.socialcomponents.main.base.BaseView;
+package com.rozdoum.socialcomponents.managers.listeners;
 
 /**
- * Created by Alexey on 03.05.18.
+ * Created by Alexey on 10.05.18.
  */
 
-public interface ProfileView extends BaseView {
-    void showUnfollowConfirmation();
-
-    void updateFollowButtonState(FollowState followState);
+public interface OnRequestComplete {
+    void onComplete(boolean success);
 }
