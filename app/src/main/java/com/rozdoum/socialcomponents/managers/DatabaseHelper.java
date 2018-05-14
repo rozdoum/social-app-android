@@ -45,6 +45,7 @@ import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
@@ -803,6 +804,43 @@ public class DatabaseHelper {
 
             }
         });
+    }
+
+    public ValueEventListener getFollowersCount(String targetUserId, OnCountChangedListener onCountChangedListener) {
+        Query userQuery = getDatabaseReference().child(FOLLOW_DB_KEY).orderByChild(targetUserId).equalTo(FOLLOWING_DB_VALUE);
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onCountChangedListener.onCountChanged(dataSnapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        userQuery.addValueEventListener(listener);
+
+        return listener;
+    }
+
+    public ValueEventListener getFollowingsCount(String targetUserId, OnCountChangedListener onCountChangedListener) {
+        Query userQuery = getDatabaseReference().child(FOLLOW_DB_KEY).child(targetUserId);
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onCountChangedListener.onCountChanged((int) dataSnapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        userQuery.addValueEventListener(listener);
+
+        return listener;
     }
 
 }

@@ -94,6 +94,8 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     private PostsByUserAdapter postsAdapter;
     private SwipeRefreshLayout swipeContainer;
     private TextView likesCountersTextView;
+    private TextView followersCounterTextView;
+    private TextView followingsCounterTextView;
     private ProfileManager profileManager;
     private FollowButton followButton;
 
@@ -125,6 +127,8 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         nameEditText = findViewById(R.id.nameEditText);
         postsCounterTextView = findViewById(R.id.postsCounterTextView);
         likesCountersTextView = findViewById(R.id.likesCountersTextView);
+        followersCounterTextView = findViewById(R.id.followersCounterTextView);
+        followingsCounterTextView = findViewById(R.id.followingsCounterTextView);
         postsLabelTextView = findViewById(R.id.postsLabelTextView);
         postsProgressBar = findViewById(R.id.postsProgressBar);
         followButton = findViewById(R.id.followButton);
@@ -146,6 +150,8 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     public void onStart() {
         super.onStart();
         loadProfile();
+        presenter.getFollowersCount(userID);
+        presenter.getFollowingsCount(userID);
 
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
@@ -290,12 +296,9 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     }
 
     private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
-        return new OnObjectChangedListener<Profile>() {
-            @Override
-            public void onObjectChanged(Profile obj) {
-                profile = obj;
-                fillUIFields(obj);
-            }
+        return obj -> {
+            profile = obj;
+            fillUIFields(obj);
         };
     }
 
@@ -390,6 +393,20 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     @Override
     public void updateFollowButtonState(FollowState followState) {
         followButton.setState(followState);
+    }
+
+    @Override
+    public void updateFollowersCount(int count) {
+        followersCounterTextView.setVisibility(View.VISIBLE);
+        String followersLabel = getResources().getQuantityString(R.plurals.followers_counter_format, count, count);
+        followersCounterTextView.setText(buildCounterSpannable(followersLabel, count));
+    }
+
+    @Override
+    public void updateFollowingsCount(int count) {
+        followingsCounterTextView.setVisibility(View.VISIBLE);
+        String followingsLabel = getResources().getQuantityString(R.plurals.followings_counter_format, count, count);
+        followingsCounterTextView.setText(buildCounterSpannable(followingsLabel, count));
     }
 
     @Override

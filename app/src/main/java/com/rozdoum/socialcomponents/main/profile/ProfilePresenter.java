@@ -84,4 +84,16 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
             });
         }
     }
+
+    public void getFollowersCount(String targetUserId) {
+        followManager.getFollowersCount(context, targetUserId, count -> {
+            ifViewAttached(view -> view.updateFollowersCount((int) count));
+        });
+    }
+
+    public void getFollowingsCount(String targetUserId) {
+        followManager.getFollowingsCount(context, targetUserId, count -> {
+            ifViewAttached(view -> view.updateFollowingsCount((int) count));
+        });
+    }
 }

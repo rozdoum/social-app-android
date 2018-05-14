@@ -27,4 +27,8 @@ public interface ProfileView extends BaseView {
     void showUnfollowConfirmation();
 
     void updateFollowButtonState(FollowState followState);
+
+    void updateFollowersCount(int count);
+
+    void updateFollowingsCount(int count);
 }
