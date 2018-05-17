@@ -28,7 +28,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -52,6 +51,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnRequestComplete;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Like;
@@ -81,7 +81,10 @@ public class DatabaseHelper {
     public static final String PROFILES_DB_KEY = "profiles";
     public static final String POST_COMMENTS_DB_KEY = "post-comments";
     public static final String POST_LIKES_DB_KEY = "post-likes";
+    public static final String FOLLOW_DB_KEY = "follow";
     public static final String IMAGES_STORAGE_KEY = "images";
+
+    public static final String FOLLOWING_DB_VALUE = "following";
 
     private Context context;
     private FirebaseDatabase database;
@@ -770,4 +773,36 @@ public class DatabaseHelper {
         DatabaseReference postRef = getDatabaseReference().child(POST_LIKES_DB_KEY).child(postId);
         return postRef.removeValue();
     }
+
+    public void followUser(String followerUserId, String followingUserId, final OnRequestComplete onRequestComplete) {
+        Task<Void> task = getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(followingUserId).setValue(FOLLOWING_DB_VALUE);
+        task.addOnCompleteListener(result -> {
+            onRequestComplete.onComplete(result.isSuccessful());
+            LogUtil.logDebug(TAG, "createFollowing, success: " + result.isSuccessful());
+        });
+    }
+
+    public void unfollowUser(String followerUserId, String followingUserId, final OnRequestComplete onRequestComplete) {
+        Task<Void> task = getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(followingUserId).removeValue();
+        task.addOnCompleteListener(result -> {
+            onRequestComplete.onComplete(result.isSuccessful());
+            LogUtil.logDebug(TAG, "unfollowUser, success: " + result.isSuccessful());
+        });
+    }
+
+    public void isFollowingExist(String followerUserId, String followingUserId, final OnObjectExistListener onObjectExistListener) {
+        DatabaseReference databaseReference = getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(followingUserId);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onObjectExistListener.onDataChanged(dataSnapshot.exists());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 }
