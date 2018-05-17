@@ -14,23 +14,31 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.main.profile;
+package com.rozdoum.socialcomponents.main.usersList;
 
-import com.rozdoum.socialcomponents.enums.FollowState;
+import android.support.annotation.StringRes;
+
 import com.rozdoum.socialcomponents.main.base.BaseView;
+
+import java.util.List;
 
 /**
  * Created by Alexey on 03.05.18.
  */
 
-public interface ProfileView extends BaseView {
-    void showUnfollowConfirmation();
+public interface UsersListView extends BaseView {
 
-    void updateFollowButtonState(FollowState followState);
+    void onProfilesIdsListLoaded(List<String> list);
 
-    void updateFollowersCount(int count);
+    void showLocalProgress();
 
-    void updateFollowingsCount(int count);
+    void hideLocalProgress();
 
-    void setFollowStateChangeResultOk();
+    void setTitle(@StringRes int title);
+
+    void showEmptyListMessage(String message);
+
+    void hideEmptyListMessage();
+
+    void updateSelectedItem();
 }

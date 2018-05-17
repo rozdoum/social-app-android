@@ -164,6 +164,11 @@
     <string name="unfollow_user_message">Unfollow %1$s?</string>
     <string name="button_title_unfollow">Unfollow</string>
 
+    <!--Users list-->
+    <string name="title_followers">Followers</string>
+    <string name="title_followings">Followings</string>
+    <string name="message_empty_list">You don\'t have any %1$s yet</string>
+
     <!--Firebase errors-->
     <string name="permission_denied_error">Please check your rules to access the Firebase Realtime Database</string>
 

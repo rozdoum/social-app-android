@@ -60,6 +60,9 @@ import com.rozdoum.socialcomponents.main.editProfile.EditProfileActivity;
 import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
 import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
+import com.rozdoum.socialcomponents.main.usersList.UsersListActivity;
+import com.rozdoum.socialcomponents.main.usersList.UsersListType;
+import com.rozdoum.socialcomponents.managers.FollowManager;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
@@ -137,6 +140,14 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
             presenter.onFollowButtonClick(followButton.getState(), userID);
         });
 
+        followingsCounterTextView.setOnClickListener(v -> {
+            startUsersListActivity(UsersListType.FOLLOWINGS);
+        });
+
+        followersCounterTextView.setOnClickListener(v -> {
+            startUsersListActivity(UsersListType.FOLLOWERS);
+        });
+
         presenter.checkFollowState(userID);
 
         swipeContainer = findViewById(R.id.swipeContainer);
@@ -161,6 +172,7 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     @Override
     public void onStop() {
         super.onStop();
+        FollowManager.getInstance(this).closeListeners(this);
         profileManager.closeListeners(this);
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
@@ -207,6 +219,13 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
 
     private void onRefreshAction() {
         postsAdapter.loadPosts();
+    }
+
+    private void startUsersListActivity(int usersListType) {
+        Intent intent = new Intent(ProfileActivity.this, UsersListActivity.class);
+        intent.putExtra(UsersListActivity.USER_ID_EXTRA_KEY, userID);
+        intent.putExtra(UsersListActivity.USER_LIST_TYPE, usersListType);
+        startActivity(intent);
     }
 
     private void loadPostsList() {
@@ -407,6 +426,11 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         followingsCounterTextView.setVisibility(View.VISIBLE);
         String followingsLabel = getResources().getQuantityString(R.plurals.followings_counter_format, count, count);
         followingsCounterTextView.setText(buildCounterSpannable(followingsLabel, count));
+    }
+
+    @Override
+    public void setFollowStateChangeResultOk() {
+        setResult(UsersListActivity.UPDATE_FOLLOWING_STATE_RESULT_OK);
     }
 
     @Override

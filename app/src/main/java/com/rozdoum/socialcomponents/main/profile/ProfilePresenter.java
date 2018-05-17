@@ -46,6 +46,7 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
         followManager.followUser(currentUserId, targetUserId, success -> {
             ifViewAttached(view -> {
                 if (success) {
+                    view.setFollowStateChangeResultOk();
                     checkFollowState(targetUserId);
                 } else {
                     LogUtil.logDebug(TAG, "followUser, success: " + false);
@@ -59,6 +60,7 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
         followManager.unfollowUser(currentUserId, targetUserId, success ->
                 ifViewAttached(view -> {
                     if (success) {
+                        view.setFollowStateChangeResultOk();
                         checkFollowState(targetUserId);
                     } else {
                         LogUtil.logDebug(TAG, "unfollowUser, success: " + false);
