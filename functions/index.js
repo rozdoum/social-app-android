@@ -3,12 +3,18 @@ var functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
-const actionTypeNewLike = "new_like"
-const actionTypeNewComment = "new_comment"
-const actionTypeNewPost = "new_post"
-const notificationTitle = "Social App"
+const actionTypeNewLike = "new_like";
+const actionTypeNewComment = "new_comment";
+const actionTypeNewPost = "new_post";
+const notificationTitle = "Social App";
 
-const postsTopic = "postsTopic"
+const followingPosDbValue = "following_post";
+const followingPosDbKey = "followingPostsIds";
+const followingsDbKey = "followings";
+const followersDbKey = "followers";
+const followingDbKey = "follow";
+
+const postsTopic = "postsTopic";
 
 exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{authorId}/{likeId}').onCreate((snap, context)  => {
 
@@ -29,7 +35,7 @@ exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{au
 
         // Get the list of device notification tokens.
         const getDeviceTokensTask = admin.database().ref(`/profiles/${post.val().authorId}/notificationTokens`).once('value');
-        console.log('getDeviceTokensTask path: ', `/profiles/${post.val().authorId}/notificationTokens`)
+        console.log('getDeviceTokensTask path: ', `/profiles/${post.val().authorId}/notificationTokens`);
 
         // Get like author.
         const getLikeAuthorProfileTask = admin.database().ref(`/profiles/${likeAuthorId}`).once('value');
@@ -102,11 +108,11 @@ exports.pushNotificationComments = functions.database.ref('/post-comments/{postI
 
         // Get the list of device notification tokens.
         const getDeviceTokensTask = admin.database().ref(`/profiles/${post.val().authorId}/notificationTokens`).once('value');
-        console.log('getDeviceTokensTask path: ', `/profiles/${post.val().authorId}/notificationTokens`)
+        console.log('getDeviceTokensTask path: ', `/profiles/${post.val().authorId}/notificationTokens`);
 
         // Get post author.
         const getCommentAuthorProfileTask = admin.database().ref(`/profiles/${comment.authorId}`).once('value');
-        console.log('getCommentAuthorProfileTask path: ', `/profiles/${comment.authorId}`)
+        console.log('getCommentAuthorProfileTask path: ', `/profiles/${comment.authorId}`);
 
         return Promise.all([getDeviceTokensTask, getCommentAuthorProfileTask]).then(results => {
             const tokensSnapshot = results[0];
@@ -196,6 +202,39 @@ exports.pushNotificationNewPost = functions.database.ref('/posts/{postId}').onCr
             .catch(error => {
                 console.log("Error sending info about new post:", error);
             });
+    }).catch(fallback => {
+        console.error('Failure getPostTask', fallback);
+    });
+
+});
+
+
+exports.addNewPostToFollowers = functions.database.ref('/posts/{postId}').onCreate((snap, context) => {
+    const postId = context.params.postId;
+
+    console.log('New post was created');
+
+    // Get post authorID.
+    const getAuthorIdTask = admin.database().ref(`/posts/${postId}/authorId`).once('value');
+
+    return getAuthorIdTask.then(authorId => {
+
+        console.log('post author id', authorId.val());
+
+        // Get followers ids.
+        return admin.database().ref().child(followingDbKey).child(authorId.val()).child(followersDbKey).once('value', function(snapshot) {
+            snapshot.forEach(function (childSnapshot) {
+                let followerId = childSnapshot.val().profileId;
+                console.log('setNewPostValuesToFollower', "followerId:", followerId, "postId:", postId);
+
+                admin.database().ref().child(followingPosDbKey).child(followerId).child(postId).set({
+                    postId:postId
+                });
+            });
+        }).catch(fallback => {
+            console.error('Failure get followers ids', fallback);
+        });
+
     }).catch(fallback => {
         console.error('Failure getPostTask', fallback);
     });
