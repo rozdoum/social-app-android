@@ -1,23 +1,23 @@
 /*
+ *  Copyright 2017 Rozdoum
  *
- * Copyright 2017 Rozdoum
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.rozdoum.socialcomponents.managers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -56,6 +56,8 @@ import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnRequestComplete;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
+import com.rozdoum.socialcomponents.model.Follower;
+import com.rozdoum.socialcomponents.model.Following;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.PostListResult;
@@ -84,9 +86,9 @@ public class DatabaseHelper {
     public static final String POST_COMMENTS_DB_KEY = "post-comments";
     public static final String POST_LIKES_DB_KEY = "post-likes";
     public static final String FOLLOW_DB_KEY = "follow";
+    public static final String FOLLOWINGS_DB_KEY = "followings";
+    public static final String FOLLOWERS_DB_KEY = "followers";
     public static final String IMAGES_STORAGE_KEY = "images";
-
-    public static final String FOLLOWING_DB_VALUE = "following";
 
     private Context context;
     private FirebaseDatabase database;
@@ -776,33 +778,73 @@ public class DatabaseHelper {
         return postRef.removeValue();
     }
 
-    public void followUser(String followerUserId, String followingUserId, final OnRequestComplete onRequestComplete) {
-        Task<Void> task = getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(followingUserId).setValue(FOLLOWING_DB_VALUE);
-        task.addOnCompleteListener(result -> {
-            onRequestComplete.onComplete(result.isSuccessful());
-            LogUtil.logDebug(TAG, "createFollowing, success: " + result.isSuccessful());
-        });
+    public void followUser(Activity activity, String followerUserId, String followingUserId, final OnRequestComplete onRequestComplete) {
+        addFollowing(followerUserId, followingUserId)
+                .continueWithTask(task -> addFollower(followerUserId, followingUserId))
+                .addOnCompleteListener(activity, task ->  {
+                    onRequestComplete.onComplete(task.isSuccessful());
+                    LogUtil.logDebug(TAG, "followUser " + followingUserId + ", success: " + task.isSuccessful());
+                });
     }
 
-    public void unfollowUser(String followerUserId, String followingUserId, final OnRequestComplete onRequestComplete) {
-        Task<Void> task = getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(followingUserId).removeValue();
-        task.addOnCompleteListener(result -> {
-            onRequestComplete.onComplete(result.isSuccessful());
-            LogUtil.logDebug(TAG, "unfollowUser, success: " + result.isSuccessful());
-        });
+    public void unfollowUser(Activity activity, String followerUserId, String followingUserId, final OnRequestComplete onRequestComplete) {
+        removeFollowing(followerUserId, followingUserId)
+                .continueWithTask(task -> removeFollower(followerUserId, followingUserId))
+                .addOnCompleteListener(activity, task -> {
+                    onRequestComplete.onComplete(task.isSuccessful());
+                    LogUtil.logDebug(TAG, "unfollowUser " + followingUserId + ", success: " + task.isSuccessful());
+                });
+
+    }
+
+    private Task addFollowing(String followerUserId, String followingUserId) {
+        Following following = new Following(followingUserId);
+        return getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(FOLLOWINGS_DB_KEY).child(followingUserId).setValue(following);
+    }
+
+    private Task addFollower(String followerUserId, String followingUserId) {
+        Follower follower = new Follower(followerUserId);
+        return getDatabaseReference().child(FOLLOW_DB_KEY).child(followingUserId).child(FOLLOWERS_DB_KEY).child(followerUserId).setValue(follower);
+    }
+
+    private Task removeFollowing(String followerUserId, String followingUserId) {
+        return getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(FOLLOWINGS_DB_KEY).child(followingUserId).removeValue();
+    }
+
+    private Task removeFollower(String followerUserId, String followingUserId) {
+        return getDatabaseReference().child(FOLLOW_DB_KEY).child(followingUserId).child(FOLLOWERS_DB_KEY).child(followerUserId).removeValue();
     }
 
     public void isFollowingExist(String followerUserId, String followingUserId, final OnObjectExistListener onObjectExistListener) {
-        DatabaseReference databaseReference = getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(followingUserId);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference followingRef = getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(FOLLOWINGS_DB_KEY).child(followingUserId);
+        DatabaseReference followerRef = getDatabaseReference().child(FOLLOW_DB_KEY).child(followingUserId).child(FOLLOWERS_DB_KEY).child(followerUserId);
+
+
+        followingRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                onObjectExistListener.onDataChanged(dataSnapshot.exists());
+                if (dataSnapshot.exists()) {
+                    followerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            onObjectExistListener.onDataChanged(dataSnapshot.exists());
+                            LogUtil.logDebug(TAG, "isFollowerExist for" + followingUserId + ", success: " + dataSnapshot.exists());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                } else {
+                    onObjectExistListener.onDataChanged(false);
+                    LogUtil.logDebug(TAG, "isFollowingExist for" + followerUserId + ", success: " + dataSnapshot.exists());
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logDebug(TAG, "isFollowingExist, onCancelled");
             }
         });
     }

@@ -61,6 +61,19 @@ android {
         }
     }
 
+    flavorDimensions "default"
+
+    productFlavors {
+        demo {
+            applicationId "com.rozdoum.socialcomponentsdemo"
+            dimension "default"
+        }
+        prod {
+            applicationId "com.rozdoum.socialcomponents"
+            dimension "default"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false

@@ -18,6 +18,7 @@
 
 package com.rozdoum.socialcomponents.managers;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.google.firebase.database.ValueEventListener;
@@ -80,12 +81,12 @@ public class FollowManager extends FirebaseListenersManager {
         ApplicationHelper.getDatabaseHelper().isFollowingExist(myId, userId, onObjectExistListener);
     }
 
-    public void followUser(String currentUserId, String targetUserId, OnRequestComplete onRequestComplete) {
-        ApplicationHelper.getDatabaseHelper().followUser(currentUserId, targetUserId, onRequestComplete);
+    public void followUser(Activity activity, String currentUserId, String targetUserId, OnRequestComplete onRequestComplete) {
+        ApplicationHelper.getDatabaseHelper().followUser(activity, currentUserId, targetUserId, onRequestComplete);
     }
 
-    public void unfollowUser(String currentUserId, String targetUserId, OnRequestComplete onRequestComplete) {
-        ApplicationHelper.getDatabaseHelper().unfollowUser(currentUserId, targetUserId, onRequestComplete);
+    public void unfollowUser(Activity activity, String currentUserId, String targetUserId, OnRequestComplete onRequestComplete) {
+        ApplicationHelper.getDatabaseHelper().unfollowUser(activity, currentUserId, targetUserId, onRequestComplete);
     }
 
     public void getFollowersCount(Context activityContext, String targetUserId, OnCountChangedListener onCountChangedListener) {
