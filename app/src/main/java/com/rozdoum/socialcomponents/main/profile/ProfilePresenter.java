@@ -16,6 +16,7 @@
 
 package com.rozdoum.socialcomponents.main.profile;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,9 +34,11 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
 
     private final FollowManager followManager;
     private String currentUserId;
+    private Activity activity;
 
-    ProfilePresenter(Context context) {
-        super(context);
+    ProfilePresenter(Activity activity) {
+        super(activity);
+        this.activity = activity;
 
         followManager = FollowManager.getInstance(context);
         currentUserId = FirebaseAuth.getInstance().getUid();
@@ -43,7 +46,7 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
 
     private void followUser(String targetUserId) {
         ifViewAttached(BaseView::showProgress);
-        followManager.followUser(currentUserId, targetUserId, success -> {
+        followManager.followUser(activity, currentUserId, targetUserId, success -> {
             ifViewAttached(view -> {
                 if (success) {
                     checkFollowState(targetUserId);
@@ -56,7 +59,7 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
 
     public void unfollowUser(String targetUserId) {
         ifViewAttached(BaseView::showProgress);
-        followManager.unfollowUser(currentUserId, targetUserId, success ->
+        followManager.unfollowUser(activity, currentUserId, targetUserId, success ->
                 ifViewAttached(view -> {
                     if (success) {
                         checkFollowState(targetUserId);
