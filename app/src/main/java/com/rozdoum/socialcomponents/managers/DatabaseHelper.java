@@ -797,21 +797,21 @@ public class DatabaseHelper {
 
     }
 
-    private Task addFollowing(String followerUserId, String followingUserId) {
+    private Task<Void> addFollowing(String followerUserId, String followingUserId) {
         Following following = new Following(followingUserId);
         return getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(FOLLOWINGS_DB_KEY).child(followingUserId).setValue(following);
     }
 
-    private Task addFollower(String followerUserId, String followingUserId) {
+    private Task<Void> addFollower(String followerUserId, String followingUserId) {
         Follower follower = new Follower(followerUserId);
         return getDatabaseReference().child(FOLLOW_DB_KEY).child(followingUserId).child(FOLLOWERS_DB_KEY).child(followerUserId).setValue(follower);
     }
 
-    private Task removeFollowing(String followerUserId, String followingUserId) {
+    private Task<Void> removeFollowing(String followerUserId, String followingUserId) {
         return getDatabaseReference().child(FOLLOW_DB_KEY).child(followerUserId).child(FOLLOWINGS_DB_KEY).child(followingUserId).removeValue();
     }
 
-    private Task removeFollower(String followerUserId, String followingUserId) {
+    private Task<Void> removeFollower(String followerUserId, String followingUserId) {
         return getDatabaseReference().child(FOLLOW_DB_KEY).child(followingUserId).child(FOLLOWERS_DB_KEY).child(followerUserId).removeValue();
     }
 
@@ -849,9 +849,16 @@ public class DatabaseHelper {
         });
     }
 
+    private DatabaseReference getFollowersRef(String userId) {
+        return getDatabaseReference().child(FOLLOW_DB_KEY).child(userId).child(FOLLOWERS_DB_KEY);
+    }
+
+    private DatabaseReference getFollowingsRef(String userId) {
+        return getDatabaseReference().child(FOLLOW_DB_KEY).child(userId).child(FOLLOWINGS_DB_KEY);
+    }
+
     public ValueEventListener getFollowersCount(String targetUserId, OnCountChangedListener onCountChangedListener) {
-        Query userQuery = getDatabaseReference().child(FOLLOW_DB_KEY).orderByChild(targetUserId).equalTo(FOLLOWING_DB_VALUE);
-        ValueEventListener listener = new ValueEventListener() {
+        return getFollowersRef(targetUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 onCountChangedListener.onCountChanged(dataSnapshot.getChildrenCount());
@@ -859,69 +866,69 @@ public class DatabaseHelper {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logDebug(TAG, "getFollowersCount, onCancelled");
             }
-        };
-
-        userQuery.addValueEventListener(listener);
-
-        return listener;
+        });
     }
 
     public ValueEventListener getFollowingsCount(String targetUserId, OnCountChangedListener onCountChangedListener) {
-        Query userQuery = getDatabaseReference().child(FOLLOW_DB_KEY).child(targetUserId);
-        ValueEventListener listener = new ValueEventListener() {
+        return getFollowingsRef(targetUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                onCountChangedListener.onCountChanged((int) dataSnapshot.getChildrenCount());
+                onCountChangedListener.onCountChanged(dataSnapshot.getChildrenCount());
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logDebug(TAG, "getFollowingsCount, onCancelled");
             }
-        };
-        userQuery.addValueEventListener(listener);
-
-        return listener;
+        });
     }
 
     public void getFollowingsList(String targetUserId, OnDataChangedListener<String> onDataChangedListener) {
-        DatabaseReference databaseReference = getDatabaseReference().child(FOLLOW_DB_KEY).child(targetUserId);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        getFollowingsRef(targetUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<String> list = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String profileId = snapshot.getKey();
-                    list.add(profileId);
+                    Following following = snapshot.getValue(Following.class);
+
+                    if (following != null) {
+                        String profileId = following.getProfileId();
+                        list.add(profileId);
+                    }
+
                 }
                 onDataChangedListener.onListChanged(list);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logDebug(TAG, "getFollowingsList, onCancelled");
             }
         });
     }
 
     public void getFollowersList(String targetUserId, OnDataChangedListener<String> onDataChangedListener) {
-        Query query = getDatabaseReference().child(FOLLOW_DB_KEY).orderByChild(targetUserId).equalTo(FOLLOWING_DB_VALUE);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        getFollowersRef(targetUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<String> list = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String profileId = snapshot.getKey();
-                    list.add(profileId);
+                    Follower follower = snapshot.getValue(Follower.class);
+
+                    if (follower != null) {
+                        String profileId = follower.getProfileId();
+                        list.add(profileId);
+                    }
+
                 }
                 onDataChangedListener.onListChanged(list);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                LogUtil.logDebug(TAG, "getFollowersList, onCancelled");
             }
         });
     }

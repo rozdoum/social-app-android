@@ -16,6 +16,7 @@
 
 package com.rozdoum.socialcomponents.main.usersList;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,9 +35,11 @@ class UsersListPresenter extends BasePresenter<UsersListView> {
 
     private final FollowManager followManager;
     private String currentUserId;
+    private Activity activity;
 
-    UsersListPresenter(Context context) {
-        super(context);
+    UsersListPresenter(Activity activity) {
+        super(activity);
+        this.activity = activity;
 
         followManager = FollowManager.getInstance(context);
         currentUserId = FirebaseAuth.getInstance().getUid();
@@ -112,7 +115,7 @@ class UsersListPresenter extends BasePresenter<UsersListView> {
 
     private void followUser(String targetUserId) {
         ifViewAttached(BaseView::showProgress);
-        followManager.followUser(currentUserId, targetUserId, success -> {
+        followManager.followUser(activity, currentUserId, targetUserId, success -> {
             ifViewAttached(view -> {
                 view.hideProgress();
                 if (success) {
@@ -126,7 +129,7 @@ class UsersListPresenter extends BasePresenter<UsersListView> {
 
     public void unfollowUser(String targetUserId) {
         ifViewAttached(BaseView::showProgress);
-        followManager.unfollowUser(currentUserId, targetUserId, success ->
+        followManager.unfollowUser(activity, currentUserId, targetUserId, success ->
                 ifViewAttached(view -> {
                     view.hideProgress();
                     if (success) {
