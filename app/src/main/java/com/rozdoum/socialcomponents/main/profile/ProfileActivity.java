@@ -57,6 +57,7 @@ import com.rozdoum.socialcomponents.enums.FollowState;
 import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.editProfile.EditProfileActivity;
+import com.rozdoum.socialcomponents.main.login.LoginActivity;
 import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
 import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
@@ -212,6 +213,10 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
                             postsAdapter.updateSelectedPost();
                         }
                     }
+                    break;
+
+                case LoginActivity.LOGIN_REQUEST_CODE:
+                    presenter.checkFollowState(userID);
                     break;
             }
         }

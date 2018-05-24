@@ -116,7 +116,6 @@ public class PostsByUserAdapter extends BasePostsAdapter {
     public interface CallBack {
         void onItemClick(Post post, View view);
         void onPostsListChanged(int postsCount);
-
         void onPostLoadingCanceled();
     }
 }
