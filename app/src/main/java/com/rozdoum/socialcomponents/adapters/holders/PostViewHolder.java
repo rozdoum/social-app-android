@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.controllers.LikeController;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
@@ -64,14 +65,16 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     protected PostManager postManager;
 
     private LikeController likeController;
+    private BaseActivity baseActivity;
 
-    public PostViewHolder(View view, final OnClickListener onClickListener) {
-        this(view, onClickListener, true);
+    public PostViewHolder(View view, final OnClickListener onClickListener, BaseActivity activity) {
+        this(view, onClickListener, activity, true);
     }
 
-    public PostViewHolder(View view, final OnClickListener onClickListener, boolean isAuthorNeeded) {
+    public PostViewHolder(View view, final OnClickListener onClickListener, BaseActivity activity, boolean isAuthorNeeded) {
         super(view);
         this.context = view.getContext();
+        this.baseActivity = activity;
 
         postImageView = (ImageView) view.findViewById(R.id.postImageView);
         likeCounterTextView = (TextView) view.findViewById(R.id.likeCounterTextView);
@@ -140,7 +143,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         int height = (int) context.getResources().getDimension(R.dimen.post_detail_image_height);
 
         // Displayed and saved to cache image, as needs for post detail.
-        ImageUtil.loadImageCenterCrop(GlideApp.with(context), imageUrl, postImageView, width, height);
+        ImageUtil.loadImageCenterCrop(GlideApp.with(baseActivity), imageUrl, postImageView, width, height);
 
         if (post.getAuthorId() != null) {
             profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
@@ -163,7 +166,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onObjectChanged(final Profile obj) {
                 if (obj.getPhotoUrl() != null) {
-                    ImageUtil.loadImage(GlideApp.with(context), obj.getPhotoUrl(), authorImageView);
+                    ImageUtil.loadImage(GlideApp.with(baseActivity), obj.getPhotoUrl(), authorImageView);
                 }
             }
         };
