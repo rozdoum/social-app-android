@@ -48,7 +48,7 @@ import com.rozdoum.socialcomponents.utils.Utils;
 public class PostViewHolder extends RecyclerView.ViewHolder {
     public static final String TAG = PostViewHolder.class.getSimpleName();
 
-    private Context context;
+    protected Context context;
     private ImageView postImageView;
     private TextView titleTextView;
     private TextView detailsTextView;
@@ -61,7 +61,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private ViewGroup likeViewGroup;
 
     private ProfileManager profileManager;
-    private PostManager postManager;
+    protected PostManager postManager;
 
     private LikeController likeController;
 

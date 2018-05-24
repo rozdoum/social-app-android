@@ -25,6 +25,7 @@
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_edit_profile">Edit profile</string>
     <string name="title_activity_edit_post">Edit post</string>
+    <string name="title_activity_following_posts">Following posts</string>
 
     <string name="text_take_photo">Take photo</string>
     <string name="text_pick_photo">Pick from Gallery</string>
