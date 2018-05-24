@@ -54,7 +54,7 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     @Override
     public void startLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, LoginActivity.LOGIN_REQUEST_CODE);
     }
 
     @Override

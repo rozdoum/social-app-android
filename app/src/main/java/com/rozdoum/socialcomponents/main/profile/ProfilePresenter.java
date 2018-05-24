@@ -17,9 +17,9 @@
 package com.rozdoum.socialcomponents.main.profile;
 
 import android.app.Activity;
-import android.content.Context;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.rozdoum.socialcomponents.enums.FollowState;
 import com.rozdoum.socialcomponents.main.base.BasePresenter;
 import com.rozdoum.socialcomponents.main.base.BaseView;
 import com.rozdoum.socialcomponents.managers.FollowManager;
@@ -33,7 +33,6 @@ import com.rozdoum.socialcomponents.views.FollowButton;
 class ProfilePresenter extends BasePresenter<ProfileView> {
 
     private final FollowManager followManager;
-    private String currentUserId;
     private Activity activity;
 
     ProfilePresenter(Activity activity) {
@@ -41,12 +40,15 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
         this.activity = activity;
 
         followManager = FollowManager.getInstance(context);
-        currentUserId = FirebaseAuth.getInstance().getUid();
+    }
+
+    private String getCurrentUserId() {
+        return FirebaseAuth.getInstance().getUid();
     }
 
     private void followUser(String targetUserId) {
         ifViewAttached(BaseView::showProgress);
-        followManager.followUser(activity, currentUserId, targetUserId, success -> {
+        followManager.followUser(activity, getCurrentUserId(), targetUserId, success -> {
             ifViewAttached(view -> {
                 if (success) {
                     checkFollowState(targetUserId);
@@ -59,7 +61,7 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
 
     public void unfollowUser(String targetUserId) {
         ifViewAttached(BaseView::showProgress);
-        followManager.unfollowUser(activity, currentUserId, targetUserId, success ->
+        followManager.unfollowUser(activity, getCurrentUserId(), targetUserId, success ->
                 ifViewAttached(view -> {
                     if (success) {
                         checkFollowState(targetUserId);
@@ -70,21 +72,29 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
     }
 
     public void onFollowButtonClick(int state, String targetUserId) {
-        if (state == FollowButton.FOLLOW_STATE || state == FollowButton.FOLLOW_BACK_STATE) {
-            followUser(targetUserId);
-        } else if (state == FollowButton.FOLLOWING_STATE) {
-            ifViewAttached(ProfileView::showUnfollowConfirmation);
+        if (checkInternetConnection() && checkAuthorization()) {
+            if (state == FollowButton.FOLLOW_STATE || state == FollowButton.FOLLOW_BACK_STATE) {
+                followUser(targetUserId);
+            } else if (state == FollowButton.FOLLOWING_STATE) {
+                ifViewAttached(ProfileView::showUnfollowConfirmation);
+            }
         }
     }
 
     public void checkFollowState(String targetUserId) {
-        if (!targetUserId.equals(currentUserId)) {
-            followManager.checkFollowState(currentUserId, targetUserId, followState -> {
-                ifViewAttached(view -> {
-                    view.hideProgress();
-                    view.updateFollowButtonState(followState);
+        String currentUserId = getCurrentUserId();
+
+        if(currentUserId != null) {
+            if (!targetUserId.equals(currentUserId)) {
+                followManager.checkFollowState(currentUserId, targetUserId, followState -> {
+                    ifViewAttached(view -> {
+                        view.hideProgress();
+                        view.updateFollowButtonState(followState);
+                    });
                 });
-            });
+            }
+        } else {
+            ifViewAttached(view -> view.updateFollowButtonState(FollowState.NO_ONE_FOLLOW));
         }
     }
 }
