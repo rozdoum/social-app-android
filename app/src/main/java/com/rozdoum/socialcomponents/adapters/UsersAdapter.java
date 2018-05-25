@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.holders.UserViewHolder;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.views.FollowButton;
 
 import java.util.ArrayList;
@@ -69,11 +70,9 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void setList(List<String> list) {
-        notifyItemRangeRemoved(0, getItemCount());
         itemsList.clear();
-
         itemsList.addAll(list);
-        notifyItemRangeInserted(0, getItemCount());
+        notifyDataSetChanged();
     }
 
     public void updateItem(int position) {

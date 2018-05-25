@@ -35,6 +35,7 @@ import android.widget.TextView;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.UsersAdapter;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.login.LoginActivity;
 import com.rozdoum.socialcomponents.main.profile.ProfileActivity;
 import com.rozdoum.socialcomponents.views.FollowButton;
 
@@ -104,6 +105,10 @@ public class UsersListActivity extends BaseActivity<UsersListView, UsersListPres
 
         if (requestCode == UPDATE_FOLLOWING_STATE_REQ && resultCode == UPDATE_FOLLOWING_STATE_RESULT_OK) {
             updateSelectedItem();
+        }
+
+        if (requestCode == LoginActivity.LOGIN_REQUEST_CODE && resultCode == RESULT_OK) {
+            presenter.loadUsersList(userID, userListType, true);
         }
     }
 

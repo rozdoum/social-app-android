@@ -141,10 +141,12 @@ class UsersListPresenter extends BasePresenter<UsersListView> {
     }
 
     public void onFollowButtonClick(int state, String targetUserId) {
-        if (state == FollowButton.FOLLOW_STATE || state == FollowButton.FOLLOW_BACK_STATE) {
-            followUser(targetUserId);
-        } else if (state == FollowButton.FOLLOWING_STATE) {
-            unfollowUser(targetUserId);
+        if (checkInternetConnection() && checkAuthorization()) {
+            if (state == FollowButton.FOLLOW_STATE || state == FollowButton.FOLLOW_BACK_STATE) {
+                followUser(targetUserId);
+            } else if (state == FollowButton.FOLLOWING_STATE) {
+                unfollowUser(targetUserId);
+            }
         }
     }
 }
