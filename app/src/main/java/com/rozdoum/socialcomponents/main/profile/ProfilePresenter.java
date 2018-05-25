@@ -84,7 +84,7 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
     public void checkFollowState(String targetUserId) {
         String currentUserId = getCurrentUserId();
 
-        if(currentUserId != null) {
+        if (currentUserId != null) {
             if (!targetUserId.equals(currentUserId)) {
                 followManager.checkFollowState(currentUserId, targetUserId, followState -> {
                     ifViewAttached(view -> {
@@ -92,6 +92,8 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
                         view.updateFollowButtonState(followState);
                     });
                 });
+            } else {
+                ifViewAttached(view -> view.updateFollowButtonState(FollowState.MY_PROFILE));
             }
         } else {
             ifViewAttached(view -> view.updateFollowButtonState(FollowState.NO_ONE_FOLLOW));
