@@ -164,6 +164,7 @@
     <string name="button_following">Following</string>
     <string name="unfollow_user_message">Unfollow %1$s?</string>
     <string name="button_title_unfollow">Unfollow</string>
+    <string name="message_following_posts_empty">Follow somebody to see his new posts</string>
 
     <!--Users list-->
     <string name="title_followers">Followers</string>

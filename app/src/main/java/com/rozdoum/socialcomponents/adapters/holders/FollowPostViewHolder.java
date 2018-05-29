@@ -2,6 +2,7 @@ package com.rozdoum.socialcomponents.adapters.holders;
 
 import android.view.View;
 
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.FollowingPost;
 import com.rozdoum.socialcomponents.model.Post;
@@ -13,12 +14,12 @@ import com.rozdoum.socialcomponents.utils.LogUtil;
 public class FollowPostViewHolder extends PostViewHolder {
 
 
-    public FollowPostViewHolder(View view, OnClickListener onClickListener) {
-        super(view, onClickListener);
+    public FollowPostViewHolder(View view, OnClickListener onClickListener, BaseActivity activity) {
+        super(view, onClickListener, activity);
     }
 
-    public FollowPostViewHolder(View view, OnClickListener onClickListener, boolean isAuthorNeeded) {
-        super(view, onClickListener, isAuthorNeeded);
+    public FollowPostViewHolder(View view, OnClickListener onClickListener, BaseActivity activity, boolean isAuthorNeeded) {
+        super(view, onClickListener, activity, isAuthorNeeded);
     }
 
     public void bindData(FollowingPost followingPost) {

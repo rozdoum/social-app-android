@@ -37,4 +37,6 @@ public interface FollowPostsView extends BaseView {
     void showLocalProgress();
 
     void hideLocalProgress();
+
+    void showEmptyListMessage(boolean show);
 }

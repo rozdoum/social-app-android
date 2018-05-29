@@ -30,7 +30,18 @@
         style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/message_following_posts_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAppearance="@style/TextAppearance.Title.Light"
+        android:visibility="gone"
+        android:text="@string/message_following_posts_empty"
+        tools:visibility="visible" />
 
     <RelativeLayout
         android:id="@+id/mainContent"
@@ -53,18 +64,6 @@
                 tools:listitem="@layout/post_item_list_view" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
-
-        <TextView
-            android:id="@+id/newPostsCounterTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/posts_counter_bg"
-            android:gravity="center_vertical"
-            android:padding="@dimen/intrinsic_padding"
-            android:textColor="@android:color/white"
-            android:visibility="gone" />
 
     </RelativeLayout>
 

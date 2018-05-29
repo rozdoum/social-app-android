@@ -19,7 +19,6 @@ package com.rozdoum.socialcomponents.main.followPosts;
 import android.content.Context;
 import android.view.View;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.base.BasePresenter;
 import com.rozdoum.socialcomponents.managers.PostManager;
@@ -33,12 +32,10 @@ import com.rozdoum.socialcomponents.model.Post;
 class FollowingPostsPresenter extends BasePresenter<FollowPostsView> {
 
     private PostManager postManager;
-    private String currentUserId;
 
     FollowingPostsPresenter(Context context) {
         super(context);
         postManager = PostManager.getInstance(context);
-        currentUserId = FirebaseAuth.getInstance().getUid();
     }
 
     void onPostClicked(final String postId, final View postView) {
@@ -53,12 +50,25 @@ class FollowingPostsPresenter extends BasePresenter<FollowPostsView> {
 
     public void loadFollowingPosts() {
         if (checkInternetConnection()) {
-            ifViewAttached(FollowPostsView::showLocalProgress);
-
-            postManager.getFollowingPosts(currentUserId, list -> ifViewAttached(view -> {
-                view.hideLocalProgress();
-                view.onFollowingPostsLoaded(list);
-            }));
+            if (getCurrentUserId() != null) {
+                ifViewAttached(FollowPostsView::showLocalProgress);
+                postManager.getFollowingPosts(getCurrentUserId(), list -> ifViewAttached(view -> {
+                    view.hideLocalProgress();
+                    if (!list.isEmpty()) {
+                        view.showEmptyListMessage(false);
+                        view.onFollowingPostsLoaded(list);
+                    } else {
+                        view.showEmptyListMessage(true);
+                    }
+                }));
+            } else {
+                ifViewAttached(view -> {
+                    view.showEmptyListMessage(true);
+                    view.hideLocalProgress();
+                });
+            }
+        } else {
+            ifViewAttached(FollowPostsView::hideLocalProgress);
         }
     }
 

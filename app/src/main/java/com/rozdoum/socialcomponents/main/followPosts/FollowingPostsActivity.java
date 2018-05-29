@@ -28,12 +28,11 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.FollowPostsAdapter;
-import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
-import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
 import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.main.profile.ProfileActivity;
 import com.rozdoum.socialcomponents.model.FollowingPost;
@@ -47,7 +46,7 @@ public class FollowingPostsActivity extends BaseActivity<FollowPostsView, Follow
 
     private ProgressBar progressBar;
     private SwipeRefreshLayout swipeContainer;
-
+    private TextView message_following_posts_empty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,9 +101,15 @@ public class FollowingPostsActivity extends BaseActivity<FollowPostsView, Follow
         progressBar.setVisibility(View.GONE);
     }
 
+    @Override
+    public void showEmptyListMessage(boolean show) {
+        message_following_posts_empty.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
     private void initContentView() {
         if (recyclerView == null) {
             progressBar = findViewById(R.id.progressBar);
+            message_following_posts_empty = findViewById(R.id.message_following_posts_empty);
             swipeContainer = findViewById(R.id.swipeContainer);
             swipeContainer.setOnRefreshListener(() -> presenter.onRefresh());
 

@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 import com.rozdoum.socialcomponents.R;
@@ -83,6 +84,10 @@ public class BasePresenter<T extends BaseView & MvpView> extends MvpBasePresente
         if (status.equals(ProfileStatus.NOT_AUTHORIZED) || status.equals(ProfileStatus.NO_PROFILE)) {
             ifViewAttached(BaseView::startLoginActivity);
         }
+    }
+
+    protected String getCurrentUserId() {
+        return FirebaseAuth.getInstance().getUid();
     }
 
 }
