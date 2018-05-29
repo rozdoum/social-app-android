@@ -23,7 +23,6 @@ public class Following {
     private long createdDate;
 
     public Following() {
-        // Default constructor required for calls to DataSnapshot.getValue(Follower.class)
     }
 
     public Following(String profileId) {

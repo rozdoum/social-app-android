@@ -26,12 +26,14 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.UsersAdapter;
+import com.rozdoum.socialcomponents.enums.FollowState;
 import com.rozdoum.socialcomponents.managers.FollowManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.views.FollowButton;
 
 /**
@@ -47,15 +49,11 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
     private FollowButton followButton;
 
     private ProfileManager profileManager;
-    private String currentUserId;
 
     public UserViewHolder(View view, final UsersAdapter.Callback onClickListener) {
         super(view);
         this.context = view.getContext();
         profileManager = ProfileManager.getInstance(context);
-
-        currentUserId = FirebaseAuth.getInstance().getUid();
-
 
         nameTextView = view.findViewById(R.id.nameTextView);
         photoImageView = view.findViewById(R.id.photoImageView);
@@ -85,11 +83,18 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
             nameTextView.setText(profile.getUsername());
 
-            if (!currentUserId.equals(profile.getId())) {
-                FollowManager.getInstance(context).checkFollowState(currentUserId, profile.getId(), followState -> {
-                    followButton.setVisibility(View.VISIBLE);
-                    followButton.setState(followState);
-                });
+            String currentUserId = FirebaseAuth.getInstance().getUid();
+            if (currentUserId != null) {
+                if (!currentUserId.equals(profile.getId())) {
+                    FollowManager.getInstance(context).checkFollowState(currentUserId, profile.getId(), followState -> {
+                        followButton.setVisibility(View.VISIBLE);
+                        followButton.setState(followState);
+                    });
+                } else {
+                    followButton.setState(FollowState.MY_PROFILE);
+                }
+            } else {
+                followButton.setState(FollowState.NO_ONE_FOLLOW);
             }
 
             if (profile.getPhotoUrl() != null) {

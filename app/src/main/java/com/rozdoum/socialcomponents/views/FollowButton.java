@@ -30,7 +30,7 @@ public class FollowButton extends android.support.v7.widget.AppCompatButton {
     public static final int FOLLOW_STATE = 1;
     public static final int FOLLOW_BACK_STATE = 2;
     public static final int FOLLOWING_STATE = 3;
-    public static final int UNDEFINED_STATE = -1;
+    public static final int INVISIBLE_STATE = -1;
 
     private int state;
 
@@ -61,6 +61,10 @@ public class FollowButton extends android.support.v7.widget.AppCompatButton {
                 break;
             case NO_ONE_FOLLOW:
                 state = FOLLOW_STATE;
+                break;
+            case MY_PROFILE:
+                state = INVISIBLE_STATE;
+
         }
 
         updateButtonState();
@@ -68,7 +72,7 @@ public class FollowButton extends android.support.v7.widget.AppCompatButton {
     }
 
     private void init() {
-        state = UNDEFINED_STATE;
+        state = INVISIBLE_STATE;
         updateButtonState();
     }
 
@@ -77,6 +81,8 @@ public class FollowButton extends android.support.v7.widget.AppCompatButton {
     }
 
     public void updateButtonState() {
+        setClickable(true);
+
         switch (state) {
             case FOLLOW_STATE: {
                 setVisibility(VISIBLE);
@@ -102,8 +108,9 @@ public class FollowButton extends android.support.v7.widget.AppCompatButton {
                 break;
             }
 
-            case UNDEFINED_STATE: {
+            case INVISIBLE_STATE: {
                 setVisibility(INVISIBLE);
+                setClickable(false);
                 break;
             }
         }
