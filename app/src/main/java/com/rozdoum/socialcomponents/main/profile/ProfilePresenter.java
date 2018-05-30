@@ -42,10 +42,6 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
         followManager = FollowManager.getInstance(context);
     }
 
-    private String getCurrentUserId() {
-        return FirebaseAuth.getInstance().getUid();
-    }
-
     private void followUser(String targetUserId) {
         ifViewAttached(BaseView::showProgress);
         followManager.followUser(activity, getCurrentUserId(), targetUserId, success -> {
