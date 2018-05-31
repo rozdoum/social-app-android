@@ -58,6 +58,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Comment;
 import com.rozdoum.socialcomponents.model.Follower;
 import com.rozdoum.socialcomponents.model.Following;
+import com.rozdoum.socialcomponents.model.FollowingPost;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.PostListResult;
@@ -87,6 +88,7 @@ public class DatabaseHelper {
     public static final String POST_LIKES_DB_KEY = "post-likes";
     public static final String FOLLOW_DB_KEY = "follow";
     public static final String FOLLOWINGS_DB_KEY = "followings";
+    public static final String FOLLOWINGS_POSTS_DB_KEY = "followingPostsIds";
     public static final String FOLLOWERS_DB_KEY = "followers";
     public static final String IMAGES_STORAGE_KEY = "images";
 
@@ -167,7 +169,7 @@ public class DatabaseHelper {
             getProfileSingleValue(currentUserId, new OnObjectChangedListener<Profile>() {
                 @Override
                 public void onObjectChanged(Profile obj) {
-                    if(obj != null) {
+                    if (obj != null) {
                         addRegistrationToken(token, currentUserId);
                     } else {
                         LogUtil.logError(TAG, "updateRegistrationToken",
@@ -342,7 +344,7 @@ public class DatabaseHelper {
         });
     }
 
-    public Task<Void> removeComment(String commentId,  String postId) {
+    public Task<Void> removeComment(String commentId, String postId) {
         DatabaseReference postRef = getDatabaseReference().child(POST_COMMENTS_DB_KEY).child(postId).child(commentId);
         return postRef.removeValue();
     }
@@ -556,12 +558,16 @@ public class DatabaseHelper {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (isPostValid((Map<String, Object>) dataSnapshot.getValue())) {
-                    Post post = dataSnapshot.getValue(Post.class);
-                    post.setId(id);
-                    listener.onObjectChanged(post);
+                if (dataSnapshot.getValue() != null && dataSnapshot.exists()) {
+                    if (isPostValid((Map<String, Object>) dataSnapshot.getValue())) {
+                        Post post = dataSnapshot.getValue(Post.class);
+                        post.setId(id);
+                        listener.onObjectChanged(post);
+                    } else {
+                        listener.onError(String.format(context.getString(R.string.error_general_post), id));
+                    }
                 } else {
-                    listener.onError(String.format(context.getString(R.string.error_general_post), id));
+                    listener.onError(context.getString(R.string.message_post_was_removed));
                 }
             }
 
@@ -781,7 +787,7 @@ public class DatabaseHelper {
     public void followUser(Activity activity, String followerUserId, String followingUserId, final OnRequestComplete onRequestComplete) {
         addFollowing(followerUserId, followingUserId)
                 .continueWithTask(task -> addFollower(followerUserId, followingUserId))
-                .addOnCompleteListener(activity, task ->  {
+                .addOnCompleteListener(activity, task -> {
                     onRequestComplete.onComplete(task.isSuccessful());
                     LogUtil.logDebug(TAG, "followUser " + followingUserId + ", success: " + task.isSuccessful());
                 });
@@ -929,6 +935,28 @@ public class DatabaseHelper {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 LogUtil.logDebug(TAG, "getFollowersList, onCancelled");
+            }
+        });
+    }
+
+    public void getFollowingPosts(String userId, OnDataChangedListener<FollowingPost> listener) {
+        getDatabaseReference().child(FOLLOWINGS_POSTS_DB_KEY).child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<FollowingPost> list = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    FollowingPost followingPost = snapshot.getValue(FollowingPost.class);
+                    list.add(followingPost);
+                }
+
+                Collections.reverse(list);
+
+                listener.onListChanged(list);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                LogUtil.logDebug(TAG, "getFollowingPosts, onCancelled");
             }
         });
     }

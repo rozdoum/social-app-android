@@ -30,12 +30,13 @@ import android.widget.TextView;
 
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.main.MainActivity;
-import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
 /**
@@ -199,8 +200,8 @@ public class LikeController {
     }
 
     public void initLike(boolean isLiked) {
-            likesImageView.setImageResource(isLiked ? R.drawable.ic_like_active : R.drawable.ic_like);
-            this.isLiked = isLiked;
+        likesImageView.setImageResource(isLiked ? R.drawable.ic_like_active : R.drawable.ic_like);
+        this.isLiked = isLiked;
     }
 
     private void updateLocalPostLikeCounter(Post post) {
@@ -224,6 +225,24 @@ public class LikeController {
                 } else {
                     showWarningMessage(baseActivity, R.string.message_post_was_removed);
                 }
+            }
+        });
+    }
+
+    public void handleLikeClickAction(final BaseActivity baseActivity, final String postId) {
+        PostManager.getInstance(baseActivity.getApplicationContext()).getSinglePostValue(postId, new OnPostChangedListener() {
+            @Override
+            public void onObjectChanged(Post post) {
+                if (baseActivity.hasInternetConnection()) {
+                    doHandleLikeClickAction(baseActivity, post);
+                } else {
+                    showWarningMessage(baseActivity, R.string.internet_connection_failed);
+                }
+            }
+
+            @Override
+            public void onError(String errorText) {
+                baseActivity.showSnackBar(errorText);
             }
         });
     }
