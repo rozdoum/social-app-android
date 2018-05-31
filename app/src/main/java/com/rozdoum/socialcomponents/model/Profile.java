@@ -17,11 +17,12 @@
 package com.rozdoum.socialcomponents.model;
 
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.rozdoum.socialcomponents.enums.ItemType;
 
 import java.io.Serializable;
 
 @IgnoreExtraProperties
-public class Profile implements Serializable {
+public class Profile implements Serializable, LazyLoading {
 
     private String id;
     private String username;
@@ -29,6 +30,7 @@ public class Profile implements Serializable {
     private String photoUrl;
     private long likesCount;
     private String registrationToken;
+    private ItemType itemType;
 
     public Profile() {
         // Default constructor required for calls to DataSnapshot.getValue(Profile.class)
@@ -36,6 +38,10 @@ public class Profile implements Serializable {
 
     public Profile(String id) {
         this.id = id;
+    }
+
+    public Profile(ItemType load) {
+        itemType = load;
     }
 
     public String getId() {
@@ -84,5 +90,15 @@ public class Profile implements Serializable {
 
     public void setRegistrationToken(String registrationToken) {
         this.registrationToken = registrationToken;
+    }
+
+    @Override
+    public ItemType getItemType() {
+        return itemType;
+    }
+
+    @Override
+    public void setItemType(ItemType itemType) {
+        this.itemType = itemType;
     }
 }

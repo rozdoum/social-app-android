@@ -65,7 +65,7 @@ public class UnfollowConfirmationDialog extends DialogFragment {
         ImageView imageView = view.findViewById(R.id.imageView);
         TextView confirmationMessageTextView = view.findViewById(R.id.confirmationMessageTextView);
 
-        confirmationMessageTextView.setText(profile.getUsername());
+        confirmationMessageTextView.setText(getString(R.string.unfollow_user_message, profile.getUsername()));
 
         ImageUtil.loadImage(GlideApp.with(this), profile.getPhotoUrl(), imageView);
 

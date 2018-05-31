@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,9 +14,31 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.managers.listeners;
+package com.rozdoum.socialcomponents.main.usersList;
 
-public interface OnCountChangedListener<T> {
+import android.support.annotation.StringRes;
 
-    void onCountChanged(long count);
+import com.rozdoum.socialcomponents.main.base.BaseView;
+
+import java.util.List;
+
+/**
+ * Created by Alexey on 03.05.18.
+ */
+
+public interface UsersListView extends BaseView {
+
+    void onProfilesIdsListLoaded(List<String> list);
+
+    void showLocalProgress();
+
+    void hideLocalProgress();
+
+    void setTitle(@StringRes int title);
+
+    void showEmptyListMessage(String message);
+
+    void hideEmptyListMessage();
+
+    void updateSelectedItem();
 }

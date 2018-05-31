@@ -123,6 +123,16 @@
         <item quantity="other">likes</item>
     </plurals>
 
+    <plurals name="followers_counter_format">
+        <item quantity="one">follower</item>
+        <item quantity="other">followers</item>
+    </plurals>
+
+    <plurals name="followings_counter_format">
+        <item quantity="one">following</item>
+        <item quantity="other">followings</item>
+    </plurals>
+
     <string name="posts_label">Posts:</string>
     <string name="complain_sent">Complain was sent successfully</string>
     <string name="now_time_range">now</string>
@@ -153,6 +163,11 @@
     <string name="button_following">Following</string>
     <string name="unfollow_user_message">Unfollow %1$s?</string>
     <string name="button_title_unfollow">Unfollow</string>
+
+    <!--Users list-->
+    <string name="title_followers">Followers</string>
+    <string name="title_followings">Followings</string>
+    <string name="message_empty_list">You don\'t have any %1$s yet</string>
 
     <!--Firebase errors-->
     <string name="permission_denied_error">Please check your rules to access the Firebase Realtime Database</string>

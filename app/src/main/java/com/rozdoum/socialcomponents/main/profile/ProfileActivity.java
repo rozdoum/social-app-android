@@ -61,6 +61,9 @@ import com.rozdoum.socialcomponents.main.login.LoginActivity;
 import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
 import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
+import com.rozdoum.socialcomponents.main.usersList.UsersListActivity;
+import com.rozdoum.socialcomponents.main.usersList.UsersListType;
+import com.rozdoum.socialcomponents.managers.FollowManager;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
@@ -95,6 +98,8 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     private PostsByUserAdapter postsAdapter;
     private SwipeRefreshLayout swipeContainer;
     private TextView likesCountersTextView;
+    private TextView followersCounterTextView;
+    private TextView followingsCounterTextView;
     private ProfileManager profileManager;
     private FollowButton followButton;
 
@@ -126,12 +131,22 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         nameEditText = findViewById(R.id.nameEditText);
         postsCounterTextView = findViewById(R.id.postsCounterTextView);
         likesCountersTextView = findViewById(R.id.likesCountersTextView);
+        followersCounterTextView = findViewById(R.id.followersCounterTextView);
+        followingsCounterTextView = findViewById(R.id.followingsCounterTextView);
         postsLabelTextView = findViewById(R.id.postsLabelTextView);
         postsProgressBar = findViewById(R.id.postsProgressBar);
         followButton = findViewById(R.id.followButton);
 
         followButton.setOnClickListener(v -> {
             presenter.onFollowButtonClick(followButton.getState(), userID);
+        });
+
+        followingsCounterTextView.setOnClickListener(v -> {
+            startUsersListActivity(UsersListType.FOLLOWINGS);
+        });
+
+        followersCounterTextView.setOnClickListener(v -> {
+            startUsersListActivity(UsersListType.FOLLOWERS);
         });
 
         presenter.checkFollowState(userID);
@@ -147,6 +162,8 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     public void onStart() {
         super.onStart();
         loadProfile();
+        presenter.getFollowersCount(userID);
+        presenter.getFollowingsCount(userID);
 
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
@@ -156,6 +173,7 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     @Override
     public void onStop() {
         super.onStop();
+        FollowManager.getInstance(this).closeListeners(this);
         profileManager.closeListeners(this);
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
@@ -206,6 +224,13 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
 
     private void onRefreshAction() {
         postsAdapter.loadPosts();
+    }
+
+    private void startUsersListActivity(int usersListType) {
+        Intent intent = new Intent(ProfileActivity.this, UsersListActivity.class);
+        intent.putExtra(UsersListActivity.USER_ID_EXTRA_KEY, userID);
+        intent.putExtra(UsersListActivity.USER_LIST_TYPE, usersListType);
+        startActivity(intent);
     }
 
     private void loadPostsList() {
@@ -295,12 +320,9 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     }
 
     private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
-        return new OnObjectChangedListener<Profile>() {
-            @Override
-            public void onObjectChanged(Profile obj) {
-                profile = obj;
-                fillUIFields(obj);
-            }
+        return obj -> {
+            profile = obj;
+            fillUIFields(obj);
         };
     }
 
@@ -395,6 +417,25 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     @Override
     public void updateFollowButtonState(FollowState followState) {
         followButton.setState(followState);
+    }
+
+    @Override
+    public void updateFollowersCount(int count) {
+        followersCounterTextView.setVisibility(View.VISIBLE);
+        String followersLabel = getResources().getQuantityString(R.plurals.followers_counter_format, count, count);
+        followersCounterTextView.setText(buildCounterSpannable(followersLabel, count));
+    }
+
+    @Override
+    public void updateFollowingsCount(int count) {
+        followingsCounterTextView.setVisibility(View.VISIBLE);
+        String followingsLabel = getResources().getQuantityString(R.plurals.followings_counter_format, count, count);
+        followingsCounterTextView.setText(buildCounterSpannable(followingsLabel, count));
+    }
+
+    @Override
+    public void setFollowStateChangeResultOk() {
+        setResult(UsersListActivity.UPDATE_FOLLOWING_STATE_RESULT_OK);
     }
 
     @Override

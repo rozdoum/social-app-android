@@ -104,35 +104,64 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/intrinsic_padding"
+                            android:layout_marginEnd="@dimen/small_intrinsic_padding"
+                            android:layout_marginStart="@dimen/small_intrinsic_padding"
                             android:paddingTop="@dimen/intrinsic_padding"
                             android:textAppearance="@style/TextAppearance.Title"
                             tools:text="John Smith " />
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:padding="@dimen/small_intrinsic_padding">
+                            android:weightSum="100">
 
                             <TextView
                                 android:id="@+id/postsCounterTextView"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginRight="@dimen/profile_screen_margin_between_counters"
+                                android:layout_weight="20"
                                 android:gravity="center"
-                                android:textAppearance="@style/TextAppearance.Title"
+                                android:padding="@dimen/small_intrinsic_padding"
+                                android:textAppearance="@style/TextAppearance.Counter"
                                 android:visibility="invisible"
                                 tools:text="25 \n posts"
                                 tools:visibility="visible" />
 
                             <TextView
                                 android:id="@+id/likesCountersTextView"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="20"
                                 android:gravity="center"
-                                android:textAppearance="@style/TextAppearance.Title"
+                                android:padding="@dimen/small_intrinsic_padding"
+                                android:textAppearance="@style/TextAppearance.Counter"
                                 android:visibility="invisible"
                                 tools:text="25 \n likes"
+                                tools:visibility="visible" />
+
+                            <TextView
+                                android:id="@+id/followersCounterTextView"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="30"
+                                android:gravity="center"
+                                android:padding="@dimen/small_intrinsic_padding"
+                                android:textAppearance="@style/TextAppearance.Counter"
+                                android:visibility="invisible"
+                                tools:text="25 \n followers"
+                                tools:visibility="visible" />
+
+                            <TextView
+                                android:id="@+id/followingsCounterTextView"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="30"
+                                android:gravity="center"
+                                android:padding="@dimen/small_intrinsic_padding"
+                                android:textAppearance="@style/TextAppearance.Counter"
+                                android:visibility="invisible"
+                                tools:text="25 \nfollowings"
                                 tools:visibility="visible" />
 
                         </LinearLayout>
