@@ -61,6 +61,7 @@ import java.util.Arrays;
 public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> implements LoginView, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int SIGN_IN_GOOGLE = 9001;
+    public static final int LOGIN_REQUEST_CODE = 10001;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -102,6 +103,7 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
                     // Profile is signed in
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     checkIsProfileExist(user.getUid());
+                    setResult(RESULT_OK);
                 } else {
                     // Profile is signed out
                     LogUtil.logDebug(TAG, "onAuthStateChanged:signed_out");
