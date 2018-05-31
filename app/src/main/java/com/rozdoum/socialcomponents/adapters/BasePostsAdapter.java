@@ -32,7 +32,7 @@ public abstract class BasePostsAdapter extends RecyclerView.Adapter<RecyclerView
 
     protected List<Post> postList = new LinkedList<>();
     protected BaseActivity activity;
-    protected int selectedPostPosition = -1;
+    protected int selectedPostPosition = RecyclerView.NO_POSITION;
 
     public BasePostsAdapter(BaseActivity activity) {
         this.activity = activity;
@@ -72,7 +72,7 @@ public abstract class BasePostsAdapter extends RecyclerView.Adapter<RecyclerView
     }
 
     public void updateSelectedPost() {
-        if (selectedPostPosition != -1) {
+        if (selectedPostPosition != RecyclerView.NO_POSITION) {
             Post selectedPost = getItemByPosition(selectedPostPosition);
             PostManager.getInstance(activity).getSinglePostValue(selectedPost.getId(), createOnPostChangeListener(selectedPostPosition));
         }

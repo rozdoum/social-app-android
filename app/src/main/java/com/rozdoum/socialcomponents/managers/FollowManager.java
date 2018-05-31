@@ -21,8 +21,11 @@ package com.rozdoum.socialcomponents.managers;
 import android.app.Activity;
 import android.content.Context;
 
+import com.google.firebase.database.ValueEventListener;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.enums.FollowState;
+import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnRequestComplete;
 import com.rozdoum.socialcomponents.utils.LogUtil;
@@ -84,6 +87,26 @@ public class FollowManager extends FirebaseListenersManager {
 
     public void unfollowUser(Activity activity, String currentUserId, String targetUserId, OnRequestComplete onRequestComplete) {
         ApplicationHelper.getDatabaseHelper().unfollowUser(activity, currentUserId, targetUserId, onRequestComplete);
+    }
+
+    public void getFollowersCount(Context activityContext, String targetUserId, OnCountChangedListener onCountChangedListener) {
+        ValueEventListener listener = ApplicationHelper.getDatabaseHelper().getFollowersCount(targetUserId, onCountChangedListener);
+        addListenerToMap(activityContext, listener);
+    }
+
+    public void getFollowingsCount(Context activityContext, String targetUserId, OnCountChangedListener onCountChangedListener) {
+        ValueEventListener listener = ApplicationHelper.getDatabaseHelper().getFollowingsCount(targetUserId, onCountChangedListener);
+        addListenerToMap(activityContext, listener);
+    }
+
+    public void getFollowingsIdsList(String targetUserId,
+                                     OnDataChangedListener<String> onDataChangedListener) {
+        ApplicationHelper.getDatabaseHelper().getFollowingsList(targetUserId, onDataChangedListener);
+    }
+
+    public void getFollowersIdsList(String targetUserId,
+                                    OnDataChangedListener<String> onDataChangedListener) {
+        ApplicationHelper.getDatabaseHelper().getFollowersList(targetUserId, onDataChangedListener);
     }
 
     public interface CheckStateListener {

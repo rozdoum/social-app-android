@@ -65,6 +65,16 @@
             android:name=".main.post.editPost.EditPostActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_edit_post" />
+
+        <activity android:name=".main.usersList.UsersListActivity"
+            android:theme="@style/AppCompat.NoActionBar"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity android:name=".main.followPosts.FollowingPostsActivity"
+            android:theme="@style/AppCompat.NoActionBar"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_following_posts"/>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="84e05e27c9fcba7e1de6a47e355a1aa247264a46" />

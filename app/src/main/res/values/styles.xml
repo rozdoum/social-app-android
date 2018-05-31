@@ -30,6 +30,11 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="TextAppearance.Title.Light" parent="@android:style/TextAppearance">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/secondary_light</item>
+    </style>
+
     <style name="TextAppearance.Toolbar.Expanded" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
         <item name="android:textSize">24sp</item>
     </style>
@@ -40,7 +45,7 @@
     </style>
 
     <style name="TextAppearance.Second.Light" parent="@android:style/TextAppearance">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/secondary_light</item>
     </style>
 
@@ -57,6 +62,11 @@
     <style name="TextAppearance.MainTitle" parent="@android:style/TextAppearance">
         <item name="android:textSize">32sp</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="TextAppearance.Counter" parent="@android:style/TextAppearance">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/primary_dark_text</item>
     </style>
 
 </resources>

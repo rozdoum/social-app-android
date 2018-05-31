@@ -35,6 +35,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
+import com.rozdoum.socialcomponents.model.FollowingPost;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -233,6 +234,12 @@ public class PostManager extends FirebaseListenersManager {
             postCounterWatcher.onPostCounterChanged(newPostsCounter);
         }
     }
+
+    public void getFollowingPosts(String userId, OnDataChangedListener<FollowingPost> listener) {
+        DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
+        databaseHelper.getFollowingPosts(userId, listener);
+    }
+
 
     public interface PostCounterWatcher {
         void onPostCounterChanged(int newValue);

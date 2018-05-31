@@ -42,15 +42,12 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
         followManager = FollowManager.getInstance(context);
     }
 
-    private String getCurrentUserId() {
-        return FirebaseAuth.getInstance().getUid();
-    }
-
     private void followUser(String targetUserId) {
         ifViewAttached(BaseView::showProgress);
         followManager.followUser(activity, getCurrentUserId(), targetUserId, success -> {
             ifViewAttached(view -> {
                 if (success) {
+                    view.setFollowStateChangeResultOk();
                     checkFollowState(targetUserId);
                 } else {
                     LogUtil.logDebug(TAG, "followUser, success: " + false);
@@ -64,6 +61,7 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
         followManager.unfollowUser(activity, getCurrentUserId(), targetUserId, success ->
                 ifViewAttached(view -> {
                     if (success) {
+                        view.setFollowStateChangeResultOk();
                         checkFollowState(targetUserId);
                     } else {
                         LogUtil.logDebug(TAG, "unfollowUser, success: " + false);
@@ -98,5 +96,17 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
         } else {
             ifViewAttached(view -> view.updateFollowButtonState(FollowState.NO_ONE_FOLLOW));
         }
+    }
+
+    public void getFollowersCount(String targetUserId) {
+        followManager.getFollowersCount(context, targetUserId, count -> {
+            ifViewAttached(view -> view.updateFollowersCount((int) count));
+        });
+    }
+
+    public void getFollowingsCount(String targetUserId) {
+        followManager.getFollowingsCount(context, targetUserId, count -> {
+            ifViewAttached(view -> view.updateFollowingsCount((int) count));
+        });
     }
 }
