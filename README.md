@@ -56,6 +56,16 @@ Setup steps
 
 ![storage_link_exp](https://user-images.githubusercontent.com/7821425/32899046-8811009c-caf2-11e7-905f-741174d26512.png)
 
+ 7. Deploy cloud functions
+  - Set up and initialize Firebase SDK for Cloud Functions following the 
+    [Firebase instruction](https://firebase.google.com/docs/functions/get-started#set_up_and_initialize).
+   **Important! During initialization CLI firebase ask you to override package.json and index.js files. Do not override index.js file!** All cloud functions code from this repository are already there. Subsequently you can add new functions to this file.
+  - Deploy the function by running the command: 
+     ```
+    $ firebase deploy --only functions
+     ```
+    
+
  Now you can install app, login and create a post.
 
 
