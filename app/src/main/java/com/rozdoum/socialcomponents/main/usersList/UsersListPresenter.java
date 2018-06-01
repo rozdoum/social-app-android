@@ -54,9 +54,8 @@ class UsersListPresenter extends BasePresenter<UsersListView> {
             FollowManager.getInstance(context).getFollowingsIdsList(userID, list -> {
                 ifViewAttached(view -> {
                     view.hideLocalProgress();
-
+                    view.onProfilesIdsListLoaded(list);
                     if (list.size() > 0) {
-                        view.onProfilesIdsListLoaded(list);
                         view.hideEmptyListMessage();
                     } else {
                         String message = context.getString(R.string.message_empty_list, context.getString(R.string.title_followings));
@@ -76,9 +75,9 @@ class UsersListPresenter extends BasePresenter<UsersListView> {
             FollowManager.getInstance(context).getFollowersIdsList(userID, list -> {
                 ifViewAttached(view -> {
                     view.hideLocalProgress();
+                    view.onProfilesIdsListLoaded(list);
 
                     if (list.size() > 0) {
-                        view.onProfilesIdsListLoaded(list);
                         view.hideEmptyListMessage();
                     } else {
                         String message = context.getString(R.string.message_empty_list, context.getString(R.string.title_followers));
