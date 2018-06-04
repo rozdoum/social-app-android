@@ -240,3 +240,20 @@ exports.addNewPostToFollowers = functions.database.ref('/posts/{postId}').onCrea
     });
 
 });
+
+
+exports.removePostFromFollowingList = functions.database.ref('/posts/{postId}').onDelete((snap, context) => {
+    const postId = context.params.postId;
+    const authorId = snap.val().authorId;
+
+    // Get followers ids.
+    return admin.database().ref().child(followingDbKey).child(authorId).child(followersDbKey).once('value', function(snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+            let followerId = childSnapshot.val().profileId;
+            admin.database().ref().child(followingPosDbKey).child(followerId).child(postId).remove();
+            console.log('remove post if from following list for followerId:', followerId, "postId:", postId);
+        });
+    }).catch(fallback => {
+        console.error('Failure get followers ids', fallback);
+    });
+});
