@@ -22,8 +22,8 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.google.firebase.database.ValueEventListener;
-import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.enums.FollowState;
+import com.rozdoum.socialcomponents.main.interactors.FollowInteractor;
 import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
@@ -34,6 +34,7 @@ public class FollowManager extends FirebaseListenersManager {
 
     private static final String TAG = FollowManager.class.getSimpleName();
     private static FollowManager instance;
+    private FollowInteractor followInteractor;
 
     private Context context;
 
@@ -47,6 +48,7 @@ public class FollowManager extends FirebaseListenersManager {
 
     private FollowManager(Context context) {
         this.context = context;
+        followInteractor = FollowInteractor.getInstance(context);
     }
 
     public void checkFollowState(String myId, String userId, CheckStateListener checkStateListener) {
@@ -74,39 +76,39 @@ public class FollowManager extends FirebaseListenersManager {
 
 
     public void doesUserFollowMe(String myId, String userId, final OnObjectExistListener onObjectExistListener) {
-        ApplicationHelper.getDatabaseHelper().isFollowingExist(userId, myId, onObjectExistListener);
+        followInteractor.isFollowingExist(userId, myId, onObjectExistListener);
     }
 
     public void doIFollowUser(String myId, String userId, final OnObjectExistListener onObjectExistListener) {
-        ApplicationHelper.getDatabaseHelper().isFollowingExist(myId, userId, onObjectExistListener);
+        followInteractor.isFollowingExist(myId, userId, onObjectExistListener);
     }
 
     public void followUser(Activity activity, String currentUserId, String targetUserId, OnRequestComplete onRequestComplete) {
-        ApplicationHelper.getDatabaseHelper().followUser(activity, currentUserId, targetUserId, onRequestComplete);
+        followInteractor.followUser(activity, currentUserId, targetUserId, onRequestComplete);
     }
 
     public void unfollowUser(Activity activity, String currentUserId, String targetUserId, OnRequestComplete onRequestComplete) {
-        ApplicationHelper.getDatabaseHelper().unfollowUser(activity, currentUserId, targetUserId, onRequestComplete);
+        followInteractor.unfollowUser(activity, currentUserId, targetUserId, onRequestComplete);
     }
 
     public void getFollowersCount(Context activityContext, String targetUserId, OnCountChangedListener onCountChangedListener) {
-        ValueEventListener listener = ApplicationHelper.getDatabaseHelper().getFollowersCount(targetUserId, onCountChangedListener);
+        ValueEventListener listener = followInteractor.getFollowersCount(targetUserId, onCountChangedListener);
         addListenerToMap(activityContext, listener);
     }
 
     public void getFollowingsCount(Context activityContext, String targetUserId, OnCountChangedListener onCountChangedListener) {
-        ValueEventListener listener = ApplicationHelper.getDatabaseHelper().getFollowingsCount(targetUserId, onCountChangedListener);
+        ValueEventListener listener = followInteractor.getFollowingsCount(targetUserId, onCountChangedListener);
         addListenerToMap(activityContext, listener);
     }
 
     public void getFollowingsIdsList(String targetUserId,
                                      OnDataChangedListener<String> onDataChangedListener) {
-        ApplicationHelper.getDatabaseHelper().getFollowingsList(targetUserId, onDataChangedListener);
+        followInteractor.getFollowingsList(targetUserId, onDataChangedListener);
     }
 
     public void getFollowersIdsList(String targetUserId,
                                     OnDataChangedListener<String> onDataChangedListener) {
-        ApplicationHelper.getDatabaseHelper().getFollowersList(targetUserId, onDataChangedListener);
+        followInteractor.getFollowersList(targetUserId, onDataChangedListener);
     }
 
     public interface CheckStateListener {

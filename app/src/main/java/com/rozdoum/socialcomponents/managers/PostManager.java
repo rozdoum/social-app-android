@@ -29,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.enums.UploadImagePrefix;
+import com.rozdoum.socialcomponents.main.interactors.FollowInteractor;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
@@ -236,8 +237,7 @@ public class PostManager extends FirebaseListenersManager {
     }
 
     public void getFollowingPosts(String userId, OnDataChangedListener<FollowingPost> listener) {
-        DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
-        databaseHelper.getFollowingPosts(userId, listener);
+        FollowInteractor.getInstance(context).getFollowingPosts(userId, listener);
     }
 
 
