@@ -32,9 +32,7 @@
 
     <com.rozdoum.socialcomponents.views.FollowButton
         android:id="@+id/followButton"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:minHeight="0dp"
+        style="@style/FollowButton"
         android:visibility="invisible"
         tools:text="Follow back" />
 

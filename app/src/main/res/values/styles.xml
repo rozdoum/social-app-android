@@ -25,6 +25,11 @@
         <item name="android:textColor">@color/primary_dark_text</item>
     </style>
 
+    <style name="TextAppearance.Large" parent="@android:style/TextAppearance">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/primary_dark_text</item>
+    </style>
+
     <style name="TextAppearance.Title.White" parent="@android:style/TextAppearance">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@android:color/white</item>
@@ -67,6 +72,13 @@
     <style name="TextAppearance.Counter" parent="@android:style/TextAppearance">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/primary_dark_text</item>
+    </style>
+
+    <style name="FollowButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:layout_width">@dimen/follow_button_width</item>
+        <item name="android:layout_height">@dimen/follow_button_height</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
 </resources>
