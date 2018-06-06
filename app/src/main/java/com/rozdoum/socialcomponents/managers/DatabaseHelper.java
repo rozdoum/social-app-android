@@ -940,7 +940,9 @@ public class DatabaseHelper {
     }
 
     public void getFollowingPosts(String userId, OnDataChangedListener<FollowingPost> listener) {
-        getDatabaseReference().child(FOLLOWINGS_POSTS_DB_KEY).child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference ref = getDatabaseReference().child(FOLLOWINGS_POSTS_DB_KEY).child(userId);
+        ref.keepSynced(true);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<FollowingPost> list = new ArrayList<>();
