@@ -148,6 +148,10 @@ public class DatabaseHelper {
         activeListeners.clear();
     }
 
+    public void addActiveListener(ValueEventListener listener, DatabaseReference reference) {
+        activeListeners.put(listener, reference);
+    }
+
     public void createOrUpdateProfile(final Profile profile, final OnProfileCreatedListener onProfileCreatedListener) {
         DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
         Task<Void> task = databaseReference.child(PROFILES_DB_KEY).child(profile.getId()).setValue(profile);
@@ -201,27 +205,6 @@ public class DatabaseHelper {
                 LogUtil.logDebug(TAG, "removeRegistrationToken, success: " + task.isSuccessful());
             }
         });
-    }
-
-    public String generatePostId() {
-        return getDatabaseReference().child(POSTS_DB_KEY).push().getKey();
-    }
-
-    public void createOrUpdatePost(Post post) {
-        try {
-            Map<String, Object> postValues = post.toMap();
-            Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/" + POSTS_DB_KEY + "/" + post.getId(), postValues);
-
-            getDatabaseReference().updateChildren(childUpdates);
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
-
-    public Task<Void> removePost(Post post) {
-        DatabaseReference postRef = getDatabaseReference().child(POSTS_DB_KEY).child(post.getId());
-        return postRef.removeValue();
     }
 
     public void updateProfileLikeCountAfterRemovingPost(Post post) {
@@ -400,28 +383,6 @@ public class DatabaseHelper {
 
     }
 
-    public void incrementWatchersCount(String postId) {
-        DatabaseReference postRef = database.getReference(POSTS_DB_KEY + "/" + postId + "/watchersCount");
-        postRef.runTransaction(new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                Integer currentValue = mutableData.getValue(Integer.class);
-                if (currentValue == null) {
-                    mutableData.setValue(1);
-                } else {
-                    mutableData.setValue(currentValue + 1);
-                }
-
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                LogUtil.logInfo(TAG, "Updating Watchers count transaction is completed.");
-            }
-        });
-    }
-
     public void removeLike(final String postId, final String postAuthorId) {
         String authorId = firebaseAuth.getCurrentUser().getUid();
         DatabaseReference mLikesReference = getDatabaseReference().child(POST_LIKES_DB_KEY).child(postId).child(authorId);
@@ -470,185 +431,6 @@ public class DatabaseHelper {
                 .build();
 
         return riversRef.putFile(uri, metadata);
-    }
-
-    public void getPostList(final OnPostListChangedListener<Post> onDataChangedListener, long date) {
-        DatabaseReference databaseReference = database.getReference(POSTS_DB_KEY);
-        Query postsQuery;
-        if (date == 0) {
-            postsQuery = databaseReference.limitToLast(Constants.Post.POST_AMOUNT_ON_PAGE).orderByChild("createdDate");
-        } else {
-            postsQuery = databaseReference.limitToLast(Constants.Post.POST_AMOUNT_ON_PAGE).endAt(date).orderByChild("createdDate");
-        }
-
-        postsQuery.keepSynced(true);
-        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Object> objectMap = (Map<String, Object>) dataSnapshot.getValue();
-                PostListResult result = parsePostList(objectMap);
-
-                if (result.getPosts().isEmpty() && result.isMoreDataAvailable()) {
-                    getPostList(onDataChangedListener, result.getLastItemCreatedDate() - 1);
-                } else {
-                    onDataChangedListener.onListChanged(parsePostList(objectMap));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "getPostList(), onCancelled", new Exception(databaseError.getMessage()));
-                onDataChangedListener.onCanceled(context.getString(R.string.permission_denied_error));
-            }
-        });
-    }
-
-    public void getPostListByUser(final OnDataChangedListener<Post> onDataChangedListener, String userId) {
-        DatabaseReference databaseReference = database.getReference(POSTS_DB_KEY);
-        Query postsQuery;
-        postsQuery = databaseReference.orderByChild("authorId").equalTo(userId);
-
-        postsQuery.keepSynced(true);
-        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                PostListResult result = parsePostList((Map<String, Object>) dataSnapshot.getValue());
-                onDataChangedListener.onListChanged(result.getPosts());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "getPostListByUser(), onCancelled", new Exception(databaseError.getMessage()));
-            }
-        });
-    }
-
-    public ValueEventListener getPost(final String id, final OnPostChangedListener listener) {
-        DatabaseReference databaseReference = getDatabaseReference().child(POSTS_DB_KEY).child(id);
-        ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null) {
-                    if (isPostValid((Map<String, Object>) dataSnapshot.getValue())) {
-                        Post post = dataSnapshot.getValue(Post.class);
-                        if (post != null) {
-                            post.setId(id);
-                        }
-                        listener.onObjectChanged(post);
-                    } else {
-                        listener.onError(String.format(context.getString(R.string.error_general_post), id));
-                    }
-                } else {
-                    listener.onObjectChanged(null);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "getPost(), onCancelled", new Exception(databaseError.getMessage()));
-            }
-        });
-
-        activeListeners.put(valueEventListener, databaseReference);
-        return valueEventListener;
-    }
-
-    public void getSinglePost(final String id, final OnPostChangedListener listener) {
-        DatabaseReference databaseReference = getDatabaseReference().child(POSTS_DB_KEY).child(id);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null && dataSnapshot.exists()) {
-                    if (isPostValid((Map<String, Object>) dataSnapshot.getValue())) {
-                        Post post = dataSnapshot.getValue(Post.class);
-                        post.setId(id);
-                        listener.onObjectChanged(post);
-                    } else {
-                        listener.onError(String.format(context.getString(R.string.error_general_post), id));
-                    }
-                } else {
-                    listener.onError(context.getString(R.string.message_post_was_removed));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "getSinglePost(), onCancelled", new Exception(databaseError.getMessage()));
-            }
-        });
-    }
-
-    private PostListResult parsePostList(Map<String, Object> objectMap) {
-        PostListResult result = new PostListResult();
-        List<Post> list = new ArrayList<Post>();
-        boolean isMoreDataAvailable = true;
-        long lastItemCreatedDate = 0;
-
-        if (objectMap != null) {
-            isMoreDataAvailable = Constants.Post.POST_AMOUNT_ON_PAGE == objectMap.size();
-
-            for (String key : objectMap.keySet()) {
-                Object obj = objectMap.get(key);
-                if (obj instanceof Map) {
-                    Map<String, Object> mapObj = (Map<String, Object>) obj;
-
-                    if (!isPostValid(mapObj)) {
-                        LogUtil.logDebug(TAG, "Invalid post, id: " + key);
-                        continue;
-                    }
-
-                    boolean hasComplain = mapObj.containsKey("hasComplain") && (boolean) mapObj.get("hasComplain");
-                    long createdDate = (long) mapObj.get("createdDate");
-
-                    if (lastItemCreatedDate == 0 || lastItemCreatedDate > createdDate) {
-                        lastItemCreatedDate = createdDate;
-                    }
-
-                    if (!hasComplain) {
-                        Post post = new Post();
-                        post.setId(key);
-                        post.setTitle((String) mapObj.get("title"));
-                        post.setDescription((String) mapObj.get("description"));
-                        post.setImagePath((String) mapObj.get("imagePath"));
-                        post.setImageTitle((String) mapObj.get("imageTitle"));
-                        post.setAuthorId((String) mapObj.get("authorId"));
-                        post.setCreatedDate(createdDate);
-                        if (mapObj.containsKey("commentsCount")) {
-                            post.setCommentsCount((long) mapObj.get("commentsCount"));
-                        }
-                        if (mapObj.containsKey("likesCount")) {
-                            post.setLikesCount((long) mapObj.get("likesCount"));
-                        }
-                        if (mapObj.containsKey("watchersCount")) {
-                            post.setWatchersCount((long) mapObj.get("watchersCount"));
-                        }
-                        list.add(post);
-                    }
-                }
-            }
-
-            Collections.sort(list, new Comparator<Post>() {
-                @Override
-                public int compare(Post lhs, Post rhs) {
-                    return ((Long) rhs.getCreatedDate()).compareTo(lhs.getCreatedDate());
-                }
-            });
-
-            result.setPosts(list);
-            result.setLastItemCreatedDate(lastItemCreatedDate);
-            result.setMoreDataAvailable(isMoreDataAvailable);
-        }
-
-        return result;
-    }
-
-    private boolean isPostValid(Map<String, Object> post) {
-        return post.containsKey("title")
-                && post.containsKey("description")
-                && post.containsKey("imagePath")
-                && post.containsKey("imageTitle")
-                && post.containsKey("authorId")
-                && post.containsKey("description");
     }
 
     public void getProfileSingleValue(String id, final OnObjectChangedListener<Profile> listener) {
@@ -748,30 +530,6 @@ public class DatabaseHelper {
                 LogUtil.logError(TAG, "hasCurrentUserLikeSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
-    }
-
-    public void addComplainToPost(Post post) {
-        DatabaseReference databaseReference = getDatabaseReference();
-        databaseReference.child(POSTS_DB_KEY).child(post.getId()).child("hasComplain").setValue(true);
-    }
-
-    public void isPostExistSingleValue(String postId, final OnObjectExistListener<Post> onObjectExistListener) {
-        DatabaseReference databaseReference = database.getReference(POSTS_DB_KEY).child(postId);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                onObjectExistListener.onDataChanged(dataSnapshot.exists());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "isPostExistSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
-            }
-        });
-    }
-
-    public void subscribeToNewPosts() {
-        FirebaseMessaging.getInstance().subscribeToTopic("postsTopic");
     }
 
     public Task<Void> removeCommentsByPost(String postId) {
