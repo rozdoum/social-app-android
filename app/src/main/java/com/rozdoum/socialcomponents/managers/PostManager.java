@@ -109,14 +109,12 @@ public class PostManager extends FirebaseListenersManager {
     }
 
     public void hasCurrentUserLike(Context activityContext, String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
-        DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
-        ValueEventListener valueEventListener = databaseHelper.hasCurrentUserLike(postId, userId, onObjectExistListener);
+        ValueEventListener valueEventListener = postInteractor.hasCurrentUserLike(postId, userId, onObjectExistListener);
         addListenerToMap(activityContext, valueEventListener);
     }
 
     public void hasCurrentUserLikeSingleValue(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
-        DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
-        databaseHelper.hasCurrentUserLikeSingleValue(postId, userId, onObjectExistListener);
+        postInteractor.hasCurrentUserLikeSingleValue(postId, userId, onObjectExistListener);
     }
 
     public void isPostExistSingleValue(String postId, final OnObjectExistListener<Post> onObjectExistListener) {

@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,6 +55,7 @@ import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.Follower;
 import com.rozdoum.socialcomponents.model.Following;
 import com.rozdoum.socialcomponents.model.FollowingPost;
+import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.PostListResult;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -362,7 +364,7 @@ public class PostInteractor extends FirebaseListenersManager {
             }
         });
 
-        databaseHelper.removeLikesByPost(postId).addOnSuccessListener(aVoid -> LogUtil.logDebug(TAG, "Likes related to post with id: " + postId + " was removed")).addOnFailureListener(new OnFailureListener() {
+        removeLikesByPost(postId).addOnSuccessListener(aVoid -> LogUtil.logDebug(TAG, "Likes related to post with id: " + postId + " was removed")).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 LogUtil.logError(TAG, "Failed to remove likes related to post with id: " + postId, e);
@@ -397,6 +399,163 @@ public class PostInteractor extends FirebaseListenersManager {
                 onPostCreatedListener.onPostSaved(true);
             });
         }
+    }
+
+    public void createOrUpdateLike(final String postId, final String postAuthorId) {
+        try {
+            String authorId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            DatabaseReference mLikesReference = databaseHelper
+                    .getDatabaseReference()
+                    .child(DatabaseHelper.POST_LIKES_DB_KEY)
+                    .child(postId)
+                    .child(authorId);
+            mLikesReference.push();
+            String id = mLikesReference.push().getKey();
+            Like like = new Like(authorId);
+            like.setId(id);
+
+            mLikesReference.child(id).setValue(like, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        DatabaseReference postRef = databaseHelper
+                                .getDatabaseReference()
+                                .child(DatabaseHelper.POSTS_DB_KEY + "/" + postId + "/likesCount");
+
+                        incrementLikesCount(postRef);
+                        DatabaseReference profileRef = databaseHelper
+                                .getDatabaseReference()
+                                .child(DatabaseHelper.PROFILES_DB_KEY + "/" + postAuthorId + "/likesCount");
+
+                        incrementLikesCount(profileRef);
+                    } else {
+                        LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
+                    }
+                }
+
+                private void incrementLikesCount(DatabaseReference postRef) {
+                    postRef.runTransaction(new Transaction.Handler() {
+                        @Override
+                        public Transaction.Result doTransaction(MutableData mutableData) {
+                            Integer currentValue = mutableData.getValue(Integer.class);
+                            if (currentValue == null) {
+                                mutableData.setValue(1);
+                            } else {
+                                mutableData.setValue(currentValue + 1);
+                            }
+
+                            return Transaction.success(mutableData);
+                        }
+
+                        @Override
+                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                            LogUtil.logInfo(TAG, "Updating likes count transaction is completed.");
+                        }
+                    });
+                }
+
+            });
+        } catch (Exception e) {
+            LogUtil.logError(TAG, "createOrUpdateLike()", e);
+        }
+
+    }
+
+    public void removeLike(final String postId, final String postAuthorId) {
+        String authorId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference mLikesReference = databaseHelper
+                .getDatabaseReference()
+                .child(DatabaseHelper.POST_LIKES_DB_KEY)
+                .child(postId)
+                .child(authorId);
+        mLikesReference.removeValue(new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    DatabaseReference postRef = databaseHelper
+                            .getDatabaseReference()
+                            .child(DatabaseHelper.POSTS_DB_KEY + "/" + postId + "/likesCount");
+                    decrementLikesCount(postRef);
+
+                    DatabaseReference profileRef = databaseHelper
+                            .getDatabaseReference()
+                            .child(DatabaseHelper.PROFILES_DB_KEY + "/" + postAuthorId + "/likesCount");
+                    decrementLikesCount(profileRef);
+                } else {
+                    LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
+                }
+            }
+
+            private void decrementLikesCount(DatabaseReference postRef) {
+                postRef.runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Long currentValue = mutableData.getValue(Long.class);
+                        if (currentValue == null) {
+                            mutableData.setValue(0);
+                        } else {
+                            mutableData.setValue(currentValue - 1);
+                        }
+
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                        LogUtil.logInfo(TAG, "Updating likes count transaction is completed.");
+                    }
+                });
+            }
+        });
+    }
+
+    public ValueEventListener hasCurrentUserLike(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
+        DatabaseReference databaseReference = databaseHelper
+                .getDatabaseReference()
+                .child(DatabaseHelper.POST_LIKES_DB_KEY)
+                .child(postId)
+                .child(userId);
+        ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onObjectExistListener.onDataChanged(dataSnapshot.exists());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                LogUtil.logError(TAG, "hasCurrentUserLike(), onCancelled", new Exception(databaseError.getMessage()));
+            }
+        });
+
+        databaseHelper.addActiveListener(valueEventListener, databaseReference);
+        return valueEventListener;
+    }
+
+    public void hasCurrentUserLikeSingleValue(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
+        DatabaseReference databaseReference = databaseHelper
+                .getDatabaseReference()
+                .child(DatabaseHelper.POST_LIKES_DB_KEY)
+                .child(postId)
+                .child(userId);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                onObjectExistListener.onDataChanged(dataSnapshot.exists());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                LogUtil.logError(TAG, "hasCurrentUserLikeSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
+            }
+        });
+    }
+
+    public Task<Void> removeLikesByPost(String postId) {
+        return databaseHelper
+                .getDatabaseReference()
+                .child(DatabaseHelper.POST_LIKES_DB_KEY)
+                .child(postId)
+                .removeValue();
     }
 
 }

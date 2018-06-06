@@ -332,97 +332,6 @@ public class DatabaseHelper {
         return postRef.removeValue();
     }
 
-    public void createOrUpdateLike(final String postId, final String postAuthorId) {
-        try {
-            String authorId = firebaseAuth.getCurrentUser().getUid();
-            DatabaseReference mLikesReference = getDatabaseReference().child(POST_LIKES_DB_KEY).child(postId).child(authorId);
-            mLikesReference.push();
-            String id = mLikesReference.push().getKey();
-            Like like = new Like(authorId);
-            like.setId(id);
-
-            mLikesReference.child(id).setValue(like, new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    if (databaseError == null) {
-                        DatabaseReference postRef = database.getReference(POSTS_DB_KEY + "/" + postId + "/likesCount");
-                        incrementLikesCount(postRef);
-
-                        DatabaseReference profileRef = database.getReference(PROFILES_DB_KEY + "/" + postAuthorId + "/likesCount");
-                        incrementLikesCount(profileRef);
-                    } else {
-                        LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
-                    }
-                }
-
-                private void incrementLikesCount(DatabaseReference postRef) {
-                    postRef.runTransaction(new Transaction.Handler() {
-                        @Override
-                        public Transaction.Result doTransaction(MutableData mutableData) {
-                            Integer currentValue = mutableData.getValue(Integer.class);
-                            if (currentValue == null) {
-                                mutableData.setValue(1);
-                            } else {
-                                mutableData.setValue(currentValue + 1);
-                            }
-
-                            return Transaction.success(mutableData);
-                        }
-
-                        @Override
-                        public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                            LogUtil.logInfo(TAG, "Updating likes count transaction is completed.");
-                        }
-                    });
-                }
-
-            });
-        } catch (Exception e) {
-            LogUtil.logError(TAG, "createOrUpdateLike()", e);
-        }
-
-    }
-
-    public void removeLike(final String postId, final String postAuthorId) {
-        String authorId = firebaseAuth.getCurrentUser().getUid();
-        DatabaseReference mLikesReference = getDatabaseReference().child(POST_LIKES_DB_KEY).child(postId).child(authorId);
-        mLikesReference.removeValue(new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (databaseError == null) {
-                    DatabaseReference postRef = database.getReference(POSTS_DB_KEY + "/" + postId + "/likesCount");
-                    decrementLikesCount(postRef);
-
-                    DatabaseReference profileRef = database.getReference(PROFILES_DB_KEY + "/" + postAuthorId + "/likesCount");
-                    decrementLikesCount(profileRef);
-                } else {
-                    LogUtil.logError(TAG, databaseError.getMessage(), databaseError.toException());
-                }
-            }
-
-            private void decrementLikesCount(DatabaseReference postRef) {
-                postRef.runTransaction(new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        Long currentValue = mutableData.getValue(Long.class);
-                        if (currentValue == null) {
-                            mutableData.setValue(0);
-                        } else {
-                            mutableData.setValue(currentValue - 1);
-                        }
-
-                        return Transaction.success(mutableData);
-                    }
-
-                    @Override
-                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                        LogUtil.logInfo(TAG, "Updating likes count transaction is completed.");
-                    }
-                });
-            }
-        });
-    }
-
     public UploadTask uploadImage(Uri uri, String imageTitle) {
         StorageReference riversRef = getStorageReference().child(IMAGES_STORAGE_KEY + "/" + imageTitle);
         // Create file metadata including the content type
@@ -499,46 +408,8 @@ public class DatabaseHelper {
         return valueEventListener;
     }
 
-    public ValueEventListener hasCurrentUserLike(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
-        DatabaseReference databaseReference = database.getReference(POST_LIKES_DB_KEY).child(postId).child(userId);
-        ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                onObjectExistListener.onDataChanged(dataSnapshot.exists());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "hasCurrentUserLike(), onCancelled", new Exception(databaseError.getMessage()));
-            }
-        });
-
-        activeListeners.put(valueEventListener, databaseReference);
-        return valueEventListener;
-    }
-
-    public void hasCurrentUserLikeSingleValue(String postId, String userId, final OnObjectExistListener<Like> onObjectExistListener) {
-        DatabaseReference databaseReference = database.getReference(POST_LIKES_DB_KEY).child(postId).child(userId);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                onObjectExistListener.onDataChanged(dataSnapshot.exists());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "hasCurrentUserLikeSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
-            }
-        });
-    }
-
     public Task<Void> removeCommentsByPost(String postId) {
         DatabaseReference postRef = getDatabaseReference().child(POST_COMMENTS_DB_KEY).child(postId);
-        return postRef.removeValue();
-    }
-
-    public Task<Void> removeLikesByPost(String postId) {
-        DatabaseReference postRef = getDatabaseReference().child(POST_LIKES_DB_KEY).child(postId);
         return postRef.removeValue();
     }
 }
