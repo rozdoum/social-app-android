@@ -40,6 +40,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.interactors.ProfileInteractor;
 import com.rozdoum.socialcomponents.main.pickImageBase.PickImageActivity;
 import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -181,7 +182,7 @@ public class CreateProfileActivity extends PickImageActivity<CreateProfileView, 
         if (success) {
             finish();
             PreferencesUtil.setProfileCreated(this, success);
-            DatabaseHelper.getInstance(CreateProfileActivity.this.getApplicationContext())
+            ProfileInteractor.getInstance(CreateProfileActivity.this.getApplicationContext())
                     .addRegistrationToken(FirebaseInstanceId.getInstance().getToken(), profile.getId());
         } else {
             showSnackBar(R.string.error_fail_create_profile);

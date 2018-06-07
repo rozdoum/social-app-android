@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,15 +18,12 @@
 
 package com.rozdoum.socialcomponents.main.interactors;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -43,18 +40,12 @@ import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.enums.UploadImagePrefix;
 import com.rozdoum.socialcomponents.managers.DatabaseHelper;
-import com.rozdoum.socialcomponents.managers.FirebaseListenersManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnCountChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnRequestComplete;
 import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
-import com.rozdoum.socialcomponents.model.Follower;
-import com.rozdoum.socialcomponents.model.Following;
-import com.rozdoum.socialcomponents.model.FollowingPost;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.PostListResult;
@@ -63,7 +54,6 @@ import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +62,7 @@ import java.util.Map;
  * Created by Alexey on 05.06.18.
  */
 
-public class PostInteractor extends FirebaseListenersManager {
+public class PostInteractor {
 
     private static final String TAG = PostInteractor.class.getSimpleName();
     private static PostInteractor instance;
@@ -344,7 +334,7 @@ public class PostInteractor extends FirebaseListenersManager {
         removeImageTask.addOnSuccessListener(aVoid -> {
             removePost(post).addOnCompleteListener(task -> {
                 onTaskCompleteListener.onTaskComplete(task.isSuccessful());
-                databaseHelper.updateProfileLikeCountAfterRemovingPost(post);
+                ProfileInteractor.getInstance(context).updateProfileLikeCountAfterRemovingPost(post);
                 removeObjectsRelatedToPost(post.getId());
                 LogUtil.logDebug(TAG, "removePost(), is success: " + task.isSuccessful());
             });

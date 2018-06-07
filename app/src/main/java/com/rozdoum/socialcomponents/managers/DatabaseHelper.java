@@ -152,84 +152,6 @@ public class DatabaseHelper {
         activeListeners.put(listener, reference);
     }
 
-    public void createOrUpdateProfile(final Profile profile, final OnProfileCreatedListener onProfileCreatedListener) {
-        DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
-        Task<Void> task = databaseReference.child(PROFILES_DB_KEY).child(profile.getId()).setValue(profile);
-        task.addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                onProfileCreatedListener.onProfileCreated(task.isSuccessful());
-                addRegistrationToken(FirebaseInstanceId.getInstance().getToken(), profile.getId());
-                LogUtil.logDebug(TAG, "createOrUpdateProfile, success: " + task.isSuccessful());
-            }
-        });
-    }
-
-    public void updateRegistrationToken(final String token) {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser != null) {
-            final String currentUserId = firebaseUser.getUid();
-
-            getProfileSingleValue(currentUserId, new OnObjectChangedListener<Profile>() {
-                @Override
-                public void onObjectChanged(Profile obj) {
-                    if (obj != null) {
-                        addRegistrationToken(token, currentUserId);
-                    } else {
-                        LogUtil.logError(TAG, "updateRegistrationToken",
-                                new RuntimeException("Profile is not found"));
-                    }
-                }
-            });
-        }
-    }
-
-    public void addRegistrationToken(String token, String userId) {
-        DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
-        Task<Void> task = databaseReference.child(PROFILES_DB_KEY).child(userId).child("notificationTokens").child(token).setValue(true);
-        task.addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                LogUtil.logDebug(TAG, "addRegistrationToken, success: " + task.isSuccessful());
-            }
-        });
-    }
-
-    public void removeRegistrationToken(String token, String userId) {
-        DatabaseReference databaseReference = ApplicationHelper.getDatabaseHelper().getDatabaseReference();
-        DatabaseReference tokenRef = databaseReference.child(PROFILES_DB_KEY).child(userId).child("notificationTokens").child(token);
-        Task<Void> task = tokenRef.removeValue();
-        task.addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                LogUtil.logDebug(TAG, "removeRegistrationToken, success: " + task.isSuccessful());
-            }
-        });
-    }
-
-    public void updateProfileLikeCountAfterRemovingPost(Post post) {
-        DatabaseReference profileRef = database.getReference(PROFILES_DB_KEY + "/" + post.getAuthorId() + "/likesCount");
-        final long likesByPostCount = post.getLikesCount();
-
-        profileRef.runTransaction(new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                Integer currentValue = mutableData.getValue(Integer.class);
-                if (currentValue != null && currentValue >= likesByPostCount) {
-                    mutableData.setValue(currentValue - likesByPostCount);
-                }
-
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                LogUtil.logInfo(TAG, "Updating likes count transaction is completed.");
-            }
-        });
-
-    }
-
     public Task<Void> removeImage(String imageTitle) {
         StorageReference desertRef = getStorageReference().child(IMAGES_STORAGE_KEY + "/" + imageTitle);
         return desertRef.delete();
@@ -340,40 +262,6 @@ public class DatabaseHelper {
                 .build();
 
         return riversRef.putFile(uri, metadata);
-    }
-
-    public void getProfileSingleValue(String id, final OnObjectChangedListener<Profile> listener) {
-        DatabaseReference databaseReference = getDatabaseReference().child(PROFILES_DB_KEY).child(id);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Profile profile = dataSnapshot.getValue(Profile.class);
-                listener.onObjectChanged(profile);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "getProfileSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
-            }
-        });
-    }
-
-    public ValueEventListener getProfile(String id, final OnObjectChangedListener<Profile> listener) {
-        DatabaseReference databaseReference = getDatabaseReference().child(PROFILES_DB_KEY).child(id);
-        ValueEventListener valueEventListener = databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Profile profile = dataSnapshot.getValue(Profile.class);
-                listener.onObjectChanged(profile);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtil.logError(TAG, "getProfile(), onCancelled", new Exception(databaseError.getMessage()));
-            }
-        });
-        activeListeners.put(valueEventListener, databaseReference);
-        return valueEventListener;
     }
 
     public ValueEventListener getCommentsList(String postId, final OnDataChangedListener<Comment> onDataChangedListener) {

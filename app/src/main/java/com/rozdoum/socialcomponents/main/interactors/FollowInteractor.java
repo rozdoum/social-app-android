@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import java.util.List;
  * Created by Alexey on 05.06.18.
  */
 
-public class FollowInteractor extends FirebaseListenersManager {
+public class FollowInteractor {
 
     private static final String TAG = FollowInteractor.class.getSimpleName();
     private static FollowInteractor instance;
