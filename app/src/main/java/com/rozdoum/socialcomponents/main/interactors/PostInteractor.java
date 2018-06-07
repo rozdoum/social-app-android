@@ -346,8 +346,7 @@ public class PostInteractor {
     }
 
     private void removeObjectsRelatedToPost(final String postId) {
-        final DatabaseHelper databaseHelper = ApplicationHelper.getDatabaseHelper();
-        databaseHelper.removeCommentsByPost(postId).addOnSuccessListener(aVoid -> LogUtil.logDebug(TAG, "Comments related to post with id: " + postId + " was removed")).addOnFailureListener(new OnFailureListener() {
+        CommentInteractor.getInstance(context).removeCommentsByPost(postId).addOnSuccessListener(aVoid -> LogUtil.logDebug(TAG, "Comments related to post with id: " + postId + " was removed")).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 LogUtil.logError(TAG, "Failed to remove comments related to post with id: " + postId, e);
