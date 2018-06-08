@@ -75,6 +75,18 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_following_posts"/>
 
+        <activity
+            android:name=".main.search.SearchActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppCompat.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="84e05e27c9fcba7e1de6a47e355a1aa247264a46" />

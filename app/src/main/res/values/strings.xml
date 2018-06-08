@@ -165,13 +165,22 @@
     <string name="unfollow_user_message">Unfollow %1$s?</string>
     <string name="button_title_unfollow">Unfollow</string>
     <string name="message_following_posts_empty">Follow somebody to see his new posts</string>
+    <string name="following_post_menu_item">Following Posts</string>
 
     <!--Users list-->
     <string name="title_followers">Followers</string>
     <string name="title_followings">Followings</string>
     <string name="message_empty_list">You don\'t have any %1$s yet</string>
 
+    <!--Search-->
+    <string name="search_menu_item">Search</string>
+    <string name="search_hint">Search…</string>
+    <string name="posts_tab_title">Posts</string>
+    <string name="users_tab_title">Users</string>
+
+
     <!--Firebase errors-->
     <string name="permission_denied_error">Please check your rules to access the Firebase Realtime Database</string>
+
 
 </resources>

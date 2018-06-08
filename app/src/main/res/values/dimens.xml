@@ -50,4 +50,6 @@
     <dimen name="post_card_content_padding_left">11dp</dimen>
 
     <dimen name="post_counter_radius">16dp</dimen>
+
+    <dimen name="tab_indicator_height">4dp</dimen>
 </resources>
