@@ -50,4 +50,9 @@
     <dimen name="post_card_content_padding_left">11dp</dimen>
 
     <dimen name="post_counter_radius">16dp</dimen>
+
+    <dimen name="follow_button_radius">16dp</dimen>
+    <dimen name="follow_button_width">100dp</dimen>
+    <dimen name="follow_button_height">32dp</dimen>
+
 </resources>

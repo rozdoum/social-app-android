@@ -33,4 +33,9 @@
     <color name="google_button_color">#d44837</color>
     <color name="google_button_color_pressed">#FFA43528</color>
     <color name="button_pressed_text_color">#bcbcbc</color>
+
+    <color name="follow_button_color">#0097D3</color>
+    <color name="follow_button_pressed_color">#0087BC</color>
+    <color name="follow_button_light_color">@color/white</color>
+    <color name="follow_button_light_pressed_color">#f7f7f7</color>
 </resources>

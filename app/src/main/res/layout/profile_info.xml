@@ -1,0 +1,136 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profileInfo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/intrinsic_padding"
+    android:paddingRight="@dimen/intrinsic_padding"
+    android:paddingTop="@dimen/intrinsic_padding">
+
+    <TextView
+        android:id="@+id/followingsCounterTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:padding="@dimen/small_intrinsic_padding"
+        android:textAppearance="@style/TextAppearance.Counter"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/likesCountersTextView"
+        app:layout_constraintStart_toStartOf="@+id/likesCountersTextView"
+        app:layout_constraintTop_toBottomOf="@+id/likesCountersTextView"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="25 \nfollowings"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/likesCountersTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center"
+        android:padding="@dimen/small_intrinsic_padding"
+        android:textAppearance="@style/TextAppearance.Counter"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/postsCounterTextView"
+        app:layout_constraintTop_toTopOf="@+id/postsCounterTextView"
+        tools:text="25 \n likes"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/followersCounterTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:padding="@dimen/small_intrinsic_padding"
+        android:textAppearance="@style/TextAppearance.Counter"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/postsCounterTextView"
+        app:layout_constraintStart_toStartOf="@+id/postsCounterTextView"
+        app:layout_constraintTop_toBottomOf="@+id/postsCounterTextView"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="25 \n followers"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/postsCounterTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:padding="@dimen/small_intrinsic_padding"
+        android:textAppearance="@style/TextAppearance.Counter"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/likesCountersTextView"
+        app:layout_constraintStart_toEndOf="@+id/imageContainer"
+        app:layout_constraintTop_toBottomOf="@+id/nameEditText"
+        tools:text="25 \n posts"
+        tools:visibility="visible" />
+
+    <com.rozdoum.socialcomponents.views.FollowButton
+        android:id="@+id/followButton"
+        style="@style/FollowButton"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageContainer"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        tools:text="Follow back" />
+
+    <TextView
+        android:id="@+id/nameEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center_horizontal"
+        android:padding="0dp"
+        android:paddingTop="@dimen/intrinsic_padding"
+        android:textAppearance="@style/TextAppearance.Large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageContainer"
+        app:layout_constraintTop_toTopOf="@+id/imageContainer"
+        tools:text="John Smith" />
+
+    <RelativeLayout
+        android:id="@+id/imageContainer"
+        android:layout_width="@dimen/profile_screen_avatar_size"
+        android:layout_height="@dimen/profile_screen_avatar_size"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="@dimen/progress_bar_size"
+            android:layout_height="@dimen/progress_bar_size"
+            android:layout_centerInParent="true"
+            android:visibility="visible" />
+
+        <com.rozdoum.socialcomponents.views.CircularImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:transitionName="@string/post_author_image_transition_name"
+            app:border="false"
+            app:shadow="false"
+            tools:src="@drawable/ic_stub"
+            tools:targetApi="lollipop" />
+
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

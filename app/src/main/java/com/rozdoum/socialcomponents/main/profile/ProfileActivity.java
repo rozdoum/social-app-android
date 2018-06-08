@@ -87,7 +87,6 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private TextView postsCounterTextView;
-    private TextView postsLabelTextView;
     private ProgressBar postsProgressBar;
 
     private FirebaseAuth mAuth;
@@ -133,7 +132,6 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         likesCountersTextView = findViewById(R.id.likesCountersTextView);
         followersCounterTextView = findViewById(R.id.followersCounterTextView);
         followingsCounterTextView = findViewById(R.id.followingsCounterTextView);
-        postsLabelTextView = findViewById(R.id.postsLabelTextView);
         postsProgressBar = findViewById(R.id.postsProgressBar);
         followButton = findViewById(R.id.followButton);
 
@@ -260,10 +258,6 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
 
                     likesCountersTextView.setVisibility(View.VISIBLE);
                     postsCounterTextView.setVisibility(View.VISIBLE);
-
-                    if (postsCount > 0) {
-                        postsLabelTextView.setVisibility(View.VISIBLE);
-                    }
 
                     swipeContainer.setRefreshing(false);
                     hideLoadingPostsProgressBar();
