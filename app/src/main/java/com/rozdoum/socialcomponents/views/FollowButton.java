@@ -87,7 +87,7 @@ public class FollowButton extends android.support.v7.widget.AppCompatButton {
             case FOLLOW_STATE: {
                 setVisibility(VISIBLE);
                 setText(R.string.button_follow_title);
-                setBackgroundColor(ContextCompat.getColor(getContext(), R.color.primary_dark));
+                setBackground(ContextCompat.getDrawable(getContext(), R.drawable.follow_button_dark_bg));
                 setTextColor(ContextCompat.getColor(getContext(), R.color.white));
                 break;
             }
@@ -95,7 +95,7 @@ public class FollowButton extends android.support.v7.widget.AppCompatButton {
             case FOLLOW_BACK_STATE: {
                 setVisibility(VISIBLE);
                 setText(R.string.button_follow_back_title);
-                setBackgroundColor(ContextCompat.getColor(getContext(), R.color.primary_dark));
+                setBackground(ContextCompat.getDrawable(getContext(), R.drawable.follow_button_dark_bg));
                 setTextColor(ContextCompat.getColor(getContext(), R.color.white));
                 break;
             }
@@ -103,7 +103,7 @@ public class FollowButton extends android.support.v7.widget.AppCompatButton {
             case FOLLOWING_STATE: {
                 setVisibility(VISIBLE);
                 setText(R.string.button_following);
-                setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
+                setBackground(ContextCompat.getDrawable(getContext(), R.drawable.follow_button_light_bg));
                 setTextColor(ContextCompat.getColor(getContext(), R.color.primary_dark_text));
                 break;
             }

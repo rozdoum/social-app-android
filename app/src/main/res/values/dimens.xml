@@ -51,5 +51,10 @@
 
     <dimen name="post_counter_radius">16dp</dimen>
 
+    <dimen name="follow_button_radius">16dp</dimen>
+    <dimen name="follow_button_width">100dp</dimen>
+    <dimen name="follow_button_height">32dp</dimen>
+
+
     <dimen name="tab_indicator_height">4dp</dimen>
 </resources>

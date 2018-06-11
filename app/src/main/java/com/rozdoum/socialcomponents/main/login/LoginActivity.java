@@ -45,9 +45,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.main.createProfile.CreateProfileActivity;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
-import com.rozdoum.socialcomponents.managers.DatabaseHelper;
+import com.rozdoum.socialcomponents.main.createProfile.CreateProfileActivity;
+import com.rozdoum.socialcomponents.main.interactors.ProfileInteractor;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Profile;
@@ -205,7 +205,7 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
                     startCreateProfileActivity();
                 } else {
                     PreferencesUtil.setProfileCreated(LoginActivity.this, true);
-                    DatabaseHelper.getInstance(LoginActivity.this.getApplicationContext())
+                    ProfileInteractor.getInstance(LoginActivity.this.getApplicationContext())
                             .addRegistrationToken(FirebaseInstanceId.getInstance().getToken(), userId);
                 }
                 hideProgress();
