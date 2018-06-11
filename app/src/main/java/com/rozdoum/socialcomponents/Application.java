@@ -17,6 +17,7 @@
 package com.rozdoum.socialcomponents;
 
 import com.crashlytics.android.Crashlytics;
+import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
 import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 
 import io.fabric.sdk.android.Fabric;
@@ -35,6 +36,6 @@ public class Application extends android.app.Application {
         Fabric.with(this, new Crashlytics());
 
         ApplicationHelper.initDatabaseHelper(this);
-        DatabaseHelper.getInstance(this).subscribeToNewPosts();
+        PostInteractor.getInstance(this).subscribeToNewPosts();
     }
 }

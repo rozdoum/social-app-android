@@ -32,6 +32,7 @@ import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
 import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -97,14 +98,14 @@ public class LikeController {
         updatingLikeCounter = true;
         isLiked = true;
         likeCounterTextView.setText(String.valueOf(prevValue + 1));
-        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(postId, postAuthorId);
+        PostInteractor.getInstance(context).createOrUpdateLike(postId, postAuthorId);
     }
 
     private void removeLike(long prevValue) {
         updatingLikeCounter = true;
         isLiked = false;
         likeCounterTextView.setText(String.valueOf(prevValue - 1));
-        ApplicationHelper.getDatabaseHelper().removeLike(postId, postAuthorId);
+        PostInteractor.getInstance(context).removeLike(postId, postAuthorId);
     }
 
     private void startAnimateLikeButton(AnimationType animationType) {
