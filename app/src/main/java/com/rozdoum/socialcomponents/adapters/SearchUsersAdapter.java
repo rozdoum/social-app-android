@@ -1,18 +1,17 @@
 /*
- *  Copyright 2017 Rozdoum
+ * Copyright 2018 Rozdoum
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package com.rozdoum.socialcomponents.adapters;
@@ -25,6 +24,8 @@ import android.view.ViewGroup;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.holders.UserViewHolder;
+import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.model.Profile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,15 +34,15 @@ import java.util.List;
  * Created by Alexey on 03.05.18.
  */
 
-public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    public static final String TAG = UsersAdapter.class.getSimpleName();
+public class SearchUsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static final String TAG = SearchUsersAdapter.class.getSimpleName();
 
-    private List<String> itemsList = new ArrayList<>();
+    private List<Profile> itemsList = new ArrayList<>();
 
     private UserViewHolder.Callback callback;
     private Activity activity;
 
-    public UsersAdapter(Activity activity) {
+    public SearchUsersAdapter(Activity activity) {
         this.activity = activity;
     }
 
@@ -52,7 +53,6 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemCount() {
         return itemsList.size();
-
     }
 
     @NonNull
@@ -68,17 +68,21 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         ((UserViewHolder) holder).bindData(itemsList.get(position));
     }
 
-    public void setList(List<String> list) {
+    public void setList(List<Profile> list) {
         itemsList.clear();
         itemsList.addAll(list);
         notifyDataSetChanged();
     }
 
     public void updateItem(int position) {
-        notifyItemChanged(position);
+        Profile profile = getItemByPosition(position);
+        ProfileManager.getInstance(activity.getApplicationContext()).getProfileSingleValue(profile.getId(), updatedProfile -> {
+            itemsList.set(position, updatedProfile);
+            notifyItemChanged(position);
+        });
     }
 
-    public String getItemByPosition(int position) {
+    public Profile getItemByPosition(int position) {
         return itemsList.get(position);
     }
 }

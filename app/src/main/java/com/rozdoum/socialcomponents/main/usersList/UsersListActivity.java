@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.UsersAdapter;
+import com.rozdoum.socialcomponents.adapters.holders.UserViewHolder;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.login.LoginActivity;
 import com.rozdoum.socialcomponents.main.profile.ProfileActivity;
@@ -126,8 +127,8 @@ public class UsersListActivity extends BaseActivity<UsersListView, UsersListPres
 
     private void initProfilesListRecyclerView() {
         recyclerView = findViewById(R.id.usersRecyclerView);
-        usersAdapter = new UsersAdapter();
-        usersAdapter.setCallback(new UsersAdapter.Callback() {
+        usersAdapter = new UsersAdapter(this);
+        usersAdapter.setCallback(new UserViewHolder.Callback() {
             @Override
             public void onItemClick(int position, View view) {
                 selectedItemPosition = position;

@@ -21,6 +21,7 @@ import android.content.Context;
 
 import com.rozdoum.socialcomponents.main.base.BasePresenter;
 import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 /**
  * Created by Alexey on 08.06.18.
@@ -47,6 +48,9 @@ public class SearchPostsPresenter extends BasePresenter<SearchPostsView> {
                         view.showEmptyListLayout();
                     }
                 });
+
+                LogUtil.logDebug(TAG, "search text: " + searchText);
+                LogUtil.logDebug(TAG, "found items count: " + list.size());
             });
         } else {
             ifViewAttached(SearchPostsView::hideLocalProgress);
