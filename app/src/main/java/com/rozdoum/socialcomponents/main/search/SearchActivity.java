@@ -21,6 +21,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -104,6 +105,11 @@ public class SearchActivity extends BaseActivity<SearchView, SearchPresenter> im
         });
     }
 
+    private void search(String searchText) {
+       Fragment fragment = tabsAdapter.getItem(viewPager.getCurrentItem());
+        ((Searchable)fragment).search(searchText);
+    }
+
     private void initSearch(MenuItem searchMenuItem) {
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -112,17 +118,16 @@ public class SearchActivity extends BaseActivity<SearchView, SearchPresenter> im
 
         searchMenuItem.expandActionView();
 
-
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                presenter.search(query);
+                search(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                presenter.search(newText);
+                search(newText);
                 return true;
             }
         });

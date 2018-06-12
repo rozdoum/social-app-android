@@ -547,4 +547,26 @@ public class PostInteractor {
                 .removeValue();
     }
 
+    public void searchPosts(String searchText, OnDataChangedListener<Post> onDataChangedListener) {
+        DatabaseReference reference = databaseHelper.getDatabaseReference().child(DatabaseHelper.POSTS_DB_KEY);
+        getSearchQuery(reference, "title", searchText).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                PostListResult result = parsePostList((Map<String, Object>) dataSnapshot.getValue());
+                onDataChangedListener.onListChanged(result.getPosts());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                LogUtil.logError(TAG, "searchPosts(), onCancelled", new Exception(databaseError.getMessage()));
+            }
+        });
+    }
+
+    private Query getSearchQuery(DatabaseReference databaseReference, String childOrderBy, String searchText) {
+        return databaseReference
+                .orderByChild(childOrderBy)
+                .startAt(searchText)
+                .endAt(searchText + "\uf8ff");
+    }
 }

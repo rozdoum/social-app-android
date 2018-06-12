@@ -290,10 +290,12 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
             case R.id.followingPosts:
                 Intent followingPosts = new Intent(this, FollowingPostsActivity.class);
                 startActivity(followingPosts);
+                return true;
 
             case R.id.search:
                 Intent searchIntent = new Intent(this, SearchActivity.class);
                 startActivity(searchIntent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

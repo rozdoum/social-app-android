@@ -17,10 +17,43 @@
 
 package com.rozdoum.socialcomponents.main.search.posts;
 
-import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
+import android.content.Context;
+
+import com.rozdoum.socialcomponents.main.base.BasePresenter;
+import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
 
 /**
  * Created by Alexey on 08.06.18.
  */
-public class SearchPostsPresenter extends MvpBasePresenter<SearchPostsView> {
+public class SearchPostsPresenter extends BasePresenter<SearchPostsView> {
+    private Context context;
+    private PostInteractor postInteractor;
+
+    public SearchPostsPresenter(Context context) {
+        super(context);
+        this.context = context;
+        postInteractor = PostInteractor.getInstance(context.getApplicationContext());
+    }
+
+    public void search(String searchText) {
+        if (checkInternetConnection()) {
+            ifViewAttached(SearchPostsView::showLocalProgress);
+            postInteractor.searchPosts(searchText, list -> {
+                ifViewAttached(view -> {
+                    view.hideLocalProgress();
+                    view.onSearchResultsReady(list);
+
+                    if (list.isEmpty()) {
+                        view.showEmptyListLayout();
+                    }
+                });
+            });
+        } else {
+            ifViewAttached(SearchPostsView::hideLocalProgress);
+        }
+    }
+
+    public void loadPostsWithEmptySearch() {
+        search("");
+    }
 }
