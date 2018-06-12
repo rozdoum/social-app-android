@@ -8,6 +8,10 @@
         <item name="actionModeBackground">@color/primary</item>
     </style>
 
+    <style name="DarkActionBarWithLightAccent" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorAccent">@color/white</item>
+    </style>
+
     <style name="AppCompat.Black.NoActionBar" parent="Theme.AppCompat.NoActionBar">
         <item name="android:colorBackground">@android:color/background_dark</item>
         <item name="android:windowBackground">@android:color/background_dark</item>
@@ -80,5 +84,14 @@
         <item name="android:padding">0dp</item>
         <item name="android:textSize">12sp</item>
     </style>
+
+    <!--Tab layout-->
+    <style name="TabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/white</item>
+        <item name="tabIndicatorHeight">@dimen/tab_indicator_height</item>
+        <item name="tabGravity">fill</item>
+        <item name="tabMode">fixed</item>
+    </style>
+
 
 </resources>

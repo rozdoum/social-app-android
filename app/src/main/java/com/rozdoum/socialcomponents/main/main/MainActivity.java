@@ -44,6 +44,7 @@ import com.rozdoum.socialcomponents.main.followPosts.FollowingPostsActivity;
 import com.rozdoum.socialcomponents.main.post.createPost.CreatePostActivity;
 import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.main.profile.ProfileActivity;
+import com.rozdoum.socialcomponents.main.search.SearchActivity;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.AnimationUtils;
 
@@ -287,8 +288,12 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
                 return true;
 
             case R.id.followingPosts:
-                Intent intent = new Intent(this, FollowingPostsActivity.class);
-                startActivity(intent);
+                Intent followingPosts = new Intent(this, FollowingPostsActivity.class);
+                startActivity(followingPosts);
+
+            case R.id.search:
+                Intent searchIntent = new Intent(this, SearchActivity.class);
+                startActivity(searchIntent);
             default:
                 return super.onOptionsItemSelected(item);
         }
