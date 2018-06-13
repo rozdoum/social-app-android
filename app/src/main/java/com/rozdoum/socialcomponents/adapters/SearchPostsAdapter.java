@@ -57,7 +57,7 @@ public class SearchPostsAdapter extends BasePostsAdapter {
         return new PostViewHolder.OnClickListener() {
             @Override
             public void onItemClick(int position, View view) {
-                if (callBack != null) {
+                if (callBack != null && callBack.enableClick()) {
                     selectedPostPosition = position;
                     callBack.onItemClick(getItemByPosition(position), view);
                 }
@@ -65,13 +65,15 @@ public class SearchPostsAdapter extends BasePostsAdapter {
 
             @Override
             public void onLikeClick(LikeController likeController, int position) {
-                Post post = getItemByPosition(position);
-                likeController.handleLikeClickAction(activity, post);
+                if (callBack != null && callBack.enableClick()) {
+                    Post post = getItemByPosition(position);
+                    likeController.handleLikeClickAction(activity, post);
+                }
             }
 
             @Override
             public void onAuthorClick(int position, View view) {
-                if (callBack != null) {
+                if (callBack != null && callBack.enableClick()) {
                     callBack.onAuthorClick(getItemByPosition(position).getAuthorId(), view);
                 }
             }
@@ -96,7 +98,7 @@ public class SearchPostsAdapter extends BasePostsAdapter {
 
     public interface CallBack {
         void onItemClick(Post post, View view);
-
         void onAuthorClick(String authorId, View view);
+        boolean enableClick();
     }
 }

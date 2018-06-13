@@ -18,18 +18,9 @@ package com.rozdoum.socialcomponents.managers;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.UploadTask;
-import com.rozdoum.socialcomponents.ApplicationHelper;
-import com.rozdoum.socialcomponents.enums.UploadImagePrefix;
-import com.rozdoum.socialcomponents.main.interactors.FollowInteractor;
 import com.rozdoum.socialcomponents.main.interactors.FollowInteractor;
 import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
@@ -41,8 +32,6 @@ import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
 import com.rozdoum.socialcomponents.model.FollowingPost;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
-import com.rozdoum.socialcomponents.utils.ImageUtil;
-import com.rozdoum.socialcomponents.utils.LogUtil;
 
 /**
  * Created by Kristina on 10/28/16.
@@ -153,6 +142,17 @@ public class PostManager extends FirebaseListenersManager {
         FollowInteractor.getInstance(context).getFollowingPosts(userId, listener);
     }
 
+    public void searchByTitle(String searchText, OnDataChangedListener<Post> onDataChangedListener) {
+        closeListeners(context);
+        ValueEventListener valueEventListener = postInteractor.searchPostsByTitle(searchText, onDataChangedListener);
+        addListenerToMap(context, valueEventListener);
+    }
+
+    public void filterByLikes(int limit, OnDataChangedListener<Post> onDataChangedListener) {
+        closeListeners(context);
+        ValueEventListener valueEventListener = postInteractor.filterPostsByLikes(limit, onDataChangedListener);
+        addListenerToMap(context, valueEventListener);
+    }
 
     public interface PostCounterWatcher {
         void onPostCounterChanged(int newValue);
