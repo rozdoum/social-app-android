@@ -21,10 +21,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.post.BaseCreatePostActivity;
-import com.rozdoum.socialcomponents.model.Post;
 
 public class CreatePostActivity extends BaseCreatePostActivity<CreatePostView, CreatePostPresenter> implements CreatePostView {
     public static final int CREATE_NEW_POST_REQUEST = 11;
@@ -39,21 +37,6 @@ public class CreatePostActivity extends BaseCreatePostActivity<CreatePostView, C
     }
 
     @Override
-    protected int getSaveFailMessage() {
-        return R.string.error_fail_create_post;
-    }
-
-    @Override
-    protected void savePost(String title, String description) {
-        showProgress(R.string.message_creating_post);
-        Post post = new Post();
-        post.setTitle(title);
-        post.setDescription(description);
-        post.setAuthorId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        postManager.createOrUpdatePostWithImage(imageUri, this, post);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.create_post_menu, menu);
@@ -65,7 +48,7 @@ public class CreatePostActivity extends BaseCreatePostActivity<CreatePostView, C
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.post:
-                doSavePost();
+                presenter.doSavePost(imageUri);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

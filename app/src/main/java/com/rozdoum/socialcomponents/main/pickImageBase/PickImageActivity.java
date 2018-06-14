@@ -36,19 +36,13 @@ import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
-import com.rozdoum.socialcomponents.main.base.BasePresenter;
-import com.rozdoum.socialcomponents.main.base.BaseView;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
-import com.rozdoum.socialcomponents.utils.ValidationUtil;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.io.File;
-
-public abstract class PickImageActivity<V extends BaseView, P extends BasePresenter<V>> extends BaseActivity<V, P> implements PickImageView {
-    protected static final int MAX_FILE_SIZE_IN_BYTES = 10485760;   //10 Mb
+public abstract class PickImageActivity<V extends PickImageView, P extends PickImagePresenter<V>> extends BaseActivity<V, P> implements PickImageView {
     private static final String SAVED_STATE_IMAGE_URI = "RegistrationActivity.SAVED_STATE_IMAGE_URI";
 
     protected Uri imageUri;
@@ -70,7 +64,7 @@ public abstract class PickImageActivity<V extends BaseView, P extends BasePresen
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(SAVED_STATE_IMAGE_URI)) {
                 imageUri = savedInstanceState.getParcelable(SAVED_STATE_IMAGE_URI);
-                loadImageToImageView();
+                loadImageToImageView(imageUri);
             }
         }
 
@@ -86,11 +80,13 @@ public abstract class PickImageActivity<V extends BaseView, P extends BasePresen
         }
     }
 
-    protected void loadImageToImageView() {
+    @Override
+    public void loadImageToImageView(Uri imageUri) {
         if (imageUri == null) {
             return;
         }
 
+        this.imageUri = imageUri;
         ImageUtil.loadLocalImage(GlideApp.with(this), imageUri, getImageView(), new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -106,31 +102,6 @@ public abstract class PickImageActivity<V extends BaseView, P extends BasePresen
         });
     }
 
-    protected boolean isImageFileValid(Uri imageUri) {
-        int message = R.string.error_general;
-        boolean result = false;
-
-        if (imageUri != null) {
-            if (ValidationUtil.isImage(imageUri, this)) {
-                File imageFile = new File(imageUri.getPath());
-                if (imageFile.length() > MAX_FILE_SIZE_IN_BYTES) {
-                    message = R.string.error_bigger_file;
-                } else {
-                    result = true;
-                }
-            } else {
-                message = R.string.error_incorrect_file_type;
-            }
-        }
-
-        if (!result) {
-            showSnackBar(message);
-            getProgressView().setVisibility(View.GONE);
-        }
-
-        return result;
-    }
-
     @Override
     @SuppressLint("NewApi")
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -138,7 +109,7 @@ public abstract class PickImageActivity<V extends BaseView, P extends BasePresen
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Uri imageUri = CropImage.getPickImageResultUri(this, data);
 
-            if (isImageFileValid(imageUri)) {
+            if (presenter.isImageFileValid(imageUri)) {
                 this.imageUri = imageUri;
             }
 
@@ -166,11 +137,8 @@ public abstract class PickImageActivity<V extends BaseView, P extends BasePresen
         }
         if (requestCode == CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
             if (imageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // required permissions granted, start crop image activity
                 LogUtil.logDebug(TAG, "PICK_IMAGE_PERMISSIONS granted");
-//                if (isImageFileValid(imageUri)) {
                 onImagePikedAction();
-//                }
             } else {
                 showSnackBar(R.string.permissions_not_granted);
                 LogUtil.logDebug(TAG, "PICK_IMAGE_PERMISSIONS not granted");
@@ -179,20 +147,7 @@ public abstract class PickImageActivity<V extends BaseView, P extends BasePresen
     }
 
     protected void handleCropImageResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                if (ValidationUtil.checkImageMinSize(result.getCropRect())) {
-                    imageUri = result.getUri();
-                    loadImageToImageView();
-                } else {
-                    showSnackBar(R.string.error_smaller_image);
-                }
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                LogUtil.logError(TAG, "crop image error", result.getError());
-                showSnackBar(R.string.error_fail_crop_image);
-            }
-        }
+        presenter.handleCropImageResult(requestCode, resultCode, data);
     }
 
     protected void startCropImageActivity() {
@@ -206,6 +161,11 @@ public abstract class PickImageActivity<V extends BaseView, P extends BasePresen
                 .setMinCropResultSize(Constants.Profile.MIN_AVATAR_SIZE, Constants.Profile.MIN_AVATAR_SIZE)
                 .setRequestedSize(Constants.Profile.MAX_AVATAR_SIZE, Constants.Profile.MAX_AVATAR_SIZE)
                 .start(this);
+    }
+
+    @Override
+    public void hideLocalProgress() {
+        getProgressView().setVisibility(View.GONE);
     }
 }
 

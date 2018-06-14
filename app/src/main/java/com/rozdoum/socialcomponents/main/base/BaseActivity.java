@@ -18,6 +18,7 @@ package com.rozdoum.socialcomponents.main.base;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -79,6 +80,7 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         }
     }
 
+    @Override
     public void hideKeyboard() {
         // Check if no view has focus:
         View view = this.getCurrentFocus();
@@ -129,6 +131,22 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message);
         builder.setPositiveButton(R.string.button_ok, null);
+        builder.show();
+    }
+
+    @Override
+    public void showWarningDialog(int message, DialogInterface.OnClickListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.button_ok, listener);
+        builder.show();
+    }
+
+    @Override
+    public void showWarningDialog(String message, DialogInterface.OnClickListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.button_ok, listener);
         builder.show();
     }
 

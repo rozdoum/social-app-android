@@ -23,4 +23,5 @@ import com.rozdoum.socialcomponents.main.post.createPost.CreatePostView;
  */
 
 public interface EditPostView extends CreatePostView {
+    void openMainActivity();
 }
