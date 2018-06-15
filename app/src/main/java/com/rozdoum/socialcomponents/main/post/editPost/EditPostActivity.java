@@ -16,13 +16,11 @@
 
 package com.rozdoum.socialcomponents.main.post.editPost;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,8 +33,6 @@ import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.main.post.BaseCreatePostActivity;
-import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -46,32 +42,26 @@ public class EditPostActivity extends BaseCreatePostActivity<EditPostView, EditP
     public static final String POST_EXTRA_KEY = "EditPostActivity.POST_EXTRA_KEY";
     public static final int EDIT_POST_REQUEST = 33;
 
-    private Post post;
-
-    @Override
-    protected int getSaveFailMessage() {
-        return R.string.error_fail_update_post;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
+        Post post = (Post) getIntent().getSerializableExtra(POST_EXTRA_KEY);
+        presenter.setPost(post);
         showProgress();
-        fillUIFields();
+        fillUIFields(post);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        addCheckIsPostChangedListener();
+        presenter.addCheckIsPostChangedListener();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        postManager.closeListeners(this);
+        presenter.closeListeners();
     }
 
     @NonNull
@@ -84,84 +74,21 @@ public class EditPostActivity extends BaseCreatePostActivity<EditPostView, EditP
     }
 
     @Override
-    protected void savePost(final String title, final String description) {
-        showProgress(R.string.message_saving);
-        post.setTitle(title);
-        post.setDescription(description);
-
-        if (imageUri != null) {
-            postManager.createOrUpdatePostWithImage(imageUri, EditPostActivity.this, post);
-        } else {
-            postManager.createOrUpdatePost(post);
-            onPostSaved(true);
-        }
-    }
-
-    private void addCheckIsPostChangedListener() {
-        PostManager.getInstance(this).getPost(this, post.getId(), new OnPostChangedListener() {
-            @Override
-            public void onObjectChanged(Post obj) {
-                if (obj == null) {
-                    showWarningDialog(getResources().getString(R.string.error_post_was_removed));
-                } else {
-                    checkIsPostCountersChanged(obj);
-                }
-            }
-
-            @Override
-            public void onError(String errorText) {
-                showWarningDialog(errorText);
-            }
-
-            private void showWarningDialog(String message) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(EditPostActivity.this);
-                builder.setMessage(message);
-                builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        openMainActivity();
-                        finish();
-                    }
-                });
-                builder.setCancelable(false);
-                builder.show();
-            }
-        });
-    }
-
-    private void checkIsPostCountersChanged(Post updatedPost) {
-        if (post.getLikesCount() != updatedPost.getLikesCount()) {
-            post.setLikesCount(updatedPost.getLikesCount());
-        }
-
-        if (post.getCommentsCount() != updatedPost.getCommentsCount()) {
-            post.setCommentsCount(updatedPost.getCommentsCount());
-        }
-
-        if (post.getWatchersCount() != updatedPost.getWatchersCount()) {
-            post.setWatchersCount(updatedPost.getWatchersCount());
-        }
-
-        if (post.isHasComplain() != updatedPost.isHasComplain()) {
-            post.setHasComplain(updatedPost.isHasComplain());
-        }
-    }
-
-    private void openMainActivity() {
+    public void openMainActivity() {
         Intent intent = new Intent(EditPostActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
-    private void fillUIFields() {
+    private void fillUIFields(Post post) {
         titleEditText.setText(post.getTitle());
         descriptionEditText.setText(post.getDescription());
-        loadPostDetailsImage();
+        loadPostDetailsImage(post.getImagePath());
         hideProgress();
     }
 
-    private void loadPostDetailsImage() {
-        ImageUtil.loadImageCenterCrop(GlideApp.with(this), post.getImagePath(), imageView, new RequestListener<Drawable>() {
+    private void loadPostDetailsImage(String imagePath) {
+        ImageUtil.loadImageCenterCrop(GlideApp.with(this), imagePath, imageView, new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 progressBar.setVisibility(View.GONE);
@@ -188,7 +115,7 @@ public class EditPostActivity extends BaseCreatePostActivity<EditPostView, EditP
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.save:
-                doSavePost();
+                presenter.doSavePost(imageUri);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
