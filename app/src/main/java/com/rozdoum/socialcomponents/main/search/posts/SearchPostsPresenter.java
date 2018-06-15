@@ -22,6 +22,7 @@ import android.content.Context;
 import com.rozdoum.socialcomponents.main.base.BasePresenter;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 import java.util.List;
 
@@ -74,6 +75,8 @@ public class SearchPostsPresenter extends BasePresenter<SearchPostsView> {
             if (list.isEmpty()) {
                 view.showEmptyListLayout();
             }
+
+            LogUtil.logDebug(TAG, "found items count: " + list.size());
         });
     }
 }

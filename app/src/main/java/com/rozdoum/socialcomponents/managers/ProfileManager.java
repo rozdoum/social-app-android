@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ValueEventListener;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.main.interactors.ProfileInteractor;
+import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
@@ -99,5 +100,11 @@ public class ProfileManager extends FirebaseListenersManager {
         } else {
             return ProfileStatus.PROFILE_CREATED;
         }
+    }
+
+    public void search(String searchText, OnDataChangedListener<Profile> onDataChangedListener) {
+        closeListeners(context);
+        ValueEventListener valueEventListener = profileInteractor.searchProfiles(searchText, onDataChangedListener);
+        addListenerToMap(context, valueEventListener);
     }
 }

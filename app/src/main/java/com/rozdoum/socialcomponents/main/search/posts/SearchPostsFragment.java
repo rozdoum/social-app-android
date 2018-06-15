@@ -80,11 +80,12 @@ public class SearchPostsFragment extends BaseFragment<SearchPostsView, SearchPos
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_search_posts, container, false);
+        View view = inflater.inflate(R.layout.fragment_search_results, container, false);
 
         progressBar = view.findViewById(R.id.progressBar);
         recyclerView = view.findViewById(R.id.recycler_view);
         emptyListMessageTextView = view.findViewById(R.id.emptyListMessageTextView);
+        emptyListMessageTextView.setText(getResources().getString(R.string.empty_posts_search_message));
 
         initRecyclerView();
         return view;

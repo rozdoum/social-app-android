@@ -177,7 +177,8 @@
     <string name="search_hint">Search…</string>
     <string name="posts_tab_title">Posts</string>
     <string name="users_tab_title">Users</string>
-    <string name="empty_posts_search_message">No one post was found</string>
+    <string name="empty_posts_search_message">No posts found</string>
+    <string name="empty_user_search_message">No users found</string>
 
 
     <!--Firebase errors-->

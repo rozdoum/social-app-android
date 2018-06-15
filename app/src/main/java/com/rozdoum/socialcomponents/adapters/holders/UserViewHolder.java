@@ -17,6 +17,7 @@
 
 package com.rozdoum.socialcomponents.adapters.holders;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -25,7 +26,6 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.adapters.UsersAdapter;
 import com.rozdoum.socialcomponents.enums.FollowState;
 import com.rozdoum.socialcomponents.managers.FollowManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
@@ -33,7 +33,6 @@ import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
-import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.views.FollowButton;
 
 /**
@@ -50,9 +49,12 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
     private ProfileManager profileManager;
 
-    public UserViewHolder(View view, final UsersAdapter.Callback onClickListener) {
+    private Activity activity;
+
+    public UserViewHolder(View view, final Callback callback, Activity activity) {
         super(view);
         this.context = view.getContext();
+        this.activity = activity;
         profileManager = ProfileManager.getInstance(context);
 
         nameTextView = view.findViewById(R.id.nameTextView);
@@ -61,14 +63,14 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
 
         view.setOnClickListener(v -> {
             int position = getAdapterPosition();
-            if (onClickListener != null && position != RecyclerView.NO_POSITION) {
-                onClickListener.onItemClick(getAdapterPosition(), v);
+            if (callback != null && position != RecyclerView.NO_POSITION) {
+                callback.onItemClick(getAdapterPosition(), v);
             }
         });
 
         followButton.setOnClickListener(v -> {
-            if (onClickListener != null) {
-                onClickListener.onFollowButtonClick(getAdapterPosition(), followButton);
+            if (callback != null) {
+                callback.onFollowButtonClick(getAdapterPosition(), followButton);
             }
         });
     }
@@ -77,30 +79,40 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
         profileManager.getProfileSingleValue(profileId, createProfileChangeListener());
     }
 
+    public void bindData(Profile profile) {
+        fillInProfileFields(profile);
+    }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener() {
-        return profile -> {
+        return this::fillInProfileFields;
+    }
 
-            nameTextView.setText(profile.getUsername());
+    protected void fillInProfileFields(Profile profile) {
+        nameTextView.setText(profile.getUsername());
 
-            String currentUserId = FirebaseAuth.getInstance().getUid();
-            if (currentUserId != null) {
-                if (!currentUserId.equals(profile.getId())) {
-                    FollowManager.getInstance(context).checkFollowState(currentUserId, profile.getId(), followState -> {
-                        followButton.setVisibility(View.VISIBLE);
-                        followButton.setState(followState);
-                    });
-                } else {
-                    followButton.setState(FollowState.MY_PROFILE);
-                }
+        String currentUserId = FirebaseAuth.getInstance().getUid();
+        if (currentUserId != null) {
+            if (!currentUserId.equals(profile.getId())) {
+                FollowManager.getInstance(context).checkFollowState(currentUserId, profile.getId(), followState -> {
+                    followButton.setVisibility(View.VISIBLE);
+                    followButton.setState(followState);
+                });
             } else {
-                followButton.setState(FollowState.NO_ONE_FOLLOW);
+                followButton.setState(FollowState.MY_PROFILE);
             }
+        } else {
+            followButton.setState(FollowState.NO_ONE_FOLLOW);
+        }
 
-            if (profile.getPhotoUrl() != null) {
-                ImageUtil.loadImage(GlideApp.with(context), profile.getPhotoUrl(), photoImageView);
-            }
-        };
+        if (profile.getPhotoUrl() != null) {
+            ImageUtil.loadImage(GlideApp.with(activity), profile.getPhotoUrl(), photoImageView);
+        }
+    }
+
+    public interface Callback {
+        void onItemClick(int position, View view);
+
+        void onFollowButtonClick(int position, FollowButton followButton);
     }
 
 }

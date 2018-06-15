@@ -33,6 +33,7 @@ import com.rozdoum.socialcomponents.adapters.viewPager.TabsPagerAdapter;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.search.posts.SearchPostsFragment;
 import com.rozdoum.socialcomponents.main.search.users.SearchUsersFragment;
+import com.rozdoum.socialcomponents.utils.LogUtil;
 
 /**
  * Created by Alexey on 08.05.18.
@@ -43,6 +44,7 @@ public class SearchActivity extends BaseActivity<SearchView, SearchPresenter> im
     private TabsPagerAdapter tabsAdapter;
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private android.support.v7.widget.SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +98,7 @@ public class SearchActivity extends BaseActivity<SearchView, SearchPresenter> im
 
             @Override
             public void onPageSelected(int position) {
+                search(searchView.getQuery().toString());
             }
 
             @Override
@@ -108,12 +111,14 @@ public class SearchActivity extends BaseActivity<SearchView, SearchPresenter> im
     private void search(String searchText) {
        Fragment fragment = tabsAdapter.getItem(viewPager.getCurrentItem());
         ((Searchable)fragment).search(searchText);
+        LogUtil.logDebug(TAG, "search text: " + searchText);
     }
 
     private void initSearch(MenuItem searchMenuItem) {
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) searchMenuItem.getActionView();
+        searchView = (android.support.v7.widget.SearchView) searchMenuItem.getActionView();
+        searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         searchMenuItem.expandActionView();
