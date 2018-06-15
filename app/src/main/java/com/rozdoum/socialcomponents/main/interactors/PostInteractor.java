@@ -547,4 +547,56 @@ public class PostInteractor {
                 .removeValue();
     }
 
+    public ValueEventListener searchPostsByTitle(String searchText, OnDataChangedListener<Post> onDataChangedListener) {
+        DatabaseReference reference = databaseHelper.getDatabaseReference().child(DatabaseHelper.POSTS_DB_KEY);
+        ValueEventListener valueEventListener = getSearchQuery(reference,"title", searchText).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                PostListResult result = parsePostList((Map<String, Object>) dataSnapshot.getValue());
+                onDataChangedListener.onListChanged(result.getPosts());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                LogUtil.logError(TAG, "searchPostsByTitle(), onCancelled", new Exception(databaseError.getMessage()));
+            }
+        });
+
+        databaseHelper.addActiveListener(valueEventListener, reference);
+
+        return valueEventListener;
+    }
+
+    public ValueEventListener filterPostsByLikes(int  limit, OnDataChangedListener<Post> onDataChangedListener) {
+        DatabaseReference reference = databaseHelper.getDatabaseReference().child(DatabaseHelper.POSTS_DB_KEY);
+        ValueEventListener valueEventListener = getFilteredQuery(reference,"likesCount", limit).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                PostListResult result = parsePostList((Map<String, Object>) dataSnapshot.getValue());
+                onDataChangedListener.onListChanged(result.getPosts());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                LogUtil.logError(TAG, "filterPostsByLikes(), onCancelled", new Exception(databaseError.getMessage()));
+            }
+        });
+
+        databaseHelper.addActiveListener(valueEventListener, reference);
+
+        return valueEventListener;
+    }
+
+    private Query getSearchQuery(DatabaseReference databaseReference, String childOrderBy, String searchText) {
+        return databaseReference
+                .orderByChild(childOrderBy)
+                .startAt(searchText)
+                .endAt(searchText + "\uf8ff");
+    }
+
+    private Query getFilteredQuery(DatabaseReference databaseReference, String childOrderBy, int limit) {
+        return databaseReference
+                .orderByChild(childOrderBy)
+                .limitToLast(limit);
+    }
 }

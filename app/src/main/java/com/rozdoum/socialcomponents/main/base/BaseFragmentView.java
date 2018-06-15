@@ -19,12 +19,10 @@ package com.rozdoum.socialcomponents.main.base;
 import android.support.annotation.StringRes;
 import android.view.View;
 
-import com.hannesdorfmann.mosby3.mvp.MvpView;
-
 /**
  * Created by Alexey on 08.05.18.
  */
-public interface BaseFragmentView extends MvpView {
+public interface BaseFragmentView extends BaseView {
 
     void showProgress();
 

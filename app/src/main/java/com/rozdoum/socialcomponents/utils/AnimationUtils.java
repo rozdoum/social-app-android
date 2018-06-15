@@ -62,6 +62,21 @@ public class AnimationUtils {
         return propertyAnimator;
     }
 
+    /**
+     * Shows a view by scaling
+     *
+     * @param v the view to be scaled
+     *
+     * @return the ViewPropertyAnimation to manage the animation
+     */
+    public static ViewPropertyAnimator showViewByScaleWithoutDelay (View v) {
+
+        ViewPropertyAnimator propertyAnimator = v.animate()
+                .scaleX(1).scaleY(1);
+
+        return propertyAnimator;
+    }
+
     public static ViewPropertyAnimator hideViewByScaleAndVisibility (final View v) {
 
         ViewPropertyAnimator propertyAnimator = v.animate().setStartDelay(DEFAULT_DELAY).setDuration(SHORT_DURATION)

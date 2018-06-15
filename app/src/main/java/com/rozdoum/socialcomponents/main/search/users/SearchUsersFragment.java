@@ -24,8 +24,10 @@ import android.view.ViewGroup;
 
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.base.BaseFragment;
+import com.rozdoum.socialcomponents.main.search.Searchable;
 
-public class SearchUsersFragment extends BaseFragment<SearchUsersView, SearchUsersPresenter> implements SearchUsersView {
+public class SearchUsersFragment extends BaseFragment<SearchUsersView, SearchUsersPresenter>
+        implements SearchUsersView, Searchable {
 
     public SearchUsersFragment() {
         // Required empty public constructor
@@ -53,4 +55,8 @@ public class SearchUsersFragment extends BaseFragment<SearchUsersView, SearchUse
         return inflater.inflate(R.layout.fragment_search_users, container, false);
     }
 
+    @Override
+    public void search(String searchText) {
+
+    }
 }

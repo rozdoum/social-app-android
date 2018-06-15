@@ -22,6 +22,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
+import com.rozdoum.socialcomponents.main.search.Searchable;
+
 import java.util.ArrayList;
 
 public class TabsPagerAdapter extends SmartFragmentStatePagerAdapter {
@@ -44,7 +46,7 @@ public class TabsPagerAdapter extends SmartFragmentStatePagerAdapter {
         return mTabs.size();
     }
 
-    public void addTab(Class<?> clss, @Nullable Bundle args, String title) {
+    public void addTab(Class<? extends Searchable> clss, @Nullable Bundle args, String title) {
         mTabs.add(new TabInfo(title, Fragment.instantiate(mActivity, clss.getName(), args)));
     }
 
