@@ -42,6 +42,7 @@ import com.rozdoum.socialcomponents.main.search.Searchable;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.AnimationUtils;
 
 import java.util.List;
 
@@ -54,6 +55,8 @@ public class SearchPostsFragment extends BaseFragment<SearchPostsView, SearchPos
     private ProgressBar progressBar;
     private SearchPostsAdapter postsAdapter;
     private TextView emptyListMessageTextView;
+
+    private boolean searchInProgress = false;
 
     public SearchPostsFragment() {
         // Required empty public constructor
@@ -130,12 +133,17 @@ public class SearchPostsFragment extends BaseFragment<SearchPostsView, SearchPos
             public void onAuthorClick(String authorId, View view) {
                 openProfileActivity(authorId, view);
             }
+
+            @Override
+            public boolean enableClick() {
+                return !searchInProgress;
+            }
         });
 
         ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.setAdapter(postsAdapter);
 
-        presenter.loadPostsWithEmptySearch();
+        presenter.search();
     }
 
 
@@ -185,31 +193,29 @@ public class SearchPostsFragment extends BaseFragment<SearchPostsView, SearchPos
 
     @Override
     public void onSearchResultsReady(List<Post> posts) {
+        hideLocalProgress();
         emptyListMessageTextView.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
         postsAdapter.setList(posts);
     }
 
     @Override
     public void showLocalProgress() {
-        progressBar.setVisibility(View.VISIBLE);
+        searchInProgress = true;
+        AnimationUtils.showViewByScaleWithoutDelay(progressBar);
     }
 
     @Override
     public void hideLocalProgress() {
-        progressBar.setVisibility(View.GONE);
+        searchInProgress = false;
+        AnimationUtils.hideViewByScale(progressBar);
     }
+
 
     @Override
     public void showEmptyListLayout() {
-        hideAllContent();
-        emptyListMessageTextView.setVisibility(View.VISIBLE);
-    }
-
-    private void hideAllContent() {
-        emptyListMessageTextView.setVisibility(View.GONE);
+        hideLocalProgress();
         recyclerView.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
+        emptyListMessageTextView.setVisibility(View.VISIBLE);
     }
 }

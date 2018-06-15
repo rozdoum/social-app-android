@@ -76,49 +76,40 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         this.context = view.getContext();
         this.baseActivity = activity;
 
-        postImageView = (ImageView) view.findViewById(R.id.postImageView);
-        likeCounterTextView = (TextView) view.findViewById(R.id.likeCounterTextView);
-        likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
-        commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
-        watcherCounterTextView = (TextView) view.findViewById(R.id.watcherCounterTextView);
-        dateTextView = (TextView) view.findViewById(R.id.dateTextView);
-        titleTextView = (TextView) view.findViewById(R.id.titleTextView);
-        detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
-        authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
-        likeViewGroup = (ViewGroup) view.findViewById(R.id.likesContainer);
+        postImageView = view.findViewById(R.id.postImageView);
+        likeCounterTextView = view.findViewById(R.id.likeCounterTextView);
+        likesImageView = view.findViewById(R.id.likesImageView);
+        commentsCountTextView = view.findViewById(R.id.commentsCountTextView);
+        watcherCounterTextView = view.findViewById(R.id.watcherCounterTextView);
+        dateTextView = view.findViewById(R.id.dateTextView);
+        titleTextView = view.findViewById(R.id.titleTextView);
+        detailsTextView = view.findViewById(R.id.detailsTextView);
+        authorImageView = view.findViewById(R.id.authorImageView);
+        likeViewGroup = view.findViewById(R.id.likesContainer);
 
         authorImageView.setVisibility(isAuthorNeeded ? View.VISIBLE : View.GONE);
 
         profileManager = ProfileManager.getInstance(context.getApplicationContext());
         postManager = PostManager.getInstance(context.getApplicationContext());
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = getAdapterPosition();
-                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
-                    onClickListener.onItemClick(getAdapterPosition(), v);
-                }
+        view.setOnClickListener(v -> {
+            int position = getAdapterPosition();
+            if (onClickListener != null && position != RecyclerView.NO_POSITION) {
+                onClickListener.onItemClick(getAdapterPosition(), v);
             }
         });
 
-        likeViewGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int position = getAdapterPosition();
-                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
-                    onClickListener.onLikeClick(likeController, position);
-                }
+        likeViewGroup.setOnClickListener(view1 -> {
+            int position = getAdapterPosition();
+            if (onClickListener != null && position != RecyclerView.NO_POSITION) {
+                onClickListener.onLikeClick(likeController, position);
             }
         });
 
-        authorImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = getAdapterPosition();
-                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
-                    onClickListener.onAuthorClick(getAdapterPosition(), v);
-                }
+        authorImageView.setOnClickListener(v -> {
+            int position = getAdapterPosition();
+            if (onClickListener != null && position != RecyclerView.NO_POSITION) {
+                onClickListener.onAuthorClick(getAdapterPosition(), v);
             }
         });
     }
@@ -162,10 +153,9 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
-        return new OnObjectChangedListener<Profile>() {
-            @Override
-            public void onObjectChanged(final Profile obj) {
-                if (obj.getPhotoUrl() != null) {
+        return obj -> {
+            if (obj.getPhotoUrl() != null) {
+                if (!baseActivity.isFinishing() && !baseActivity.isDestroyed()) {
                     ImageUtil.loadImage(GlideApp.with(baseActivity), obj.getPhotoUrl(), authorImageView);
                 }
             }
@@ -173,12 +163,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     }
 
     private OnObjectExistListener<Like> createOnLikeObjectExistListener() {
-        return new OnObjectExistListener<Like>() {
-            @Override
-            public void onDataChanged(boolean exist) {
-                likeController.initLike(exist);
-            }
-        };
+        return exist -> likeController.initLike(exist);
     }
 
     public interface OnClickListener {
