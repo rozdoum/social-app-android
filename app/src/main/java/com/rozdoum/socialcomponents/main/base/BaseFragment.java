@@ -16,6 +16,7 @@
 
 package com.rozdoum.socialcomponents.main.base;
 
+import android.content.DialogInterface;
 import android.view.View;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
@@ -78,6 +79,16 @@ public abstract class BaseFragment<V extends BaseFragmentView, P extends MvpBase
     }
 
     @Override
+    public void showWarningDialog(int messageId, DialogInterface.OnClickListener listener) {
+        ((BaseActivity) getActivity()).showWarningDialog(messageId, listener);
+    }
+
+    @Override
+    public void showWarningDialog(String message, DialogInterface.OnClickListener listener) {
+        ((BaseActivity) getActivity()).showWarningDialog(message, listener);
+    }
+
+    @Override
     public boolean hasInternetConnection() {
         return ((BaseActivity) getActivity()).hasInternetConnection();
     }
@@ -85,5 +96,15 @@ public abstract class BaseFragment<V extends BaseFragmentView, P extends MvpBase
     @Override
     public void startLoginActivity() {
         ((BaseActivity) getActivity()).startLoginActivity();
+    }
+
+    @Override
+    public void hideKeyboard() {
+        ((BaseActivity) getActivity()).hideKeyboard();
+    }
+
+    @Override
+    public void finish() {
+        ((BaseActivity) getActivity()).finish();
     }
 }
