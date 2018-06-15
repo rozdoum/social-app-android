@@ -86,14 +86,17 @@ public class SearchPostsAdapter extends BasePostsAdapter {
     }
 
     public void setList(List<Post> list) {
+        cleanSelectedPostInformation();
         postList.clear();
         postList.addAll(list);
         notifyDataSetChanged();
     }
 
     public void removeSelectedPost() {
-        postList.remove(selectedPostPosition);
-        notifyItemRemoved(selectedPostPosition);
+        if (selectedPostPosition != RecyclerView.NO_POSITION) {
+            postList.remove(selectedPostPosition);
+            notifyItemRemoved(selectedPostPosition);
+        }
     }
 
     public interface CallBack {
