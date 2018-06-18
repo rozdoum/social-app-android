@@ -23,4 +23,13 @@ import com.rozdoum.socialcomponents.main.pickImageBase.PickImageView;
  */
 
 public interface CreateProfileView extends PickImageView {
+    void setName(String username);
+
+    void setProfilePhoto(String photoUrl);
+
+    void setDefaultProfilePhoto();
+
+    String getNameText();
+
+    void setNameError(String string);
 }

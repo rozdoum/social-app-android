@@ -22,12 +22,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -36,31 +34,18 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.main.interactors.ProfileInteractor;
 import com.rozdoum.socialcomponents.main.pickImageBase.PickImageActivity;
-import com.rozdoum.socialcomponents.managers.DatabaseHelper;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
-import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
-import com.rozdoum.socialcomponents.utils.PreferencesUtil;
-import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
-public class CreateProfileActivity extends PickImageActivity<CreateProfileView, CreateProfilePresenter> implements CreateProfileView, OnProfileCreatedListener {
+public class CreateProfileActivity extends PickImageActivity<CreateProfileView, CreateProfilePresenter> implements CreateProfileView {
     public static final String LARGE_IMAGE_URL_EXTRA_KEY = "CreateProfileActivity.LARGE_IMAGE_URL_EXTRA_KEY";
 
     // UI references.
     private EditText nameEditText;
     private ImageView imageView;
-    private ProgressBar progressBar;
-
-    private Profile profile;
-    private String largeAvatarURL;
+    private ProgressBar avatarProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,42 +56,14 @@ public class CreateProfileActivity extends PickImageActivity<CreateProfileView, 
         }
 
         // Set up the login form.
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        imageView = (ImageView) findViewById(R.id.imageView);
-        nameEditText = (EditText) findViewById(R.id.nameEditText);
+        avatarProgressBar = findViewById(R.id.avatarProgressBar);
+        imageView = findViewById(R.id.imageView);
+        nameEditText = findViewById(R.id.nameEditText);
 
-        largeAvatarURL = getIntent().getStringExtra(LARGE_IMAGE_URL_EXTRA_KEY);
+        String largeAvatarURL = getIntent().getStringExtra(LARGE_IMAGE_URL_EXTRA_KEY);
+        presenter.buildProfile(largeAvatarURL);
 
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        profile = ProfileManager.getInstance(this).buildProfile(firebaseUser, largeAvatarURL);
-
-        nameEditText.setText(profile.getUsername());
-
-        if (profile.getPhotoUrl() != null) {
-            ImageUtil.loadImage(GlideApp.with(this), profile.getPhotoUrl(), imageView, new RequestListener<Drawable>() {
-                @Override
-                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                    progressBar.setVisibility(View.GONE);
-                    return false;
-                }
-
-                @Override
-                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                    progressBar.setVisibility(View.GONE);
-                    return false;
-                }
-            });
-        } else {
-            progressBar.setVisibility(View.GONE);
-            imageView.setImageResource(R.drawable.ic_stub);
-        }
-
-        imageView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSelectImageClick(v);
-            }
-        });
+        imageView.setOnClickListener(this::onSelectImageClick);
     }
 
     @NonNull
@@ -120,7 +77,7 @@ public class CreateProfileActivity extends PickImageActivity<CreateProfileView, 
 
     @Override
     public ProgressBar getProgressView() {
-        return progressBar;
+        return avatarProgressBar;
     }
 
     @Override
@@ -133,40 +90,6 @@ public class CreateProfileActivity extends PickImageActivity<CreateProfileView, 
         startCropImageActivity();
     }
 
-    private void attemptCreateProfile() {
-
-        // Reset errors.
-        nameEditText.setError(null);
-
-        // Store values at the time of the login attempt.
-        String name = nameEditText.getText().toString().trim();
-
-        boolean cancel = false;
-        View focusView = null;
-
-        if (TextUtils.isEmpty(name)) {
-            nameEditText.setError(getString(R.string.error_field_required));
-            focusView = nameEditText;
-            cancel = true;
-        } else if (!ValidationUtil.isNameValid(name)) {
-            nameEditText.setError(getString(R.string.error_profile_name_length));
-            focusView = nameEditText;
-            cancel = true;
-        }
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress();
-            profile.setUsername(name);
-            ProfileManager.getInstance(this).createOrUpdateProfile(profile, imageUri, this);
-        }
-    }
-
     @Override
     @SuppressLint("NewApi")
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -176,17 +99,41 @@ public class CreateProfileActivity extends PickImageActivity<CreateProfileView, 
     }
 
     @Override
-    public void onProfileCreated(boolean success) {
-        hideProgress();
+    public void setName(String username) {
+        nameEditText.setText(username);
+    }
 
-        if (success) {
-            finish();
-            PreferencesUtil.setProfileCreated(this, success);
-            ProfileInteractor.getInstance(CreateProfileActivity.this.getApplicationContext())
-                    .addRegistrationToken(FirebaseInstanceId.getInstance().getToken(), profile.getId());
-        } else {
-            showSnackBar(R.string.error_fail_create_profile);
-        }
+    @Override
+    public void setProfilePhoto(String photoUrl) {
+        ImageUtil.loadImage(GlideApp.with(this), photoUrl, imageView, new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                avatarProgressBar.setVisibility(View.GONE);
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                avatarProgressBar.setVisibility(View.GONE);
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void setDefaultProfilePhoto() {
+        imageView.setImageResource(R.drawable.ic_stub);
+    }
+
+    @Override
+    public String getNameText() {
+        return nameEditText.getText().toString();
+    }
+
+    @Override
+    public void setNameError(@Nullable String string) {
+        nameEditText.setError(string);
+        nameEditText.requestFocus();
     }
 
     @Override
@@ -201,11 +148,7 @@ public class CreateProfileActivity extends PickImageActivity<CreateProfileView, 
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.continueButton:
-                if (hasInternetConnection()) {
-                    attemptCreateProfile();
-                } else {
-                    showSnackBar(R.string.internet_connection_failed);
-                }
+                presenter.attemptCreateProfile(imageUri);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -26,7 +26,7 @@
                 android:layout_gravity="center_horizontal">
 
                 <ProgressBar
-                    android:id="@+id/progressBar"
+                    android:id="@+id/avatarProgressBar"
                     android:layout_width="@dimen/progress_bar_size"
                     android:layout_height="@dimen/progress_bar_size"
                     android:layout_centerInParent="true" />
@@ -47,9 +47,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_name"
-                    android:imeActionId="@+id/createProdile"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="textEmailAddress"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
                     android:maxLines="1" />
 
             </android.support.design.widget.TextInputLayout>
