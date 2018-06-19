@@ -39,12 +39,12 @@ import com.rozdoum.socialcomponents.main.pickImageBase.PickImageActivity;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 
-public class EditProfileActivity extends PickImageActivity<EditProfileView, EditProfilePresenter> implements EditProfileView {
+public class EditProfileActivity<V extends EditProfileView, P extends EditProfilePresenter<V>> extends PickImageActivity<V, P> implements EditProfileView {
     private static final String TAG = EditProfileActivity.class.getSimpleName();
 
     // UI references.
     private EditText nameEditText;
-    private ImageView imageView;
+    protected ImageView imageView;
     private ProgressBar avatarProgressBar;
 
     @Override
@@ -59,18 +59,22 @@ public class EditProfileActivity extends PickImageActivity<EditProfileView, Edit
         imageView = findViewById(R.id.imageView);
         nameEditText = findViewById(R.id.nameEditText);
 
-        presenter.loadProfile();
-
         imageView.setOnClickListener(this::onSelectImageClick);
+
+        initContent();
     }
 
     @NonNull
     @Override
-    public EditProfilePresenter createPresenter() {
+    public P createPresenter() {
         if (presenter == null) {
-            return new EditProfilePresenter(this);
+            return (P) new EditProfilePresenter(this);
         }
         return presenter;
+    }
+
+    protected void initContent() {
+        presenter.loadProfile();
     }
 
     @Override

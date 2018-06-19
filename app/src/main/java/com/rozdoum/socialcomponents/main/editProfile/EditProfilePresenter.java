@@ -31,12 +31,12 @@ import com.rozdoum.socialcomponents.utils.ValidationUtil;
  * Created by Alexey on 03.05.18.
  */
 
-class EditProfilePresenter extends PickImagePresenter<EditProfileView> {
+public class EditProfilePresenter<V extends EditProfileView> extends PickImagePresenter<V> {
 
-    private Profile profile;
-    private ProfileManager profileManager;
+    protected Profile profile;
+    protected ProfileManager profileManager;
 
-    EditProfilePresenter(Context context) {
+    protected EditProfilePresenter(Context context) {
         super(context);
         profileManager = ProfileManager.getInstance(context.getApplicationContext());
 
@@ -80,18 +80,18 @@ class EditProfilePresenter extends PickImagePresenter<EditProfileView> {
                 if (!cancel) {
                     view.showProgress();
                     profile.setUsername(name);
-                    updateProfile(imageUri);
+                    createOrUpdateProfile(imageUri);
                 }
             });
         }
     }
 
-    private void updateProfile(Uri imageUri) {
+    private void createOrUpdateProfile(Uri imageUri) {
         profileManager.createOrUpdateProfile(profile, imageUri, success -> {
             ifViewAttached(view -> {
                 view.hideProgress();
                 if (success) {
-                    view.finish();
+                    onProfileUpdatedSuccessfully();
                 } else {
                     view.showSnackBar(R.string.error_fail_create_profile);
                 }
@@ -99,5 +99,8 @@ class EditProfilePresenter extends PickImagePresenter<EditProfileView> {
         });
     }
 
+    protected void onProfileUpdatedSuccessfully() {
+        ifViewAttached(BaseView::finish);
+    }
 
 }
