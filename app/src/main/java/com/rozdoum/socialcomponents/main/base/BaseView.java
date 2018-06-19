@@ -48,6 +48,8 @@ public interface BaseView extends MvpView {
 
     void showWarningDialog(String message);
 
+    void showNotCancelableWarningDialog(String message);
+
     void showWarningDialog(@StringRes int messageId, DialogInterface.OnClickListener listener);
 
     void showWarningDialog(String message, DialogInterface.OnClickListener listener);

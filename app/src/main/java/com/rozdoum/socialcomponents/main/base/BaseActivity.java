@@ -135,6 +135,15 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     }
 
     @Override
+    public void showNotCancelableWarningDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.button_ok, null);
+        builder.setCancelable(false);
+        builder.show();
+    }
+
+    @Override
     public void showWarningDialog(int message, DialogInterface.OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message);

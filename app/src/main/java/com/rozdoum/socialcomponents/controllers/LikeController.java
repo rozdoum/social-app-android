@@ -24,6 +24,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.support.design.widget.Snackbar;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -268,5 +269,18 @@ public class LikeController {
         } else {
             baseActivity.doAuthorization(profileStatus);
         }
+    }
+
+    public void changeAnimationType() {
+        if (getLikeAnimationType() == LikeController.AnimationType.BOUNCE_ANIM) {
+            setLikeAnimationType(LikeController.AnimationType.COLOR_ANIM);
+        } else {
+            setLikeAnimationType(LikeController.AnimationType.BOUNCE_ANIM);
+        }
+
+        Snackbar snackbar = Snackbar
+                .make(likesImageView, "Animation was changed", Snackbar.LENGTH_LONG);
+
+        snackbar.show();
     }
 }
