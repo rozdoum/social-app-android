@@ -16,17 +16,14 @@
 
 package com.rozdoum.socialcomponents.main.imageDetail;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -42,33 +39,58 @@ public class ImageDetailActivity extends BaseActivity<ImageDetailView, ImageDeta
     private static final String TAG = ImageDetailActivity.class.getSimpleName();
 
     public static final String IMAGE_URL_EXTRA_KEY = "ImageDetailActivity.IMAGE_URL_EXTRA_KEY";
+    private ViewGroup viewGroup;
+    private TouchImageView touchImageView;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_detail);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        actionBar = getSupportActionBar();
-        final TouchImageView touchImageView = (TouchImageView) findViewById(R.id.touchImageView);
-        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        final ViewGroup viewGroup = (ViewGroup) findViewById(R.id.image_detail_container);
+        touchImageView = findViewById(R.id.touchImageView);
+        progressBar = findViewById(R.id.progressBar);
+        viewGroup = findViewById(R.id.image_detail_container);
 
+        initActionBar();
+
+        String imageUrl = getIntent().getStringExtra(IMAGE_URL_EXTRA_KEY);
+        loadImage(imageUrl);
+
+        touchImageView.setOnClickListener(v -> {
+            final int vis = viewGroup.getSystemUiVisibility();
+            if ((vis & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0) {
+                viewGroup.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            } else {
+                viewGroup.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+            }
+        });
+    }
+
+    @NonNull
+    @Override
+    public ImageDetailPresenter createPresenter() {
+        if (presenter == null) {
+            return new ImageDetailPresenter(this);
+        }
+        return presenter;
+    }
+
+    private void initActionBar() {
+        actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(true);
 
             viewGroup.setOnSystemUiVisibilityChangeListener(
-                    new View.OnSystemUiVisibilityChangeListener() {
-                        @Override
-                        public void onSystemUiVisibilityChange(int vis) {
-                            if ((vis & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0) {
-                                actionBar.hide();
-                            } else {
-                                actionBar.show();
-                            }
+                    vis -> {
+                        if ((vis & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0) {
+                            actionBar.hide();
+                        } else {
+                            actionBar.show();
                         }
                     });
 
@@ -76,10 +98,10 @@ public class ImageDetailActivity extends BaseActivity<ImageDetailView, ImageDeta
             viewGroup.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
             actionBar.hide();
         }
+    }
 
-        String imageUrl = getIntent().getStringExtra(IMAGE_URL_EXTRA_KEY);
-
-        int maxImageSide = calcMaxImageSide();
+    private void loadImage(String imageUrl) {
+        int maxImageSide = presenter.calcMaxImageSide();
 
         ImageUtil.loadImageWithSimpleTarget(GlideApp.with(this), imageUrl, new SimpleTarget<Bitmap>(maxImageSide, maxImageSide) {
             @Override
@@ -95,37 +117,5 @@ public class ImageDetailActivity extends BaseActivity<ImageDetailView, ImageDeta
                 touchImageView.setImageResource(R.drawable.ic_stub);
             }
         });
-
-        touchImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final int vis = viewGroup.getSystemUiVisibility();
-                if ((vis & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0) {
-                    viewGroup.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-                } else {
-                    viewGroup.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
-                }
-            }
-        });
-    }
-
-    @NonNull
-    @Override
-    public ImageDetailPresenter createPresenter() {
-        if (presenter == null) {
-            return new ImageDetailPresenter(this);
-        }
-        return presenter;
-    }
-
-    private int calcMaxImageSide() {
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        WindowManager windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
-        windowManager.getDefaultDisplay().getMetrics(displaymetrics);
-
-        int width = displaymetrics.widthPixels;
-        int height = displaymetrics.heightPixels;
-
-        return width > height ? width : height;
     }
 }

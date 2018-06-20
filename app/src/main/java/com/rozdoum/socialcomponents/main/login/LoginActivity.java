@@ -19,10 +19,7 @@ package com.rozdoum.socialcomponents.main.login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.view.View;
-import android.view.View.OnClickListener;
 
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -30,31 +27,18 @@ import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.createProfile.CreateProfileActivity;
-import com.rozdoum.socialcomponents.main.interactors.ProfileInteractor;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
-import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GoogleApiHelper;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 import com.rozdoum.socialcomponents.utils.LogoutHelper;
-import com.rozdoum.socialcomponents.utils.PreferencesUtil;
 
 import java.util.Arrays;
 
@@ -79,47 +63,46 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // Configure Google Sign In
-        mGoogleApiClient = GoogleApiHelper.createGoogleApiClient(this);
-        findViewById(R.id.googleSignInButton).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signInWithGoogle();
-            }
-        });
+        initGoogleSignIn();
+        initFirebaseAuth();
+        initFacebookSignIn();
+    }
 
-        // Configure firebase auth
+    private void initGoogleSignIn() {
+        mGoogleApiClient = GoogleApiHelper.createGoogleApiClient(this);
+        mAuth = FirebaseAuth.getInstance();
+
+        findViewById(R.id.googleSignInButton).setOnClickListener(view -> presenter.onGoogleSignInClick());
+    }
+
+    private void initFirebaseAuth() {
         mAuth = FirebaseAuth.getInstance();
 
         if (mAuth.getCurrentUser() != null) {
             LogoutHelper.signOut(mGoogleApiClient, this);
         }
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                final FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // Profile is signed in
-                    LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    checkIsProfileExist(user.getUid());
-                    setResult(RESULT_OK);
-                } else {
-                    // Profile is signed out
-                    LogUtil.logDebug(TAG, "onAuthStateChanged:signed_out");
-                }
+        mAuthListener = firebaseAuth -> {
+            final FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user != null) {
+                // Profile is signed in
+                LogUtil.logDebug(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                presenter.checkIsProfileExist(user.getUid());
+                setResult(RESULT_OK);
+            } else {
+                // Profile is signed out
+                LogUtil.logDebug(TAG, "onAuthStateChanged:signed_out");
             }
         };
+    }
 
-        // Configure Facebook  Sign In
+    private void initFacebookSignIn() {
         mCallbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 LogUtil.logDebug(TAG, "facebook:onSuccess:" + loginResult);
-                profilePhotoUrlLarge = String.format(getString(R.string.facebook_large_image_url_pattern),
-                        loginResult.getAccessToken().getUserId());
-                handleFacebookAccessToken(loginResult.getAccessToken());
+                presenter.handleFacebookSignInResult(loginResult);
             }
 
             @Override
@@ -134,12 +117,7 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
             }
         });
 
-        findViewById(R.id.facebookSignInButton).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signInWithFacebook();
-            }
-        });
+        findViewById(R.id.facebookSignInButton).setOnClickListener(v -> presenter.onFacebookSignInClick());
     }
 
     @Override
@@ -182,97 +160,35 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == SIGN_IN_GOOGLE) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                showProgress();
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                profilePhotoUrlLarge = String.format(getString(R.string.google_large_image_url_pattern),
-                        account.getPhotoUrl(), Constants.Profile.MAX_AVATAR_SIZE);
-                firebaseAuthWithGoogle(account);
-            } else {
-                LogUtil.logDebug(TAG, "SIGN_IN_GOOGLE failed :" + result);
-                // Google Sign In failed, update UI appropriately
-                hideProgress();
-            }
+            presenter.handleGoogleSignInResult(result);
         }
     }
 
-    private void checkIsProfileExist(final String userId) {
-        ProfileManager.getInstance(this).isProfileExist(userId, new OnObjectExistListener<Profile>() {
-            @Override
-            public void onDataChanged(boolean exist) {
-                if (!exist) {
-                    startCreateProfileActivity();
-                } else {
-                    PreferencesUtil.setProfileCreated(LoginActivity.this, true);
-                    ProfileInteractor.getInstance(LoginActivity.this.getApplicationContext())
-                            .addRegistrationToken(FirebaseInstanceId.getInstance().getToken(), userId);
-                }
-                hideProgress();
-                finish();
-            }
-        });
-    }
-
-    private void startCreateProfileActivity() {
+    @Override
+    public void startCreateProfileActivity() {
         Intent intent = new Intent(LoginActivity.this, CreateProfileActivity.class);
         intent.putExtra(CreateProfileActivity.LARGE_IMAGE_URL_EXTRA_KEY, profilePhotoUrlLarge);
         startActivity(intent);
     }
 
-    private void handleFacebookAccessToken(AccessToken token) {
-        LogUtil.logDebug(TAG, "handleFacebookAccessToken:" + token);
-        showProgress();
-
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+    @Override
+    public void firebaseAuthWithCredentials(AuthCredential credential) {
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        LogUtil.logDebug(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                .addOnCompleteListener(this, task -> {
+                    LogUtil.logDebug(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            handleAuthError(task);
-                        }
+                    // If sign in fails, display a message to the user. If sign in succeeds
+                    // the auth state listener will be notified and logic to handle the
+                    // signed in user can be handled in the listener.
+                    if (!task.isSuccessful()) {
+                        presenter.handleAuthError(task);
                     }
                 });
     }
 
-    private void handleAuthError(Task<AuthResult> task) {
-        Exception exception = task.getException();
-        LogUtil.logError(TAG, "signInWithCredential", exception);
-
-        if (exception != null) {
-            showWarningDialog(exception.getMessage());
-        } else {
-            showSnackBar(R.string.error_authentication);
-        }
-
-        hideProgress();
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        LogUtil.logDebug(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        showProgress();
-
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        LogUtil.logDebug(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            handleAuthError(task);
-                        }
-                    }
-                });
+    @Override
+    public void setProfilePhotoUrl(String url) {
+        profilePhotoUrlLarge = url;
     }
 
     @Override
@@ -284,21 +200,15 @@ public class LoginActivity extends BaseActivity<LoginView, LoginPresenter> imple
         hideProgress();
     }
 
-    private void signInWithGoogle() {
-        if (hasInternetConnection()) {
-            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-            startActivityForResult(signInIntent, SIGN_IN_GOOGLE);
-        } else {
-            showSnackBar(R.string.internet_connection_failed);
-        }
+    @Override
+    public void signInWithGoogle() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, SIGN_IN_GOOGLE);
     }
 
-    private void signInWithFacebook() {
-        if (hasInternetConnection()) {
-            LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("email", "public_profile"));
-        } else {
-            showSnackBar(R.string.internet_connection_failed);
-        }
+    @Override
+    public void signInWithFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("email", "public_profile"));
     }
 }
 
