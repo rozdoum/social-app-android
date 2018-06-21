@@ -79,6 +79,11 @@ public abstract class BaseFragment<V extends BaseFragmentView, P extends MvpBase
     }
 
     @Override
+    public void showNotCancelableWarningDialog(String message) {
+        ((BaseActivity) getActivity()).showNotCancelableWarningDialog(message);
+    }
+
+    @Override
     public void showWarningDialog(int messageId, DialogInterface.OnClickListener listener) {
         ((BaseActivity) getActivity()).showWarningDialog(messageId, listener);
     }
