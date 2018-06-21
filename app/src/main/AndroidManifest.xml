@@ -46,7 +46,7 @@
             android:label="@string/title_activity_login"
             android:theme="@style/AppCompat.NoActionBar" />
         <activity
-            android:name=".main.createProfile.CreateProfileActivity"
+            android:name="com.rozdoum.socialcomponents.main.editProfile.createProfile.CreateProfileActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_create_profile"/>
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"

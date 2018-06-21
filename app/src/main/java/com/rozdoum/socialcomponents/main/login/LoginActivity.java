@@ -46,7 +46,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
-import com.rozdoum.socialcomponents.main.createProfile.CreateProfileActivity;
+import com.rozdoum.socialcomponents.main.editProfile.createProfile.CreateProfileActivity;
 import com.rozdoum.socialcomponents.main.interactors.ProfileInteractor;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;

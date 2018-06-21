@@ -14,13 +14,16 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.main.createProfile;
+package com.rozdoum.socialcomponents.main.editProfile.createProfile;
 
-import com.rozdoum.socialcomponents.main.pickImageBase.PickImageView;
+import com.rozdoum.socialcomponents.main.editProfile.EditProfileView;
 
 /**
  * Created by Alexey on 03.05.18.
  */
 
-public interface CreateProfileView extends PickImageView {
+public interface CreateProfileView extends EditProfileView {
+
+    void setDefaultProfilePhoto();
+
 }

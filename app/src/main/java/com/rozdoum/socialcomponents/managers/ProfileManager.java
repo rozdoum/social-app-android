@@ -107,4 +107,8 @@ public class ProfileManager extends FirebaseListenersManager {
         ValueEventListener valueEventListener = profileInteractor.searchProfiles(searchText, onDataChangedListener);
         addListenerToMap(context, valueEventListener);
     }
+
+    public void addRegistrationToken(String token, String userId) {
+        profileInteractor.addRegistrationToken(token, userId);
+    }
 }
