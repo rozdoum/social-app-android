@@ -30,9 +30,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.TextAppearanceSpan;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,7 +51,6 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.PostsByUserAdapter;
 import com.rozdoum.socialcomponents.dialogs.UnfollowConfirmationDialog;
 import com.rozdoum.socialcomponents.enums.FollowState;
-import com.rozdoum.socialcomponents.enums.PostStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.editProfile.EditProfileActivity;
 import com.rozdoum.socialcomponents.main.login.LoginActivity;
@@ -64,10 +60,7 @@ import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.main.usersList.UsersListActivity;
 import com.rozdoum.socialcomponents.main.usersList.UsersListType;
 import com.rozdoum.socialcomponents.managers.FollowManager;
-import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GlideApp;
@@ -99,10 +92,7 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     private TextView likesCountersTextView;
     private TextView followersCounterTextView;
     private TextView followingsCounterTextView;
-    private ProfileManager profileManager;
     private FollowButton followButton;
-
-    private Profile profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,23 +124,11 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         followingsCounterTextView = findViewById(R.id.followingsCounterTextView);
         postsProgressBar = findViewById(R.id.postsProgressBar);
         followButton = findViewById(R.id.followButton);
+        swipeContainer = findViewById(R.id.swipeContainer);
 
-        followButton.setOnClickListener(v -> {
-            presenter.onFollowButtonClick(followButton.getState(), userID);
-        });
-
-        followingsCounterTextView.setOnClickListener(v -> {
-            startUsersListActivity(UsersListType.FOLLOWINGS);
-        });
-
-        followersCounterTextView.setOnClickListener(v -> {
-            startUsersListActivity(UsersListType.FOLLOWERS);
-        });
+        initListeners();
 
         presenter.checkFollowState(userID);
-
-        swipeContainer = findViewById(R.id.swipeContainer);
-        swipeContainer.setOnRefreshListener(() -> onRefreshAction());
 
         loadPostsList();
         supportPostponeEnterTransition();
@@ -159,7 +137,7 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     @Override
     public void onStart() {
         super.onStart();
-        loadProfile();
+        presenter.loadProfile(this, userID);
         presenter.getFollowersCount(userID);
         presenter.getFollowingsCount(userID);
 
@@ -172,7 +150,7 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     public void onStop() {
         super.onStop();
         FollowManager.getInstance(this).closeListeners(this);
-        profileManager.closeListeners(this);
+        ProfileManager.getInstance(this).closeListeners(this);
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.stopAutoManage(this);
@@ -202,15 +180,7 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
                     break;
 
                 case PostDetailsActivity.UPDATE_POST_REQUEST:
-                    if (data != null) {
-                        PostStatus postStatus = (PostStatus) data.getSerializableExtra(PostDetailsActivity.POST_STATUS_EXTRA_KEY);
-                        if (postStatus.equals(PostStatus.REMOVED)) {
-                            postsAdapter.removeSelectedPost();
-
-                        } else if (postStatus.equals(PostStatus.UPDATED)) {
-                            postsAdapter.updateSelectedPost();
-                        }
-                    }
+                    presenter.checkPostChanges(data);
                     break;
 
                 case LoginActivity.LOGIN_REQUEST_CODE:
@@ -218,6 +188,22 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
                     break;
             }
         }
+    }
+
+    private void initListeners() {
+        followButton.setOnClickListener(v -> {
+            presenter.onFollowButtonClick(followButton.getState(), userID);
+        });
+
+        followingsCounterTextView.setOnClickListener(v -> {
+            startUsersListActivity(UsersListType.FOLLOWINGS);
+        });
+
+        followersCounterTextView.setOnClickListener(v -> {
+            startUsersListActivity(UsersListType.FOLLOWERS);
+        });
+
+        swipeContainer.setOnRefreshListener(this::onRefreshAction);
     }
 
     private void onRefreshAction() {
@@ -234,39 +220,22 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     private void loadPostsList() {
         if (recyclerView == null) {
 
-            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            recyclerView = findViewById(R.id.recycler_view);
             postsAdapter = new PostsByUserAdapter(this, userID);
             postsAdapter.setCallBack(new PostsByUserAdapter.CallBack() {
                 @Override
                 public void onItemClick(final Post post, final View view) {
-                    PostManager.getInstance(ProfileActivity.this).isPostExistSingleValue(post.getId(), new OnObjectExistListener<Post>() {
-                        @Override
-                        public void onDataChanged(boolean exist) {
-                            if (exist) {
-                                openPostDetailsActivity(post, view);
-                            } else {
-                                showSnackBar(R.string.error_post_was_removed);
-                            }
-                        }
-                    });
+                    presenter.onPostClick(post, view);
                 }
 
                 @Override
                 public void onPostsListChanged(int postsCount) {
-                    String postsLabel = getResources().getQuantityString(R.plurals.posts_counter_format, postsCount, postsCount);
-                    postsCounterTextView.setText(buildCounterSpannable(postsLabel, postsCount));
-
-                    likesCountersTextView.setVisibility(View.VISIBLE);
-                    postsCounterTextView.setVisibility(View.VISIBLE);
-
-                    swipeContainer.setRefreshing(false);
-                    hideLoadingPostsProgressBar();
+                    presenter.onPostListChanged(postsCount);
                 }
 
                 @Override
                 public void onPostLoadingCanceled() {
-                    swipeContainer.setRefreshing(false);
-                    hideLoadingPostsProgressBar();
+                    hideLoadingPostsProgress();
                 }
             });
 
@@ -277,19 +246,9 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         }
     }
 
-    private Spannable buildCounterSpannable(String label, int value) {
-        SpannableStringBuilder contentString = new SpannableStringBuilder();
-        contentString.append(String.valueOf(value));
-        contentString.append("\n");
-        int start = contentString.length();
-        contentString.append(label);
-        contentString.setSpan(new TextAppearanceSpan(this, R.style.TextAppearance_Second_Light), start, contentString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return contentString;
-    }
-
-
     @SuppressLint("RestrictedApi")
-    private void openPostDetailsActivity(Post post, View v) {
+    @Override
+    public void openPostDetailsActivity(Post post, View v) {
         Intent intent = new Intent(ProfileActivity.this, PostDetailsActivity.class);
         intent.putExtra(PostDetailsActivity.POST_ID_EXTRA_KEY, post.getId());
         intent.putExtra(PostDetailsActivity.AUTHOR_ANIMATION_NEEDED_EXTRA_KEY, true);
@@ -305,55 +264,6 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
             startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST, options.toBundle());
         } else {
             startActivityForResult(intent, PostDetailsActivity.UPDATE_POST_REQUEST);
-        }
-    }
-
-    private void loadProfile() {
-        profileManager = ProfileManager.getInstance(this);
-        profileManager.getProfileValue(ProfileActivity.this, userID, createOnProfileChangedListener());
-    }
-
-    private OnObjectChangedListener<Profile> createOnProfileChangedListener() {
-        return obj -> {
-            profile = obj;
-            fillUIFields(obj);
-        };
-    }
-
-    private void fillUIFields(Profile profile) {
-        if (profile != null) {
-            nameEditText.setText(profile.getUsername());
-
-            if (profile.getPhotoUrl() != null) {
-                ImageUtil.loadImage(GlideApp.with(this), profile.getPhotoUrl(), imageView, new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        scheduleStartPostponedTransition(imageView);
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        scheduleStartPostponedTransition(imageView);
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                });
-            } else {
-                progressBar.setVisibility(View.GONE);
-                imageView.setImageResource(R.drawable.ic_stub);
-            }
-
-            int likesCount = (int) profile.getLikesCount();
-            String likesLabel = getResources().getQuantityString(R.plurals.likes_counter_format, likesCount, likesCount);
-            likesCountersTextView.setText(buildCounterSpannable(likesLabel, likesCount));
-        }
-    }
-
-    private void hideLoadingPostsProgressBar() {
-        if (postsProgressBar.getVisibility() != View.GONE) {
-            postsProgressBar.setVisibility(View.GONE);
         }
     }
 
@@ -374,13 +284,10 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         startActivity(intent);
     }
 
-    private void startEditProfileActivity() {
-        if (hasInternetConnection()) {
-            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-            startActivity(intent);
-        } else {
-            showSnackBar(R.string.internet_connection_failed);
-        }
+    @Override
+    public void startEditProfileActivity() {
+        Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -388,24 +295,87 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         LogUtil.logDebug(TAG, "onConnectionFailed:" + connectionResult);
     }
 
-    private void openCreatePostActivity() {
+    @Override
+    public void openCreatePostActivity() {
         Intent intent = new Intent(this, CreatePostActivity.class);
         startActivityForResult(intent, CreatePostActivity.CREATE_NEW_POST_REQUEST);
     }
 
-    public void openUnfollowConfirmDialog() {
-        if (profile != null) {
-            UnfollowConfirmationDialog unfollowConfirmationDialog = new UnfollowConfirmationDialog();
-            Bundle args = new Bundle();
-            args.putSerializable(UnfollowConfirmationDialog.PROFILE, profile);
-            unfollowConfirmationDialog.setArguments(args);
-            unfollowConfirmationDialog.show(getFragmentManager(), UnfollowConfirmationDialog.TAG);
+    @Override
+    public void setProfileName(String username) {
+        nameEditText.setText(username);
+    }
+
+    @Override
+    public void setProfilePhoto(String photoUrl) {
+        ImageUtil.loadImage(GlideApp.with(this), photoUrl, imageView, new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                scheduleStartPostponedTransition(imageView);
+                progressBar.setVisibility(View.GONE);
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                scheduleStartPostponedTransition(imageView);
+                progressBar.setVisibility(View.GONE);
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void setDefaultProfilePhoto() {
+        progressBar.setVisibility(View.GONE);
+        imageView.setImageResource(R.drawable.ic_stub);
+    }
+
+    @Override
+    public void updateLikesCounter(Spannable text) {
+        likesCountersTextView.setText(text);
+    }
+
+    @Override
+    public void hideLoadingPostsProgress() {
+        swipeContainer.setRefreshing(false);
+        if (postsProgressBar.getVisibility() != View.GONE) {
+            postsProgressBar.setVisibility(View.GONE);
         }
     }
 
     @Override
-    public void showUnfollowConfirmation() {
-        openUnfollowConfirmDialog();
+    public void showLikeCounter(boolean show) {
+        likesCountersTextView.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void updatePostsCounter(Spannable text) {
+        postsCounterTextView.setText(text);
+    }
+
+    @Override
+    public void showPostCounter(boolean show) {
+        postsCounterTextView.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onPostRemoved() {
+        postsAdapter.removeSelectedPost();
+    }
+
+    @Override
+    public void onPostUpdated() {
+        postsAdapter.updateSelectedPost();
+    }
+
+    @Override
+    public void showUnfollowConfirmation(@NonNull Profile profile) {
+        UnfollowConfirmationDialog unfollowConfirmationDialog = new UnfollowConfirmationDialog();
+        Bundle args = new Bundle();
+        args.putSerializable(UnfollowConfirmationDialog.PROFILE, profile);
+        unfollowConfirmationDialog.setArguments(args);
+        unfollowConfirmationDialog.show(getFragmentManager(), UnfollowConfirmationDialog.TAG);
     }
 
     @Override
@@ -417,14 +387,14 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
     public void updateFollowersCount(int count) {
         followersCounterTextView.setVisibility(View.VISIBLE);
         String followersLabel = getResources().getQuantityString(R.plurals.followers_counter_format, count, count);
-        followersCounterTextView.setText(buildCounterSpannable(followersLabel, count));
+        followersCounterTextView.setText(presenter.buildCounterSpannable(followersLabel, count));
     }
 
     @Override
     public void updateFollowingsCount(int count) {
         followingsCounterTextView.setVisibility(View.VISIBLE);
         String followingsLabel = getResources().getQuantityString(R.plurals.followings_counter_format, count, count);
-        followingsCounterTextView.setText(buildCounterSpannable(followingsLabel, count));
+        followingsCounterTextView.setText(presenter.buildCounterSpannable(followingsLabel, count));
     }
 
     @Override
@@ -453,18 +423,14 @@ public class ProfileActivity extends BaseActivity<ProfileView, ProfilePresenter>
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.editProfile:
-                startEditProfileActivity();
+                presenter.onEditProfileClick();
                 return true;
             case R.id.signOut:
                 LogoutHelper.signOut(mGoogleApiClient, this);
                 startMainActivity();
                 return true;
             case R.id.createPost:
-                if (hasInternetConnection()) {
-                    openCreatePostActivity();
-                } else {
-                    showSnackBar(R.string.internet_connection_failed);
-                }
+                presenter.onCreatePostClick();
             default:
                 return super.onOptionsItemSelected(item);
         }
