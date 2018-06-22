@@ -29,14 +29,11 @@ import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
 import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
@@ -258,16 +255,12 @@ public class LikeController {
     }
 
     private void doHandleLikeClickAction(BaseActivity baseActivity, Post post) {
-        ProfileStatus profileStatus = ProfileManager.getInstance(baseActivity).checkProfile();
-
-        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+        if (baseActivity.checkAuthorization()) {
             if (isListView) {
                 likeClickActionLocal(post);
             } else {
                 likeClickAction(post.getLikesCount());
             }
-        } else {
-            baseActivity.doAuthorization(profileStatus);
         }
     }
 
