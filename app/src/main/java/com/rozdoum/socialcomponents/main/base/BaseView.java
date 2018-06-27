@@ -54,8 +54,6 @@ public interface BaseView extends MvpView {
 
     void showWarningDialog(String message, DialogInterface.OnClickListener listener);
 
-    boolean hasInternetConnection();
-
     void startLoginActivity();
 
     void hideKeyboard();

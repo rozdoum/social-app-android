@@ -159,16 +159,13 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
         builder.show();
     }
 
-    // TODO: REMOVE AFTER FULL IMPLEMENTATION OF MVP  **********************************
-    @Override
     public boolean hasInternetConnection() {
         return presenter.hasInternetConnection();
     }
 
-    public void doAuthorization(ProfileStatus status) {
-        presenter.doAuthorization(status);
+    public boolean checkAuthorization() {
+        return presenter.checkAuthorization();
     }
-    ////////////////////////////////////////////////////////////////
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
