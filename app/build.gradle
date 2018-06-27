@@ -40,7 +40,7 @@ android {
         applicationId "com.rozdoum.socialcomponents"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 25
+        versionCode 26
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
