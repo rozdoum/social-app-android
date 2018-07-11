@@ -33,6 +33,7 @@ import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListenerSimple;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
@@ -153,10 +154,13 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
-        return obj -> {
-            if (obj.getPhotoUrl() != null) {
-                if (!baseActivity.isFinishing() && !baseActivity.isDestroyed()) {
-                    ImageUtil.loadImage(GlideApp.with(baseActivity), obj.getPhotoUrl(), authorImageView);
+        return new OnObjectChangedListenerSimple<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                if (obj.getPhotoUrl() != null) {
+                    if (!baseActivity.isFinishing() && !baseActivity.isDestroyed()) {
+                        ImageUtil.loadImage(GlideApp.with(baseActivity), obj.getPhotoUrl(), authorImageView);
+                    }
                 }
             }
         };

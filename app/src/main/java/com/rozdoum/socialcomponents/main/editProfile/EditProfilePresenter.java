@@ -24,6 +24,7 @@ import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.base.BaseView;
 import com.rozdoum.socialcomponents.main.pickImageBase.PickImagePresenter;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListenerSimple;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.ValidationUtil;
 
@@ -44,20 +45,23 @@ public class EditProfilePresenter<V extends EditProfileView> extends PickImagePr
 
     public void loadProfile() {
         ifViewAttached(BaseView::showProgress);
-        profileManager.getProfileSingleValue(getCurrentUserId(), obj -> {
-            profile = obj;
-            ifViewAttached(view -> {
-                if (profile != null) {
-                    view.setName(profile.getUsername());
+        profileManager.getProfileSingleValue(getCurrentUserId(), new OnObjectChangedListenerSimple<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                profile = obj;
+                ifViewAttached(view -> {
+                    if (profile != null) {
+                        view.setName(profile.getUsername());
 
-                    if (profile.getPhotoUrl() != null) {
-                        view.setProfilePhoto(profile.getPhotoUrl());
+                        if (profile.getPhotoUrl() != null) {
+                            view.setProfilePhoto(profile.getPhotoUrl());
+                        }
                     }
-                }
 
-                view.hideProgress();
-                view.setNameError(null);
-            });
+                    view.hideProgress();
+                    view.setNameError(null);
+                });
+            }
         });
     }
 

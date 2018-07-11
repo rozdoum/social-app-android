@@ -32,8 +32,10 @@ import com.rozdoum.socialcomponents.main.base.BaseView;
 import com.rozdoum.socialcomponents.managers.CommentManager;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListenerSimple;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.model.Profile;
 
 /**
  * Created by Alexey on 03.05.18.
@@ -112,14 +114,18 @@ class PostDetailsPresenter extends BasePresenter<PostDetailsView> {
 
     private void loadAuthorProfile() {
         if (post != null && post.getAuthorId() != null) {
-            profileManager.getProfileSingleValue(post.getAuthorId(), profile ->
+            profileManager.getProfileSingleValue(post.getAuthorId(), new OnObjectChangedListenerSimple<Profile>() {
+                @Override
+                public void onObjectChanged(Profile profile) {
                     ifViewAttached(view -> {
                         if (profile.getPhotoUrl() != null) {
                             view.loadAuthorPhoto(profile.getPhotoUrl());
                         }
 
                         view.setAuthorName(profile.getUsername());
-                    }));
+                    });
+                }
+            });
         }
     }
 
