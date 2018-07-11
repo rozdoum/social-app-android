@@ -92,6 +92,7 @@
     <string name="error_general">Somthing went wrong.</string>
     <string name="error_general_post">Somthing went wrong with post, id: %1$s</string>
     <string name="internet_connection_failed">No internet connection</string>
+    <string name="press_once_again_to_exit">Press once again to exit</string>
 
     <!-- Strings related to login -->
 

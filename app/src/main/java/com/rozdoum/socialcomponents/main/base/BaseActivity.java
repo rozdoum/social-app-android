@@ -32,6 +32,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
+import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.enums.ProfileStatus;
 import com.rozdoum.socialcomponents.main.login.LoginActivity;
@@ -44,6 +45,7 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
     public final String TAG = this.getClass().getSimpleName();
     public ProgressDialog progressDialog;
     public ActionBar actionBar;
+    private long backPressedTime;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -165,6 +167,28 @@ public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V
 
     public boolean checkAuthorization() {
         return presenter.checkAuthorization();
+    }
+
+    public void attemptToExitIfRoot() {
+        attemptToExitIfRoot(null);
+    }
+
+    public void attemptToExitIfRoot(@Nullable View anchorView) {
+        if (isTaskRoot()) {
+            if (backPressedTime + Constants.General.DOUBLE_CLICK_TO_EXIT_INTERVAL> System.currentTimeMillis()) {
+                super.onBackPressed();
+            } else {
+                if (anchorView != null) {
+                    showSnackBar(anchorView, R.string.press_once_again_to_exit);
+                } else {
+                    showSnackBar(R.string.press_once_again_to_exit);
+                }
+
+                backPressedTime = System.currentTimeMillis();
+            }
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
