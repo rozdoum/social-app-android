@@ -30,6 +30,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.views.TouchImageView;
@@ -38,7 +39,7 @@ public class ImageDetailActivity extends BaseActivity<ImageDetailView, ImageDeta
 
     private static final String TAG = ImageDetailActivity.class.getSimpleName();
 
-    public static final String IMAGE_URL_EXTRA_KEY = "ImageDetailActivity.IMAGE_URL_EXTRA_KEY";
+    public static final String IMAGE_TITLE_EXTRA_KEY = "ImageDetailActivity.IMAGE_TITLE_EXTRA_KEY";
     private ViewGroup viewGroup;
     private TouchImageView touchImageView;
     private ProgressBar progressBar;
@@ -57,8 +58,8 @@ public class ImageDetailActivity extends BaseActivity<ImageDetailView, ImageDeta
 
         initActionBar();
 
-        String imageUrl = getIntent().getStringExtra(IMAGE_URL_EXTRA_KEY);
-        loadImage(imageUrl);
+        String imageTitle = getIntent().getStringExtra(IMAGE_TITLE_EXTRA_KEY);
+        loadImage(imageTitle);
 
         touchImageView.setOnClickListener(v -> {
             final int vis = viewGroup.getSystemUiVisibility();
@@ -100,10 +101,12 @@ public class ImageDetailActivity extends BaseActivity<ImageDetailView, ImageDeta
         }
     }
 
-    private void loadImage(String imageUrl) {
+    private void loadImage(String imageTitle) {
         int maxImageSide = presenter.calcMaxImageSide();
 
-        ImageUtil.loadImageWithSimpleTarget(GlideApp.with(this), imageUrl, new SimpleTarget<Bitmap>(maxImageSide, maxImageSide) {
+        ImageUtil.loadImageWithSimpleTarget(GlideApp.with(this),
+                PostManager.getInstance(this.getApplicationContext()).getOriginImageStorageRef(imageTitle),
+                new SimpleTarget<Bitmap>(maxImageSide, maxImageSide) {
             @Override
             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                 progressBar.setVisibility(View.GONE);

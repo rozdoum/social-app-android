@@ -34,6 +34,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.Constants;
@@ -267,7 +268,6 @@ public class PostInteractor {
                         post.setId(key);
                         post.setTitle((String) mapObj.get("title"));
                         post.setDescription((String) mapObj.get("description"));
-                        post.setImagePath((String) mapObj.get("imagePath"));
                         post.setImageTitle((String) mapObj.get("imageTitle"));
                         post.setAuthorId((String) mapObj.get("authorId"));
                         post.setCreatedDate(createdDate);
@@ -298,7 +298,6 @@ public class PostInteractor {
     private boolean isPostValid(Map<String, Object> post) {
         return post.containsKey("title")
                 && post.containsKey("description")
-                && post.containsKey("imagePath")
                 && post.containsKey("imageTitle")
                 && post.containsKey("authorId")
                 && post.containsKey("description");
@@ -378,10 +377,7 @@ public class PostInteractor {
 
             }).addOnSuccessListener(taskSnapshot -> {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                LogUtil.logDebug(TAG, "successful upload image, image url: " + String.valueOf(downloadUrl));
 
-                post.setImagePath(String.valueOf(downloadUrl));
                 post.setImageTitle(imageTitle);
                 createOrUpdatePost(post);
 
@@ -598,5 +594,17 @@ public class PostInteractor {
         return databaseReference
                 .orderByChild(childOrderBy)
                 .limitToLast(limit);
+    }
+
+    public StorageReference getMediumImageStorageRef(String imageTitle) {
+        return databaseHelper.getMediumImageStorageRef(imageTitle);
+    }
+
+    public StorageReference getOriginImageStorageRef(String imageTitle) {
+        return databaseHelper.getOriginImageStorageRef(imageTitle);
+    }
+
+    public StorageReference getSmallImageStorageRef(String imageTitle) {
+        return databaseHelper.getSmallImageStorageRef(imageTitle);
     }
 }

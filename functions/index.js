@@ -1,4 +1,4 @@
-var functions = require('firebase-functions');
+const functions = require('firebase-functions');
 
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
@@ -15,6 +15,16 @@ const followersDbKey = "followers";
 const followingDbKey = "follow";
 
 const postsTopic = "postsTopic";
+
+const THUMB_MEDIUM_SIZE = 1024; //px
+const THUMB_SMALL_SIZE = 100; //px
+
+const THUMB_MEDIUM_DIR = "medium";
+const THUMB_SMALL_DIR = "small";
+
+const gcs = require('@google-cloud/storage')();
+const path = require('path');
+const sharp = require('sharp');
 
 exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{authorId}/{likeId}').onCreate((snap, context)  => {
 
@@ -257,3 +267,62 @@ exports.removePostFromFollowingList = functions.database.ref('/posts/{postId}').
         console.error('Failure get followers ids', fallback);
     });
 });
+
+/**
+ * When an image is uploaded in the Storage bucket We generate a thumbnail automatically using
+ * Sharp.
+ */
+exports.generateThumbnail = functions.storage.object().onFinalize((object) => {
+    const fileBucket = object.bucket; // The Storage bucket that contains the origin file.
+    const filePath = object.name; // File path in the bucket.
+    const contentType = object.contentType; // File content type.
+
+    // Exit if this is triggered on a file that is not an image.
+    if (!contentType.startsWith('image/')) {
+        console.log('This is not an image.');
+        return null;
+    }
+
+    // Get the dir name.
+    const dirname = path.dirname(filePath);
+    if (dirname.includes(THUMB_MEDIUM_DIR) || dirname.includes(THUMB_SMALL_DIR)) {
+        console.log('Already scaled.');
+        return null;
+    }
+
+    // Download file from bucket.
+    const bucket = gcs.bucket(fileBucket);
+
+    const mediumThumbPromise = createThumb(filePath, THUMB_MEDIUM_DIR, THUMB_MEDIUM_SIZE, contentType, bucket);
+    const smallThumbPromise = createThumb(filePath, THUMB_SMALL_DIR, THUMB_SMALL_SIZE, contentType, bucket);
+
+    return Promise.all([mediumThumbPromise, smallThumbPromise]).then(() => {
+        console.log('Thumbnail created successfully');
+        return null;
+    });
+});
+
+function createThumb(originFilePath, thumbDir, size, contentType, bucket) {
+    const metadata = {
+        contentType: contentType,
+    };
+
+    // Get the file name.
+    const fileName = path.basename(originFilePath);
+    const thumbFilePath = path.join(path.dirname(originFilePath), thumbDir, fileName);
+    console.log("thumb file path", thumbFilePath);
+
+    const thumbnailUploadStream = bucket.file(thumbFilePath).createWriteStream({metadata});
+
+    // Create Sharp pipeline for resizing the image and use pipe to read from bucket read stream
+    const pipeline = sharp();
+    pipeline
+        .resize(size, size)
+        .max()
+        .pipe(thumbnailUploadStream);
+
+    bucket.file(originFilePath).createReadStream().pipe(pipeline);
+
+    return new Promise((resolve, reject) =>
+        thumbnailUploadStream.on('finish', resolve).on('error', reject));
+}

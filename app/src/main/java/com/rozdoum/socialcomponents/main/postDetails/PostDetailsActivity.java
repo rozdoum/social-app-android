@@ -335,9 +335,9 @@ public class PostDetailsActivity extends BaseActivity<PostDetailsView, PostDetai
     }
 
     @Override
-    public void openImageDetailScreen(String imagePath) {
+    public void openImageDetailScreen(String imageTitle) {
         Intent intent = new Intent(this, ImageDetailActivity.class);
-        intent.putExtra(ImageDetailActivity.IMAGE_URL_EXTRA_KEY, imagePath);
+        intent.putExtra(ImageDetailActivity.IMAGE_TITLE_EXTRA_KEY, imageTitle);
         startActivity(intent);
     }
 
@@ -368,23 +368,10 @@ public class PostDetailsActivity extends BaseActivity<PostDetailsView, PostDetai
     }
 
     @Override
-    public void loadPostDetailImage(String imagePath) {
-        int width = Utils.getDisplayWidth(this);
-        int height = (int) getResources().getDimension(R.dimen.post_detail_image_height);
-
-        ImageUtil.loadImageCenterCrop(GlideApp.with(this), imagePath, postImageView, width, height, new RequestListener<Drawable>() {
-            @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                scheduleStartPostponedTransition(postImageView);
-                return false;
-            }
-
-            @Override
-            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                scheduleStartPostponedTransition(postImageView);
-                progressBar.setVisibility(View.GONE);
-                return false;
-            }
+    public void loadPostDetailImage(String imageTitle) {
+        postManager.loadImageMediumSize(GlideApp.with(this), imageTitle, postImageView, () -> {
+            scheduleStartPostponedTransition(postImageView);
+            progressBar.setVisibility(View.GONE);
         });
     }
 
