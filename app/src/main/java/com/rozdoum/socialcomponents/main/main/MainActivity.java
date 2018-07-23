@@ -105,6 +105,11 @@ public class MainActivity extends BaseActivity<MainView, MainPresenter> implemen
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        attemptToExitIfRoot(floatingActionButton);
+    }
+
     public void refreshPostList() {
         postsAdapter.loadFirstPage();
         if (postsAdapter.getItemCount() > 0) {
