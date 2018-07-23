@@ -1,3 +1,4 @@
+package com.rozdoum.socialcomponents.managers.listeners;
 /*
  * Copyright 2017 Rozdoum
  *
@@ -14,11 +15,9 @@
  *    limitations under the License.
  */
 
-package com.rozdoum.socialcomponents.managers.listeners;
+public abstract class OnObjectChangedListenerSimple<T> implements OnObjectChangedListener<T> {
 
-public interface OnObjectChangedListener<T> {
-
-    void onObjectChanged(T obj);
-
-    void onError(String errorText);
+    @Override
+    public void onError(String errorText) {
+    }
 }

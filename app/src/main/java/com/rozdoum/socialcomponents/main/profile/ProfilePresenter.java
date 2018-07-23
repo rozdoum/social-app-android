@@ -34,6 +34,7 @@ import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.managers.FollowManager;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListenerSimple;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.LogUtil;
@@ -161,21 +162,24 @@ class ProfilePresenter extends BasePresenter<ProfileView> {
     }
 
     public void loadProfile(Context activityContext, String userID) {
-        profileManager.getProfileValue(activityContext, userID, obj -> {
-            profile = obj;
-            ifViewAttached(view -> {
-                view.setProfileName(profile.getUsername());
+        profileManager.getProfileValue(activityContext, userID, new OnObjectChangedListenerSimple<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                profile = obj;
+                ifViewAttached(view -> {
+                    view.setProfileName(profile.getUsername());
 
-                if (profile.getPhotoUrl() != null) {
-                    view.setProfilePhoto(profile.getPhotoUrl());
-                } else {
-                    view.setDefaultProfilePhoto();
-                }
+                    if (profile.getPhotoUrl() != null) {
+                        view.setProfilePhoto(profile.getPhotoUrl());
+                    } else {
+                        view.setDefaultProfilePhoto();
+                    }
 
-                int likesCount = (int) profile.getLikesCount();
-                String likesLabel = context.getResources().getQuantityString(R.plurals.likes_counter_format, likesCount, likesCount);
-                view.updateLikesCounter(buildCounterSpannable(likesLabel, likesCount));
-            });
+                    int likesCount = (int) profile.getLikesCount();
+                    String likesLabel = context.getResources().getQuantityString(R.plurals.likes_counter_format, likesCount, likesCount);
+                    view.updateLikesCounter(buildCounterSpannable(likesLabel, likesCount));
+                });
+            }
         });
     }
 

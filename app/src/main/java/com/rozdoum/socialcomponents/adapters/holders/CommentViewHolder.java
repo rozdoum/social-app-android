@@ -83,42 +83,47 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(Comment comment) {
         final String authorId = comment.getAuthorId();
-        if (authorId != null)
+
+        if (authorId != null) {
             profileManager.getProfileSingleValue(authorId, createOnProfileChangeListener(commentTextView,
-                    avatarImageView, comment.getText()));
+                    avatarImageView, comment, dateTextView));
+        } else {
+            fillComment("", comment, commentTextView, dateTextView);
+        }
 
-        commentTextView.setText(comment.getText());
-
-        CharSequence date = FormatterUtil.getRelativeTimeSpanString(context, comment.getCreatedDate());
-        dateTextView.setText(date);
-
-        avatarImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callback.onAuthorClick(authorId, v);
-            }
-        });
+        avatarImageView.setOnClickListener(v -> callback.onAuthorClick(authorId, v));
     }
 
-    private OnObjectChangedListener<Profile> createOnProfileChangeListener(final ExpandableTextView expandableTextView, final ImageView avatarImageView, final String comment) {
+    private OnObjectChangedListener<Profile> createOnProfileChangeListener(final ExpandableTextView expandableTextView,
+                                                                           final ImageView avatarImageView,
+                                                                           final Comment comment,
+                                                                           final TextView dateTextView) {
         return new OnObjectChangedListener<Profile>() {
             @Override
             public void onObjectChanged(Profile obj) {
                 String userName = obj.getUsername();
-                fillComment(userName, comment, expandableTextView);
+                fillComment(userName, comment, expandableTextView, dateTextView);
 
                 if (obj.getPhotoUrl() != null) {
                     ImageUtil.loadImage(GlideApp.with(context), obj.getPhotoUrl(), avatarImageView);
                 }
             }
+
+            @Override
+            public void onError(String errorText) {
+                fillComment("", comment, commentTextView, dateTextView);
+            }
         };
     }
 
-    private void fillComment(String userName, String comment, ExpandableTextView commentTextView) {
-        Spannable contentString = new SpannableStringBuilder(userName + "   " + comment);
+    private void fillComment(String userName, Comment comment, ExpandableTextView commentTextView, TextView dateTextView) {
+        Spannable contentString = new SpannableStringBuilder(userName + "   " + comment.getText());
         contentString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.highlight_text)),
                 0, userName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         commentTextView.setText(contentString);
+
+        CharSequence date = FormatterUtil.getRelativeTimeSpanString(context, comment.getCreatedDate());
+        dateTextView.setText(date);
     }
 }
