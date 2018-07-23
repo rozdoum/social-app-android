@@ -23,6 +23,7 @@
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/avatarImageView"
         android:paddingLeft="@dimen/large_intrinsic_padding"
+        expandableTextView:animAlphaStart="1"
         expandableTextView:animDuration="200"
         expandableTextView:collapseText="@string/collapse_text_label"
         expandableTextView:expandText="@string/expand_text_label"
