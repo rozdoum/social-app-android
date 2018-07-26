@@ -42,8 +42,8 @@
     <string name="error_smaller_image">Image is too small. Required image size 100x100 px</string>
     <string name="error_incorrect_file_type">Incorrect file type</string>
     <string name="error_bigger_file">File size is bigger than 10Mb</string>
-    <string name="message_creating_post">Creating post ..</string>
-    <string name="message_saving">Saving ..</string>
+    <string name="message_creating_post">Creating post …</string>
+    <string name="message_saving">Saving …</string>
     <string name="warning_empty_image">Image is required</string>
     <string name="warning_empty_title">Title is required</string>
     <string name="warning_empty_description">Description is required</string>
@@ -54,7 +54,7 @@
     <string name="error_post_was_removed">Post was removed</string>
     <string name="confirm_deletion_post">Delete this post?</string>
 
-    <string name="comment_text_hint">Enter your comment…</string>
+    <string name="comment_text_hint">Enter your comment …</string>
     <string name="button_post_comment">Post comment</string>
 
     <string name="label_comments">Comments (%1$d):</string>
@@ -87,8 +87,8 @@
     <string name="button_login_with_google">Login with google</string>
 
 
-    <string name="loading">Loading...</string>
-    <string name="removing">Removing...</string>
+    <string name="loading">Loading …</string>
+    <string name="removing">Removing …</string>
     <string name="error_general">Somthing went wrong.</string>
     <string name="error_general_post">Somthing went wrong with post, id: %1$s</string>
     <string name="internet_connection_failed">No internet connection</string>
@@ -175,7 +175,7 @@
 
     <!--Search-->
     <string name="search_menu_item">Search</string>
-    <string name="search_hint">Search…</string>
+    <string name="search_hint">Search …</string>
     <string name="posts_tab_title">Posts</string>
     <string name="users_tab_title">Users</string>
     <string name="empty_posts_search_message">No posts found</string>
