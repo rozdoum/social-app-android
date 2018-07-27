@@ -44,6 +44,10 @@ public class ImageUtil {
         return prefix.toString() + new Date().getTime();
     }
 
+    public static String generatePostImageTitle(String parentId) {
+        return generateImageTitle(UploadImagePrefix.POST, parentId) + "_" + new Date().getTime();
+    }
+
     public static void loadImage(GlideRequests glideRequests, String url, ImageView imageView) {
         loadImage(glideRequests, url, imageView, DiskCacheStrategy.ALL);
     }

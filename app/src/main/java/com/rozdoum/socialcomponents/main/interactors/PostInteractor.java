@@ -367,7 +367,7 @@ public class PostInteractor {
             post.setId(generatePostId());
         }
 
-        final String imageTitle = ImageUtil.generateImageTitle(UploadImagePrefix.POST, post.getId());
+        final String imageTitle = ImageUtil.generatePostImageTitle(post.getId());
         UploadTask uploadTask = databaseHelper.uploadImage(imageUri, imageTitle);
 
         if (uploadTask != null) {
