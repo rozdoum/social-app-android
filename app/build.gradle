@@ -46,46 +46,10 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
-    signingConfigs {
-        release {
-            storeFile file('keystore/certificate.jks')
-            storePassword "rozdoum"
-            keyAlias "rozdev"
-            keyPassword "rozdoum"
-        }
-        debug {
-            storeFile file('keystore/certificate.jks')
-            storePassword "rozdoum"
-            keyAlias "rozdev"
-            keyPassword "rozdoum"
-        }
-    }
-
-    flavorDimensions "default"
-
-    productFlavors {
-        dev {
-            applicationId "com.rozdoum.socialcomponentsdev"
-            dimension "default"
-        }
-        demo {
-            applicationId "com.rozdoum.socialcomponentsdemo"
-            dimension "default"
-        }
-        prod {
-            applicationId "com.rozdoum.socialcomponents"
-            dimension "default"
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
-        debug {
-            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
