@@ -28,6 +28,6 @@ public class Application extends android.app.Application {
         super.onCreate();
 
         ApplicationHelper.initDatabaseHelper(this);
-        DatabaseHelper.getInstance(this).subscribeToNewPosts();
+        PostInteractor.getInstance(this).subscribeToNewPosts();
     }
 }

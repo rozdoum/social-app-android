@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/large_intrinsic_padding">
+
+    <com.rozdoum.socialcomponents.views.CircularImageView
+        android:id="@+id/photoImageView"
+        android:layout_width="@dimen/post_author_image_side"
+        android:layout_height="@dimen/post_author_image_side"
+        android:transitionName="@string/post_author_image_transition_name"
+        app:border="false"
+        app:shadow="false"
+        app:shadow_radius="@dimen/circle_image_shadow_radius"
+        tools:src="@drawable/ic_stub"
+        tools:targetApi="lollipop" />
+
+    <TextView
+        android:id="@+id/nameTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/intrinsic_padding"
+        android:layout_marginStart="@dimen/intrinsic_padding"
+        android:layout_weight="1"
+        android:textAppearance="@style/TextAppearance.Title"
+        tools:text="John Smith " />
+
+    <com.rozdoum.socialcomponents.views.FollowButton
+        android:id="@+id/followButton"
+        style="@style/FollowButton"
+        android:visibility="invisible"
+        tools:text="Follow back" />
+
+</LinearLayout>

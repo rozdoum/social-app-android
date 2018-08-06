@@ -25,6 +25,7 @@
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_edit_profile">Edit profile</string>
     <string name="title_activity_edit_post">Edit post</string>
+    <string name="title_activity_following_posts">Following posts</string>
 
     <string name="text_take_photo">Take photo</string>
     <string name="text_pick_photo">Pick from Gallery</string>
@@ -41,8 +42,8 @@
     <string name="error_smaller_image">Image is too small. Required image size 100x100 px</string>
     <string name="error_incorrect_file_type">Incorrect file type</string>
     <string name="error_bigger_file">File size is bigger than 10Mb</string>
-    <string name="message_creating_post">Creating post ..</string>
-    <string name="message_saving">Saving ..</string>
+    <string name="message_creating_post">Creating post …</string>
+    <string name="message_saving">Saving …</string>
     <string name="warning_empty_image">Image is required</string>
     <string name="warning_empty_title">Title is required</string>
     <string name="warning_empty_description">Description is required</string>
@@ -53,7 +54,7 @@
     <string name="error_post_was_removed">Post was removed</string>
     <string name="confirm_deletion_post">Delete this post?</string>
 
-    <string name="comment_text_hint">Enter your comment…</string>
+    <string name="comment_text_hint">Enter your comment …</string>
     <string name="button_post_comment">Post comment</string>
 
     <string name="label_comments">Comments (%1$d):</string>
@@ -86,11 +87,12 @@
     <string name="button_login_with_google">Login with google</string>
 
 
-    <string name="loading">Loading...</string>
-    <string name="removing">Removing...</string>
+    <string name="loading">Loading …</string>
+    <string name="removing">Removing …</string>
     <string name="error_general">Somthing went wrong.</string>
     <string name="error_general_post">Somthing went wrong with post, id: %1$s</string>
     <string name="internet_connection_failed">No internet connection</string>
+    <string name="press_once_again_to_exit">Press once again to exit</string>
 
     <!-- Strings related to login -->
 
@@ -123,6 +125,16 @@
         <item quantity="other">likes</item>
     </plurals>
 
+    <plurals name="followers_counter_format">
+        <item quantity="one">follower</item>
+        <item quantity="other">followers</item>
+    </plurals>
+
+    <plurals name="followings_counter_format">
+        <item quantity="one">following</item>
+        <item quantity="other">followings</item>
+    </plurals>
+
     <string name="posts_label">Posts:</string>
     <string name="complain_sent">Complain was sent successfully</string>
     <string name="now_time_range">now</string>
@@ -147,7 +159,31 @@
     <string name="message_comment_was_edited">Comment was edited</string>
     <string name="title_edit_comment">Edit comment</string>
 
+    <!--Follow-->
+    <string name="button_follow_title">Follow</string>
+    <string name="button_follow_back_title">Follow back</string>
+    <string name="button_following">Following</string>
+    <string name="unfollow_user_message">Unfollow %1$s?</string>
+    <string name="button_title_unfollow">Unfollow</string>
+    <string name="message_following_posts_empty">Follow somebody to see his new posts</string>
+    <string name="following_post_menu_item">Following Posts</string>
+
+    <!--Users list-->
+    <string name="title_followers">Followers</string>
+    <string name="title_followings">Followings</string>
+    <string name="message_empty_list">You don\'t have any %1$s yet</string>
+
+    <!--Search-->
+    <string name="search_menu_item">Search</string>
+    <string name="search_hint">Search …</string>
+    <string name="posts_tab_title">Posts</string>
+    <string name="users_tab_title">Users</string>
+    <string name="empty_posts_search_message">No posts found</string>
+    <string name="empty_user_search_message">No users found</string>
+
+
     <!--Firebase errors-->
     <string name="permission_denied_error">Please check your rules to access the Firebase Realtime Database</string>
+
 
 </resources>

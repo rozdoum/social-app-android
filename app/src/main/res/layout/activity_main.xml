@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
-    tools:context=".activities.MainActivity">
+    tools:context=".main.main.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -38,7 +38,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <com.rozdoum.socialcomponents.views.SwipeRefreshPreLollyPop
             android:id="@+id/swipeContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -50,7 +50,7 @@
                 android:divider="@null"
                 android:paddingBottom="@dimen/intrinsic_padding" />
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </com.rozdoum.socialcomponents.views.SwipeRefreshPreLollyPop>
 
         <TextView
             android:id="@+id/newPostsCounterTextView"

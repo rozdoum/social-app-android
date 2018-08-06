@@ -62,3 +62,10 @@ Icon
 
 # Thumbnails
 ._*
+/.firebaserc
+.firebaserc
+firebase.json
+functions/.eslintrc.json
+functions/node_modules/
+functions/package-lock.json
+/app/fabric.properties

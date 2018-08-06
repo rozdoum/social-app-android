@@ -43,6 +43,10 @@ public class AnimationUtils {
         return propertyAnimator;
     }
 
+    public static boolean isViewHiddenByScale(View v) {
+        return v.getScaleX() == 0 && v.getScaleY() == 0;
+    }
+
     /**
      * Shows a view by scaling
      *
@@ -54,6 +58,21 @@ public class AnimationUtils {
 
         ViewPropertyAnimator propertyAnimator = v.animate().setStartDelay(DEFAULT_DELAY)
             .scaleX(1).scaleY(1);
+
+        return propertyAnimator;
+    }
+
+    /**
+     * Shows a view by scaling
+     *
+     * @param v the view to be scaled
+     *
+     * @return the ViewPropertyAnimation to manage the animation
+     */
+    public static ViewPropertyAnimator showViewByScaleWithoutDelay (View v) {
+
+        ViewPropertyAnimator propertyAnimator = v.animate()
+                .scaleX(1).scaleY(1);
 
         return propertyAnimator;
     }

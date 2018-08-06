@@ -24,21 +24,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.controllers.LikeController;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListenerSimple;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.FormatterUtil;
+import com.rozdoum.socialcomponents.utils.GlideApp;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.Utils;
 
 /**
@@ -48,7 +50,7 @@ import com.rozdoum.socialcomponents.utils.Utils;
 public class PostViewHolder extends RecyclerView.ViewHolder {
     public static final String TAG = PostViewHolder.class.getSimpleName();
 
-    private Context context;
+    protected Context context;
     private ImageView postImageView;
     private TextView titleTextView;
     private TextView detailsTextView;
@@ -61,61 +63,54 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     private ViewGroup likeViewGroup;
 
     private ProfileManager profileManager;
-    private PostManager postManager;
+    protected PostManager postManager;
 
     private LikeController likeController;
+    private BaseActivity baseActivity;
 
-    public PostViewHolder(View view, final OnClickListener onClickListener) {
-        this(view, onClickListener, true);
+    public PostViewHolder(View view, final OnClickListener onClickListener, BaseActivity activity) {
+        this(view, onClickListener, activity, true);
     }
 
-    public PostViewHolder(View view, final OnClickListener onClickListener, boolean isAuthorNeeded) {
+    public PostViewHolder(View view, final OnClickListener onClickListener, BaseActivity activity, boolean isAuthorNeeded) {
         super(view);
         this.context = view.getContext();
+        this.baseActivity = activity;
 
-        postImageView = (ImageView) view.findViewById(R.id.postImageView);
-        likeCounterTextView = (TextView) view.findViewById(R.id.likeCounterTextView);
-        likesImageView = (ImageView) view.findViewById(R.id.likesImageView);
-        commentsCountTextView = (TextView) view.findViewById(R.id.commentsCountTextView);
-        watcherCounterTextView = (TextView) view.findViewById(R.id.watcherCounterTextView);
-        dateTextView = (TextView) view.findViewById(R.id.dateTextView);
-        titleTextView = (TextView) view.findViewById(R.id.titleTextView);
-        detailsTextView = (TextView) view.findViewById(R.id.detailsTextView);
-        authorImageView = (ImageView) view.findViewById(R.id.authorImageView);
-        likeViewGroup = (ViewGroup) view.findViewById(R.id.likesContainer);
+        postImageView = view.findViewById(R.id.postImageView);
+        likeCounterTextView = view.findViewById(R.id.likeCounterTextView);
+        likesImageView = view.findViewById(R.id.likesImageView);
+        commentsCountTextView = view.findViewById(R.id.commentsCountTextView);
+        watcherCounterTextView = view.findViewById(R.id.watcherCounterTextView);
+        dateTextView = view.findViewById(R.id.dateTextView);
+        titleTextView = view.findViewById(R.id.titleTextView);
+        detailsTextView = view.findViewById(R.id.detailsTextView);
+        authorImageView = view.findViewById(R.id.authorImageView);
+        likeViewGroup = view.findViewById(R.id.likesContainer);
 
         authorImageView.setVisibility(isAuthorNeeded ? View.VISIBLE : View.GONE);
 
         profileManager = ProfileManager.getInstance(context.getApplicationContext());
         postManager = PostManager.getInstance(context.getApplicationContext());
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = getAdapterPosition();
-                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
-                    onClickListener.onItemClick(getAdapterPosition(), v);
-                }
+        view.setOnClickListener(v -> {
+            int position = getAdapterPosition();
+            if (onClickListener != null && position != RecyclerView.NO_POSITION) {
+                onClickListener.onItemClick(getAdapterPosition(), v);
             }
         });
 
-        likeViewGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int position = getAdapterPosition();
-                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
-                    onClickListener.onLikeClick(likeController, position);
-                }
+        likeViewGroup.setOnClickListener(view1 -> {
+            int position = getAdapterPosition();
+            if (onClickListener != null && position != RecyclerView.NO_POSITION) {
+                onClickListener.onLikeClick(likeController, position);
             }
         });
 
-        authorImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = getAdapterPosition();
-                if (onClickListener != null && position != RecyclerView.NO_POSITION) {
-                    onClickListener.onAuthorClick(getAdapterPosition(), v);
-                }
+        authorImageView.setOnClickListener(v -> {
+            int position = getAdapterPosition();
+            if (onClickListener != null && position != RecyclerView.NO_POSITION) {
+                onClickListener.onAuthorClick(getAdapterPosition(), v);
             }
         });
     }
@@ -140,14 +135,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         int height = (int) context.getResources().getDimension(R.dimen.post_detail_image_height);
 
         // Displayed and saved to cache image, as needs for post detail.
-        Glide.with(context)
-                .load(imageUrl)
-                .centerCrop()
-                .override(width, height)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .crossFade()
-                .error(R.drawable.ic_stub)
-                .into(postImageView);
+        ImageUtil.loadImageCenterCrop(GlideApp.with(baseActivity), imageUrl, postImageView, width, height);
 
         if (post.getAuthorId() != null) {
             profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
@@ -166,29 +154,20 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
-        return new OnObjectChangedListener<Profile>() {
+        return new OnObjectChangedListenerSimple<Profile>() {
             @Override
-            public void onObjectChanged(final Profile obj) {
+            public void onObjectChanged(Profile obj) {
                 if (obj.getPhotoUrl() != null) {
-
-                    Glide.with(context)
-                            .load(obj.getPhotoUrl())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .centerCrop()
-                            .crossFade()
-                            .into(authorImageView);
+                    if (!baseActivity.isFinishing() && !baseActivity.isDestroyed()) {
+                        ImageUtil.loadImage(GlideApp.with(baseActivity), obj.getPhotoUrl(), authorImageView);
+                    }
                 }
             }
         };
     }
 
     private OnObjectExistListener<Like> createOnLikeObjectExistListener() {
-        return new OnObjectExistListener<Like>() {
-            @Override
-            public void onDataChanged(boolean exist) {
-                likeController.initLike(exist);
-            }
-        };
+        return exist -> likeController.initLike(exist);
     }
 
     public interface OnClickListener {
