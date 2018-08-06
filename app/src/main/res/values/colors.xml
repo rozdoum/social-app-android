@@ -18,6 +18,7 @@
     <color name="send_button_color">@color/primary</color>
 
     <color name="light_gray">#d8d6d5</color>
+    <color name="white">#ffffff</color>
     <color name="posts_counter_bg">#df3e3e3e</color>
 
     <color name="like_icon_activated">#FF5252</color>
@@ -32,4 +33,9 @@
     <color name="google_button_color">#d44837</color>
     <color name="google_button_color_pressed">#FFA43528</color>
     <color name="button_pressed_text_color">#bcbcbc</color>
+
+    <color name="follow_button_color">#0097D3</color>
+    <color name="follow_button_pressed_color">#0087BC</color>
+    <color name="follow_button_light_color">@color/white</color>
+    <color name="follow_button_light_pressed_color">#f7f7f7</color>
 </resources>

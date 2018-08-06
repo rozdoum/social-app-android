@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        <activity android:name=".activities.MainActivity"
+        <activity android:name=".main.main.MainActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppCompat.NoActionBar">
             <intent-filter>
@@ -29,42 +29,65 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.PostDetailsActivity"
+            android:name=".main.postDetails.PostDetailsActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/label_post_detail_activity" />
         <activity
-            android:name=".activities.CreatePostActivity"
+            android:name=".main.post.createPost.CreatePostActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/label_create_post_activity" />
         <activity
-            android:name=".activities.ImageDetailActivity"
+            android:name=".main.imageDetail.ImageDetailActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/label_image_detail_activity"
             android:theme="@style/AppCompat.Black.NoActionBar" />
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".main.login.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppCompat.NoActionBar" />
         <activity
-            android:name=".activities.CreateProfileActivity"
+            android:name="com.rozdoum.socialcomponents.main.editProfile.createProfile.CreateProfileActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_create_profile"/>
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
         <activity
-            android:name=".activities.ProfileActivity"
+            android:name=".main.profile.ProfileActivity"
             android:theme="@style/AppCompat.NoActionBar"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_profile" />
         <activity
-            android:name=".activities.EditProfileActivity"
+            android:name=".main.editProfile.EditProfileActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_edit_profile" />
 
         <activity
-            android:name=".activities.EditPostActivity"
+            android:name=".main.post.editPost.EditPostActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_edit_post" />
+
+        <activity android:name=".main.usersList.UsersListActivity"
+            android:theme="@style/AppCompat.NoActionBar"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity android:name=".main.followPosts.FollowingPostsActivity"
+            android:theme="@style/AppCompat.NoActionBar"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_following_posts"/>
+
+        <activity
+            android:name=".main.search.SearchActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppCompat.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="84e05e27c9fcba7e1de6a47e355a1aa247264a46" />

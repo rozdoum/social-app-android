@@ -24,18 +24,18 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.support.design.widget.Snackbar;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.rozdoum.socialcomponents.ApplicationHelper;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.BaseActivity;
-import com.rozdoum.socialcomponents.activities.MainActivity;
-import com.rozdoum.socialcomponents.enums.ProfileStatus;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
+import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
-import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
 
 /**
@@ -96,14 +96,14 @@ public class LikeController {
         updatingLikeCounter = true;
         isLiked = true;
         likeCounterTextView.setText(String.valueOf(prevValue + 1));
-        ApplicationHelper.getDatabaseHelper().createOrUpdateLike(postId, postAuthorId);
+        PostInteractor.getInstance(context).createOrUpdateLike(postId, postAuthorId);
     }
 
     private void removeLike(long prevValue) {
         updatingLikeCounter = true;
         isLiked = false;
         likeCounterTextView.setText(String.valueOf(prevValue - 1));
-        ApplicationHelper.getDatabaseHelper().removeLike(postId, postAuthorId);
+        PostInteractor.getInstance(context).removeLike(postId, postAuthorId);
     }
 
     private void startAnimateLikeButton(AnimationType animationType) {
@@ -199,8 +199,8 @@ public class LikeController {
     }
 
     public void initLike(boolean isLiked) {
-            likesImageView.setImageResource(isLiked ? R.drawable.ic_like_active : R.drawable.ic_like);
-            this.isLiked = isLiked;
+        likesImageView.setImageResource(isLiked ? R.drawable.ic_like_active : R.drawable.ic_like);
+        this.isLiked = isLiked;
     }
 
     private void updateLocalPostLikeCounter(Post post) {
@@ -228,6 +228,24 @@ public class LikeController {
         });
     }
 
+    public void handleLikeClickAction(final BaseActivity baseActivity, final String postId) {
+        PostManager.getInstance(baseActivity.getApplicationContext()).getSinglePostValue(postId, new OnPostChangedListener() {
+            @Override
+            public void onObjectChanged(Post post) {
+                if (baseActivity.hasInternetConnection()) {
+                    doHandleLikeClickAction(baseActivity, post);
+                } else {
+                    showWarningMessage(baseActivity, R.string.internet_connection_failed);
+                }
+            }
+
+            @Override
+            public void onError(String errorText) {
+                baseActivity.showSnackBar(errorText);
+            }
+        });
+    }
+
     private void showWarningMessage(BaseActivity baseActivity, int messageId) {
         if (baseActivity instanceof MainActivity) {
             ((MainActivity) baseActivity).showFloatButtonRelatedSnackBar(messageId);
@@ -237,16 +255,25 @@ public class LikeController {
     }
 
     private void doHandleLikeClickAction(BaseActivity baseActivity, Post post) {
-        ProfileStatus profileStatus = ProfileManager.getInstance(baseActivity).checkProfile();
-
-        if (profileStatus.equals(ProfileStatus.PROFILE_CREATED)) {
+        if (baseActivity.checkAuthorization()) {
             if (isListView) {
                 likeClickActionLocal(post);
             } else {
                 likeClickAction(post.getLikesCount());
             }
-        } else {
-            baseActivity.doAuthorization(profileStatus);
         }
+    }
+
+    public void changeAnimationType() {
+        if (getLikeAnimationType() == LikeController.AnimationType.BOUNCE_ANIM) {
+            setLikeAnimationType(LikeController.AnimationType.COLOR_ANIM);
+        } else {
+            setLikeAnimationType(LikeController.AnimationType.BOUNCE_ANIM);
+        }
+
+        Snackbar snackbar = Snackbar
+                .make(likesImageView, "Animation was changed", Snackbar.LENGTH_LONG);
+
+        snackbar.show();
     }
 }

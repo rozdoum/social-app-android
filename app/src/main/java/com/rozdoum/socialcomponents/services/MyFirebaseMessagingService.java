@@ -24,19 +24,20 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rozdoum.socialcomponents.Constants;
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.MainActivity;
-import com.rozdoum.socialcomponents.activities.PostDetailsActivity;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
+import com.rozdoum.socialcomponents.main.postDetails.PostDetailsActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
+import com.rozdoum.socialcomponents.utils.GlideApp;
+import com.rozdoum.socialcomponents.utils.ImageUtil;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
 /**
@@ -114,20 +115,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         LogUtil.logDebug(TAG, "Message Notification Body: " + remoteMessage.getData().get(BODY_KEY));
     }
 
+    @Nullable
     public Bitmap getBitmapFromUrl(String imageUrl) {
-        try {
-            return Glide.with(this)
-                    .load(imageUrl)
-                    .asBitmap()
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .into(Constants.PushNotification.LARGE_ICONE_SIZE, Constants.PushNotification.LARGE_ICONE_SIZE)
-                    .get();
-
-        } catch (Exception e) {
-            LogUtil.logError(TAG, "getBitmapfromUrl", e);
-            return null;
-        }
+        return ImageUtil.loadBitmap(GlideApp.with(this), imageUrl, Constants.PushNotification.LARGE_ICONE_SIZE, Constants.PushNotification.LARGE_ICONE_SIZE);
     }
 
     private void sendNotification(String notificationTitle, String notificationBody, Bitmap bitmap, Intent intent) {

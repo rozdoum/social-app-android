@@ -20,7 +20,7 @@ package com.rozdoum.socialcomponents.services;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.rozdoum.socialcomponents.managers.DatabaseHelper;
+import com.rozdoum.socialcomponents.main.interactors.ProfileInteractor;
 import com.rozdoum.socialcomponents.utils.LogUtil;
 
 
@@ -60,6 +60,6 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) {
-        DatabaseHelper.getInstance(getApplicationContext()).updateRegistrationToken(token);
+        ProfileInteractor.getInstance(getApplicationContext()).updateRegistrationToken(token);
     }
 }

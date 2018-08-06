@@ -38,7 +38,7 @@
     <dimen name="login_screen_title_margin">48dp</dimen>
 
     <dimen name="profile_screen_margin_between_counters">32dp</dimen>
-    <dimen name="profile_screen_avatar_right_margin">24dp</dimen>
+    <dimen name="profile_screen_avatar_right_margin">8dp</dimen>
 
     <dimen name="post_card_elevation">3dp</dimen>
 
@@ -50,4 +50,14 @@
     <dimen name="post_card_content_padding_left">11dp</dimen>
 
     <dimen name="post_counter_radius">16dp</dimen>
+
+    <dimen name="follow_button_radius">16dp</dimen>
+    <dimen name="follow_button_width">100dp</dimen>
+    <dimen name="follow_button_height">32dp</dimen>
+
+
+    <dimen name="tab_indicator_height">4dp</dimen>
+
+    <dimen name="refresh_layout_end_offset">24dp</dimen>
+    <dimen name="refresh_layout_start_offset">-24dp</dimen>
 </resources>

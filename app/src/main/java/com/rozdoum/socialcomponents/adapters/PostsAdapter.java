@@ -24,11 +24,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.MainActivity;
 import com.rozdoum.socialcomponents.adapters.holders.LoadViewHolder;
 import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.enums.ItemType;
+import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
 import com.rozdoum.socialcomponents.model.Post;
@@ -89,7 +89,7 @@ public class PostsAdapter extends BasePostsAdapter {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == ItemType.ITEM.getTypeCode()) {
             return new PostViewHolder(inflater.inflate(R.layout.post_item_list_view, parent, false),
-                    createOnClickListener());
+                    createOnClickListener(), activity);
         } else {
             return new LoadViewHolder(inflater.inflate(R.layout.loading_view, parent, false));
         }

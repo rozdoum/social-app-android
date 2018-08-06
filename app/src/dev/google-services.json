@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1021018082868",
+    "firebase_url": "https://socialcomponentsdev.firebaseio.com",
+    "project_id": "socialcomponentsdev",
+    "storage_bucket": "socialcomponentsdev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021018082868:android:a75c1edac6597e88",
+        "android_client_info": {
+          "package_name": "com.rozdoum.socialcomponentsdev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1021018082868-m9cujvb1sacp0859ilii6npo28a161et.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rozdoum.socialcomponentsdev",
+            "certificate_hash": "d8c4533b96cf4b9cef62197dde9eb716bbfc8d32"
+          }
+        },
+        {
+          "client_id": "1021018082868-l66mjav84ln185aijile5jspmf6ot3rt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_Pq0-essl5AeuS7ISbzO9UKyJrLpiJ3o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1021018082868-l66mjav84ln185aijile5jspmf6ot3rt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

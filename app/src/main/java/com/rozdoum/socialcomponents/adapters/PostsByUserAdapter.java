@@ -22,7 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.rozdoum.socialcomponents.R;
-import com.rozdoum.socialcomponents.activities.BaseActivity;
+import com.rozdoum.socialcomponents.main.base.BaseActivity;
 import com.rozdoum.socialcomponents.adapters.holders.PostViewHolder;
 import com.rozdoum.socialcomponents.controllers.LikeController;
 import com.rozdoum.socialcomponents.managers.PostManager;
@@ -52,7 +52,7 @@ public class PostsByUserAdapter extends BasePostsAdapter {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.post_item_list_view, parent, false);
 
-        return new PostViewHolder(view, createOnClickListener(), false);
+        return new PostViewHolder(view, createOnClickListener(), activity, false);
     }
 
     private PostViewHolder.OnClickListener createOnClickListener() {
@@ -116,7 +116,6 @@ public class PostsByUserAdapter extends BasePostsAdapter {
     public interface CallBack {
         void onItemClick(Post post, View view);
         void onPostsListChanged(int postsCount);
-
         void onPostLoadingCanceled();
     }
 }
