@@ -289,67 +289,64 @@ exports.generateThumbnail = functions.storage.object().onFinalize((object) => {
 });
 
 function generateThumbnailsGeneral(fileBucket, filePath, contentType) {
-    return new Promise(function(resolve, reject) {
-        console.log("fileBucket", fileBucket);
-        console.log("filePath", filePath);
-        console.log("contentType", contentType);
+    console.log("fileBucket", fileBucket);
+    console.log("filePath", filePath);
+    console.log("contentType", contentType);
 
-        // Exit if this is triggered on a file that is not an image.
-        if (!contentType.startsWith('image/')) {
-            console.log('This is not an image.');
-            return null;
-        }
+    // Exit if this is triggered on a file that is not an image.
+    if (!contentType.startsWith('image/')) {
+        console.log('This is not an image.');
+        return null;
+    }
 
-        // Get the dir name.
-        const dirname = path.dirname(filePath);
-        if (dirname.includes(THUMB_MEDIUM_DIR) || dirname.includes(THUMB_SMALL_DIR)) {
-            console.log('Already scaled.');
-            return null;
-        }
+    // Get the dir name.
+    const dirname = path.dirname(filePath);
+    if (dirname.includes(THUMB_MEDIUM_DIR) || dirname.includes(THUMB_SMALL_DIR)) {
+        console.log('Already scaled.');
+        return null;
+    }
 
-        // Download file from bucket.
+    // Download file from bucket.
 
-        const fileName = path.basename(filePath);
+    const fileName = path.basename(filePath);
 
-        const tempFilePath = path.join(os.tmpdir(), fileName);
-        const bucket = gcs.bucket(fileBucket);
+    const tempFilePath = path.join(os.tmpdir(), fileName);
+    const bucket = gcs.bucket(fileBucket);
 
-        return bucket.file(filePath).download({
+    return bucket.file(filePath)
+        .download({
             destination: tempFilePath
-        }).then(() => {
+        })
+        .then(() => {
             console.log('download origin file successfully');
             const mediumThumbPromise = createThumb(fileName, filePath, tempFilePath, THUMB_MEDIUM_DIR, THUMB_MEDIUM_SIZE, bucket);
             const smallThumbPromise = createThumb(fileName, filePath, tempFilePath, THUMB_SMALL_DIR, THUMB_SMALL_SIZE, bucket);
-            return Promise.all([mediumThumbPromise, smallThumbPromise]).then(() => {
-                fs.unlinkSync(tempFilePath);
-                console.log(`removing origimal temp file complete`);
-                resolve("result");
-                return null;
-            });
+            return Promise.all([mediumThumbPromise, smallThumbPromise])
         })
-    })
+        .then(() => {
+            fs.unlinkSync(tempFilePath);
+            console.log(`removing origimal temp file complete`);
+            return null;
+        });
 }
 
 function createThumb(fileName, originFilePath, tempFilePath, thumbDir, size, bucket) {
-    return new Promise(function (resolve, reject) {
-        const newFileTemp = path.join(os.tmpdir(), `${fileName}_${size}_tmp.jpg`);
-        const newFilePath = path.join(path.dirname(originFilePath), thumbDir, fileName);
+    const newFileTemp = path.join(os.tmpdir(), `${fileName}_${size}_tmp.jpg`);
+    const newFilePath = path.join(path.dirname(originFilePath), thumbDir, fileName);
 
-        return sharp(tempFilePath)
-            .resize(size, size)
-            .max()
-            .toFile(newFileTemp)
-            .then(info => {
-                console.log(`resize ${size} complete, filePath = ${newFilePath}`);
-                return bucket.upload(newFileTemp, {
-                    destination: newFilePath
-                }).then(() => {
-                    fs.unlinkSync(newFileTemp);
-                    console.log(`removing thumb temp file for ${size} complete`);
-                    resolve("result");
-                    return null;
-                });
-
+    return sharp(tempFilePath)
+        .resize(size, size)
+        .max()
+        .toFile(newFileTemp)
+        .then(info => {
+            console.log(`resize ${size} complete, filePath = ${newFilePath}`);
+            return bucket.upload(newFileTemp, {
+                destination: newFilePath
             })
-    })
+        })
+        .then(() => {
+            fs.unlinkSync(newFileTemp);
+            console.log(`removing thumb temp file for size ${size} px is complete`);
+            return null;
+        });
 }
