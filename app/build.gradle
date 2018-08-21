@@ -114,7 +114,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:15.1.0'
 
     // MVP
-    compile 'com.hannesdorfmann.mosby3:mvp:3.1.0' // Plain MVP
+    implementation 'com.hannesdorfmann.mosby3:mvp:3.1.0' // Plain MVP
 
     // Social
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
