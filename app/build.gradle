@@ -68,16 +68,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:15.1.0'
 
     // MVP
-    compile 'com.hannesdorfmann.mosby3:mvp:3.1.0' // Plain MVP
+    implementation 'com.hannesdorfmann.mosby3:mvp:3.1.0' // Plain MVP
 
     // Social
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
     implementation 'com.facebook.android:facebook-android-sdk:4.17.0'
-
-    // Fabric
-    implementation('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
-        transitive = true;
-    }
 
     // Images
     implementation 'com.github.bumptech.glide:glide:4.6.1'
