@@ -77,20 +77,12 @@ public class Post implements Serializable, LazyLoading {
         this.description = description;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
-
     public String getImageTitle() {
         return imageTitle;
     }
 
     public void setImageTitle(String imageTitle) {
         this.imageTitle = imageTitle;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
     }
 
     public String getAuthorId() {

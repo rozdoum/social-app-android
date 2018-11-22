@@ -101,11 +101,13 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
         return new OnObjectChangedListener<Profile>() {
             @Override
             public void onObjectChanged(Profile obj) {
-                String userName = obj.getUsername();
-                fillComment(userName, comment, expandableTextView, dateTextView);
+                if (obj != null) {
+                    String userName = obj.getUsername();
+                    fillComment(userName, comment, expandableTextView, dateTextView);
 
-                if (obj.getPhotoUrl() != null) {
-                    ImageUtil.loadImage(GlideApp.with(context), obj.getPhotoUrl(), avatarImageView);
+                    if (obj.getPhotoUrl() != null) {
+                        ImageUtil.loadImage(GlideApp.with(context), obj.getPhotoUrl(), avatarImageView);
+                    }
                 }
             }
 
