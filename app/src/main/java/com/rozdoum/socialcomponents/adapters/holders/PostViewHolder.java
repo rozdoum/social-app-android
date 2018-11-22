@@ -130,12 +130,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         CharSequence date = FormatterUtil.getRelativeTimeSpanStringShort(context, post.getCreatedDate());
         dateTextView.setText(date);
 
-        String imageUrl = post.getImagePath();
-        int width = Utils.getDisplayWidth(context);
-        int height = (int) context.getResources().getDimension(R.dimen.post_detail_image_height);
-
-        // Displayed and saved to cache image, as needs for post detail.
-        ImageUtil.loadImageCenterCrop(GlideApp.with(baseActivity), imageUrl, postImageView, width, height);
+        postManager.loadImageMediumSize(GlideApp.with(baseActivity), post.getImageTitle(), postImageView);
 
         if (post.getAuthorId() != null) {
             profileManager.getProfileSingleValue(post.getAuthorId(), createProfileChangeListener(authorImageView));
@@ -157,7 +152,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         return new OnObjectChangedListenerSimple<Profile>() {
             @Override
             public void onObjectChanged(Profile obj) {
-                if (obj.getPhotoUrl() != null) {
+                if (obj != null && obj.getPhotoUrl() != null) {
                     if (!baseActivity.isFinishing() && !baseActivity.isDestroyed()) {
                         ImageUtil.loadImage(GlideApp.with(baseActivity), obj.getPhotoUrl(), authorImageView);
                     }
