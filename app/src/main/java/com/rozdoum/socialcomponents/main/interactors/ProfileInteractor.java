@@ -40,6 +40,7 @@ import com.rozdoum.socialcomponents.enums.UploadImagePrefix;
 import com.rozdoum.socialcomponents.managers.DatabaseHelper;
 import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListenerSimple;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
 import com.rozdoum.socialcomponents.managers.listeners.OnProfileCreatedListener;
 import com.rozdoum.socialcomponents.model.Post;
@@ -145,6 +146,7 @@ public class ProfileInteractor {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                listener.onError(databaseError.getMessage());
                 LogUtil.logError(TAG, "getProfile(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
@@ -163,6 +165,7 @@ public class ProfileInteractor {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                listener.onError(databaseError.getMessage());
                 LogUtil.logError(TAG, "getProfileSingleValue(), onCancelled", new Exception(databaseError.getMessage()));
             }
         });
@@ -207,12 +210,15 @@ public class ProfileInteractor {
         if (firebaseUser != null) {
             final String currentUserId = firebaseUser.getUid();
 
-            getProfileSingleValue(currentUserId, obj -> {
-                if (obj != null) {
-                    addRegistrationToken(token, currentUserId);
-                } else {
-                    LogUtil.logError(TAG, "updateRegistrationToken",
-                            new RuntimeException("Profile is not found"));
+            getProfileSingleValue(currentUserId, new OnObjectChangedListenerSimple<Profile>() {
+                @Override
+                public void onObjectChanged(Profile obj) {
+                    if(obj != null) {
+                        addRegistrationToken(token, currentUserId);
+                    } else {
+                        LogUtil.logError(TAG, "updateRegistrationToken",
+                                new RuntimeException("Profile is not found"));
+                    }
                 }
             });
         }

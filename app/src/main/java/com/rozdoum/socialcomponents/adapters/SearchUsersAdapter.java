@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.adapters.holders.UserViewHolder;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListenerSimple;
 import com.rozdoum.socialcomponents.model.Profile;
 
 import java.util.ArrayList;
@@ -76,9 +77,12 @@ public class SearchUsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void updateItem(int position) {
         Profile profile = getItemByPosition(position);
-        ProfileManager.getInstance(activity.getApplicationContext()).getProfileSingleValue(profile.getId(), updatedProfile -> {
-            itemsList.set(position, updatedProfile);
-            notifyItemChanged(position);
+        ProfileManager.getInstance(activity.getApplicationContext()).getProfileSingleValue(profile.getId(), new OnObjectChangedListenerSimple<Profile>() {
+            @Override
+            public void onObjectChanged(Profile updatedProfile) {
+                itemsList.set(position, updatedProfile);
+                notifyItemChanged(position);
+            }
         });
     }
 

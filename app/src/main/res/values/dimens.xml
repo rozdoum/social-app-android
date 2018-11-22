@@ -57,4 +57,7 @@
 
 
     <dimen name="tab_indicator_height">4dp</dimen>
+
+    <dimen name="refresh_layout_end_offset">24dp</dimen>
+    <dimen name="refresh_layout_start_offset">-24dp</dimen>
 </resources>

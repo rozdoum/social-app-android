@@ -61,57 +61,71 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
         this.context = itemView.getContext();
         profileManager = ProfileManager.getInstance(itemView.getContext().getApplicationContext());
 
-        avatarImageView = itemView.findViewById(R.id.avatarImageView);
-        commentTextView = itemView.findViewById(R.id.commentText);
-        dateTextView = itemView.findViewById(R.id.dateTextView);
+        avatarImageView = (ImageView) itemView.findViewById(R.id.avatarImageView);
+        commentTextView = (ExpandableTextView) itemView.findViewById(R.id.commentText);
+        dateTextView = (TextView) itemView.findViewById(R.id.dateTextView);
 
         if (callback != null) {
-            itemView.setOnLongClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    callback.onLongItemClick(v, position);
-                    return true;
-                }
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        callback.onLongItemClick(v, position);
+                        return true;
+                    }
 
-                return false;
+                    return false;
+                }
             });
         }
     }
 
     public void bindData(Comment comment) {
         final String authorId = comment.getAuthorId();
-        if (authorId != null)
+
+        if (authorId != null) {
             profileManager.getProfileSingleValue(authorId, createOnProfileChangeListener(commentTextView,
-                    avatarImageView, comment.getText()));
-
-        commentTextView.setText(comment.getText());
-
-        CharSequence date = FormatterUtil.getRelativeTimeSpanString(context, comment.getCreatedDate());
-        dateTextView.setText(date);
+                    avatarImageView, comment, dateTextView));
+        } else {
+            fillComment("", comment, commentTextView, dateTextView);
+        }
 
         avatarImageView.setOnClickListener(v -> callback.onAuthorClick(authorId, v));
     }
 
     private OnObjectChangedListener<Profile> createOnProfileChangeListener(final ExpandableTextView expandableTextView,
                                                                            final ImageView avatarImageView,
-                                                                           final String comment) {
-        return obj -> {
-            if (obj != null) {
-                String userName = obj.getUsername();
-                fillComment(userName, comment, expandableTextView);
+                                                                           final Comment comment,
+                                                                           final TextView dateTextView) {
+        return new OnObjectChangedListener<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                if (obj != null) {
+                    String userName = obj.getUsername();
+                    fillComment(userName, comment, expandableTextView, dateTextView);
 
-                if (obj.getPhotoUrl() != null) {
-                    ImageUtil.loadImage(GlideApp.with(context), obj.getPhotoUrl(), avatarImageView);
+                    if (obj.getPhotoUrl() != null) {
+                        ImageUtil.loadImage(GlideApp.with(context), obj.getPhotoUrl(), avatarImageView);
+                    }
                 }
+            }
+
+            @Override
+            public void onError(String errorText) {
+                fillComment("", comment, commentTextView, dateTextView);
             }
         };
     }
 
-    private void fillComment(String userName, String comment, ExpandableTextView commentTextView) {
-        Spannable contentString = new SpannableStringBuilder(userName + "   " + comment);
+    private void fillComment(String userName, Comment comment, ExpandableTextView commentTextView, TextView dateTextView) {
+        Spannable contentString = new SpannableStringBuilder(userName + "   " + comment.getText());
         contentString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.highlight_text)),
                 0, userName.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         commentTextView.setText(contentString);
+
+        CharSequence date = FormatterUtil.getRelativeTimeSpanString(context, comment.getCreatedDate());
+        dateTextView.setText(date);
     }
 }

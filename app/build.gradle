@@ -116,7 +116,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-storage:4.1.0'
 
     // MVP
-    compile 'com.hannesdorfmann.mosby3:mvp:3.1.0' // Plain MVP
+    implementation 'com.hannesdorfmann.mosby3:mvp:3.1.0' // Plain MVP
 
     // Social
     implementation 'com.google.android.gms:play-services-auth:16.0.1'

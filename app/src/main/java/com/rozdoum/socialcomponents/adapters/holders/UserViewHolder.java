@@ -30,6 +30,7 @@ import com.rozdoum.socialcomponents.enums.FollowState;
 import com.rozdoum.socialcomponents.managers.FollowManager;
 import com.rozdoum.socialcomponents.managers.ProfileManager;
 import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListener;
+import com.rozdoum.socialcomponents.managers.listeners.OnObjectChangedListenerSimple;
 import com.rozdoum.socialcomponents.model.Profile;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -84,7 +85,12 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
     }
 
     private OnObjectChangedListener<Profile> createProfileChangeListener() {
-        return this::fillInProfileFields;
+        return new OnObjectChangedListenerSimple<Profile>() {
+            @Override
+            public void onObjectChanged(Profile obj) {
+                fillInProfileFields(obj);
+            }
+        };
     }
 
     protected void fillInProfileFields(Profile profile) {
