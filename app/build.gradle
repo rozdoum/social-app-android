@@ -40,8 +40,8 @@ android {
         applicationId "com.rozdoum.socialcomponents"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 27
-        versionName "2.0"
+        versionCode 28
+        versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -106,12 +106,13 @@ dependencies {
     implementation 'com.android.support:cardview-v7:27.1.1'
 
     // Firebase
-    implementation 'com.google.firebase:firebase-core:15.0.2'
-    implementation 'com.google.firebase:firebase-database:15.0.1'
-    implementation 'com.google.firebase:firebase-auth:15.1.0'
-    implementation 'com.google.firebase:firebase-storage:15.0.2'
-    implementation 'com.google.firebase:firebase-messaging:15.0.2'
-    implementation 'com.google.firebase:firebase-auth:15.1.0'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-database:16.0.1'
+    implementation 'com.google.firebase:firebase-auth:16.0.2'
+    implementation 'com.google.firebase:firebase-storage:16.0.1'
+    implementation 'com.google.firebase:firebase-messaging:17.1.0'
+    implementation 'com.google.firebase:firebase-auth:16.0.2'
+    implementation 'com.firebaseui:firebase-ui-storage:4.1.0'
 
     // MVP
     implementation 'com.hannesdorfmann.mosby3:mvp:3.1.0' // Plain MVP

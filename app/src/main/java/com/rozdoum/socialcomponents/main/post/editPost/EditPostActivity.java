@@ -31,8 +31,10 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.rozdoum.socialcomponents.R;
+import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
 import com.rozdoum.socialcomponents.main.main.MainActivity;
 import com.rozdoum.socialcomponents.main.post.BaseCreatePostActivity;
+import com.rozdoum.socialcomponents.managers.PostManager;
 import com.rozdoum.socialcomponents.model.Post;
 import com.rozdoum.socialcomponents.utils.GlideApp;
 import com.rozdoum.socialcomponents.utils.ImageUtil;
@@ -83,24 +85,15 @@ public class EditPostActivity extends BaseCreatePostActivity<EditPostView, EditP
     private void fillUIFields(Post post) {
         titleEditText.setText(post.getTitle());
         descriptionEditText.setText(post.getDescription());
-        loadPostDetailsImage(post.getImagePath());
+        loadPostDetailsImage(post.getImageTitle());
         hideProgress();
     }
 
-    private void loadPostDetailsImage(String imagePath) {
-        ImageUtil.loadImageCenterCrop(GlideApp.with(this), imagePath, imageView, new RequestListener<Drawable>() {
-            @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                progressBar.setVisibility(View.GONE);
-                return false;
-            }
-
-            @Override
-            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                progressBar.setVisibility(View.GONE);
-                return false;
-            }
-        });
+    private void loadPostDetailsImage(String imageTitle) {
+        PostManager.getInstance(this.getApplicationContext()).loadImageMediumSize(GlideApp.with(this),
+                imageTitle,
+                imageView,
+                () -> progressBar.setVisibility(View.GONE));
     }
 
     @Override

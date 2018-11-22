@@ -21,6 +21,8 @@ package com.rozdoum.socialcomponents.main.interactors;
 import android.content.Context;
 import android.net.Uri;
 
+import android.support.annotation.NonNull;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -94,15 +96,21 @@ public class ProfileInteractor {
         if (uploadTask != null) {
             uploadTask.addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Uri downloadUrl = task.getResult().getDownloadUrl();
-                    LogUtil.logDebug(TAG, "successful upload image, image url: " + String.valueOf(downloadUrl));
+                    task.getResult().getStorage().getDownloadUrl().addOnCompleteListener(task1 -> {
+                        if (task1.isSuccessful()) {
+                            Uri downloadUrl = task1.getResult();
+                            LogUtil.logDebug(TAG, "successful upload image, image url: " + String.valueOf(downloadUrl));
 
-                    profile.setPhotoUrl(downloadUrl.toString());
-                    createOrUpdateProfile(profile, onProfileCreatedListener);
-
+                            profile.setPhotoUrl(downloadUrl.toString());
+                            createOrUpdateProfile(profile, onProfileCreatedListener);
+                        } else {
+                            onProfileCreatedListener.onProfileCreated(false);
+                            LogUtil.logDebug(TAG, "createOrUpdateProfileWithImage, fail to getDownloadUrl");
+                        }
+                    });
                 } else {
                     onProfileCreatedListener.onProfileCreated(false);
-                    LogUtil.logDebug(TAG, "fail to upload image");
+                    LogUtil.logDebug(TAG, "createOrUpdateProfileWithImage, fail to upload image");
                 }
 
             });

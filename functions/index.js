@@ -1,4 +1,4 @@
-var functions = require('firebase-functions');
+const functions = require('firebase-functions');
 
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
@@ -15,6 +15,18 @@ const followersDbKey = "followers";
 const followingDbKey = "follow";
 
 const postsTopic = "postsTopic";
+
+const THUMB_MEDIUM_SIZE = 1024; //px
+const THUMB_SMALL_SIZE = 100; //px
+
+const THUMB_MEDIUM_DIR = "medium";
+const THUMB_SMALL_DIR = "small";
+
+const gcs = require('@google-cloud/storage')();
+const path = require('path');
+const sharp = require('sharp');
+const os = require('os');
+const fs = require('fs');
 
 exports.pushNotificationLikes = functions.database.ref('/post-likes/{postId}/{authorId}/{likeId}').onCreate((snap, context)  => {
 
@@ -194,11 +206,11 @@ exports.pushNotificationNewPost = functions.database.ref('/posts/{postId}').onCr
 
         // Send a message to devices subscribed to the provided topic.
         return admin.messaging().sendToTopic(postsTopic, payload).then(response => {
-                // See the MessagingTopicResponse reference documentation for the
-                // contents of response.
-                console.log("Successfully sent info about new post :", response);
-                return response;
-            })
+            // See the MessagingTopicResponse reference documentation for the
+            // contents of response.
+            console.log("Successfully sent info about new post :", response);
+            return response;
+        })
             .catch(error => {
                 console.log("Error sending info about new post:", error);
             });
@@ -257,3 +269,84 @@ exports.removePostFromFollowingList = functions.database.ref('/posts/{postId}').
         console.error('Failure get followers ids', fallback);
     });
 });
+
+exports.generateThumbnail = functions.storage.object().onFinalize((object) => {
+    const fileBucket = object.bucket; // The Storage bucket that contains the origin file.
+    const filePath = object.name; // File path in the bucket.
+    const contentType = object.contentType; // File content type.
+
+    const generateThumbsPromises = generateThumbnailsGeneral(fileBucket, filePath, contentType);
+
+    if(generateThumbsPromises !== null) {
+        return generateThumbsPromises.then(() => {
+            console.log('Thumbnail created successfully');
+            return null;
+        })
+    } else {
+        return null;
+    }
+
+});
+
+function generateThumbnailsGeneral(fileBucket, filePath, contentType) {
+    console.log("fileBucket", fileBucket);
+    console.log("filePath", filePath);
+    console.log("contentType", contentType);
+
+    // Exit if this is triggered on a file that is not an image.
+    if (!contentType.startsWith('image/')) {
+        console.log('This is not an image.');
+        return null;
+    }
+
+    // Get the dir name.
+    const dirname = path.dirname(filePath);
+    if (dirname.includes(THUMB_MEDIUM_DIR) || dirname.includes(THUMB_SMALL_DIR)) {
+        console.log('Already scaled.');
+        return null;
+    }
+
+    // Download file from bucket.
+
+    const fileName = path.basename(filePath);
+
+    const tempFilePath = path.join(os.tmpdir(), fileName);
+    const bucket = gcs.bucket(fileBucket);
+
+    return bucket.file(filePath)
+        .download({
+            destination: tempFilePath
+        })
+        .then(() => {
+            console.log('download origin file successfully');
+            const mediumThumbPromise = createThumb(fileName, filePath, tempFilePath, THUMB_MEDIUM_DIR, THUMB_MEDIUM_SIZE, bucket);
+            const smallThumbPromise = createThumb(fileName, filePath, tempFilePath, THUMB_SMALL_DIR, THUMB_SMALL_SIZE, bucket);
+            return Promise.all([mediumThumbPromise, smallThumbPromise])
+        })
+        .then(() => {
+            fs.unlinkSync(tempFilePath);
+            console.log(`removing origimal temp file complete`);
+            return null;
+        });
+}
+
+function createThumb(fileName, originFilePath, tempFilePath, thumbDir, size, bucket) {
+    const newFileTemp = path.join(os.tmpdir(), `${fileName}_${size}_tmp.jpg`);
+    const newFilePath = path.join(path.dirname(originFilePath), thumbDir, fileName);
+
+    return sharp(tempFilePath)
+        .resize(size, size)
+        .max()
+        .toFile(newFileTemp)
+        .then(info => {
+            console.log(`resize ${size} complete, filePath = ${newFilePath}`);
+            return bucket.upload(newFileTemp, {
+                destination: newFilePath
+            })
+        })
+        .then(() => {
+            fs.unlinkSync(newFileTemp);
+            console.log(`removing thumb temp file for size ${size} px is complete`);
+            return null;
+        });
+}

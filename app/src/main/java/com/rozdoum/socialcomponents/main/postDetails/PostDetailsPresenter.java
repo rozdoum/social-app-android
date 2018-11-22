@@ -106,7 +106,7 @@ class PostDetailsPresenter extends BasePresenter<PostDetailsView> {
         ifViewAttached(view -> {
             view.setTitle(post.getTitle());
             view.setDescription(post.getDescription());
-            view.loadPostDetailImage(post.getImagePath());
+            view.loadPostDetailImage(post.getImageTitle());
 
             loadAuthorProfile();
         });
@@ -286,8 +286,8 @@ class PostDetailsPresenter extends BasePresenter<PostDetailsView> {
 
     public void onPostImageClick() {
         ifViewAttached(view -> {
-            if (post != null && post.getImagePath() != null) {
-                view.openImageDetailScreen(post.getImagePath());
+            if (post != null && post.getTitle() != null) {
+                view.openImageDetailScreen(post.getImageTitle());
             }
         });
     }

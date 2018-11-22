@@ -17,21 +17,25 @@
 package com.rozdoum.socialcomponents.managers;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
-
+import android.widget.ImageView;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
+import com.rozdoum.socialcomponents.R;
 import com.rozdoum.socialcomponents.main.interactors.FollowInteractor;
 import com.rozdoum.socialcomponents.main.interactors.PostInteractor;
-import com.rozdoum.socialcomponents.managers.listeners.OnDataChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnObjectExistListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnPostChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnPostCreatedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnPostListChangedListener;
-import com.rozdoum.socialcomponents.managers.listeners.OnTaskCompleteListener;
+import com.rozdoum.socialcomponents.managers.listeners.*;
 import com.rozdoum.socialcomponents.model.FollowingPost;
 import com.rozdoum.socialcomponents.model.Like;
 import com.rozdoum.socialcomponents.model.Post;
+import com.rozdoum.socialcomponents.utils.*;
 
 /**
  * Created by Kristina on 10/28/16.
@@ -86,7 +90,7 @@ public class PostManager extends FirebaseListenersManager {
     }
 
     public void createOrUpdatePostWithImage(Uri imageUri, final OnPostCreatedListener onPostCreatedListener, final Post post) {
-       postInteractor.createOrUpdatePostWithImage(imageUri, onPostCreatedListener, post);
+        postInteractor.createOrUpdatePostWithImage(imageUri, onPostCreatedListener, post);
     }
 
     public void removePost(final Post post, final OnTaskCompleteListener onTaskCompleteListener) {
@@ -154,7 +158,54 @@ public class PostManager extends FirebaseListenersManager {
         addListenerToMap(context, valueEventListener);
     }
 
+    public void loadImageMediumSize(GlideRequests request, String imageTitle, ImageView imageView, @Nullable OnImageRequestListener onImageRequestListener) {
+        int width = Utils.getDisplayWidth(context);
+        int height = (int) context.getResources().getDimension(R.dimen.post_detail_image_height);
+
+        StorageReference mediumStorageRef = getMediumImageStorageRef(imageTitle);
+        StorageReference originalStorageRef = getOriginImageStorageRef(imageTitle);
+
+        ImageUtil.loadMediumImageCenterCrop(request, mediumStorageRef, originalStorageRef, imageView, width, height, new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                if (onImageRequestListener != null) {
+                    onImageRequestListener.onImageRequestFinished();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                if (onImageRequestListener != null) {
+                    onImageRequestListener.onImageRequestFinished();
+                }
+                return false;
+            }
+        });
+
+    }
+
+    public void loadImageMediumSize(GlideRequests request, String imageTitle, ImageView imageView) {
+        loadImageMediumSize(request, imageTitle, imageView, null);
+    }
+
+    private StorageReference getMediumImageStorageRef(String imageTitle) {
+        return postInteractor.getMediumImageStorageRef(imageTitle);
+    }
+
+    public StorageReference getSmallImageStorageRef(String imageTitle) {
+        return postInteractor.getSmallImageStorageRef(imageTitle);
+    }
+
+    public StorageReference getOriginImageStorageRef(String imageTitle) {
+        return postInteractor.getOriginImageStorageRef(imageTitle);
+    }
+
     public interface PostCounterWatcher {
         void onPostCounterChanged(int newValue);
+    }
+
+    public interface OnImageRequestListener {
+        void onImageRequestFinished();
     }
 }
