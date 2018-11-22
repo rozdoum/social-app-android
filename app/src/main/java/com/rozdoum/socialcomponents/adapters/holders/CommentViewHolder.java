@@ -61,22 +61,19 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
         this.context = itemView.getContext();
         profileManager = ProfileManager.getInstance(itemView.getContext().getApplicationContext());
 
-        avatarImageView = (ImageView) itemView.findViewById(R.id.avatarImageView);
-        commentTextView = (ExpandableTextView) itemView.findViewById(R.id.commentText);
-        dateTextView = (TextView) itemView.findViewById(R.id.dateTextView);
+        avatarImageView = itemView.findViewById(R.id.avatarImageView);
+        commentTextView = itemView.findViewById(R.id.commentText);
+        dateTextView = itemView.findViewById(R.id.dateTextView);
 
         if (callback != null) {
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        callback.onLongItemClick(v, position);
-                        return true;
-                    }
-
-                    return false;
+            itemView.setOnLongClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    callback.onLongItemClick(v, position);
+                    return true;
                 }
+
+                return false;
             });
         }
     }
@@ -92,18 +89,14 @@ public class CommentViewHolder extends RecyclerView.ViewHolder {
         CharSequence date = FormatterUtil.getRelativeTimeSpanString(context, comment.getCreatedDate());
         dateTextView.setText(date);
 
-        avatarImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callback.onAuthorClick(authorId, v);
-            }
-        });
+        avatarImageView.setOnClickListener(v -> callback.onAuthorClick(authorId, v));
     }
 
-    private OnObjectChangedListener<Profile> createOnProfileChangeListener(final ExpandableTextView expandableTextView, final ImageView avatarImageView, final String comment) {
-        return new OnObjectChangedListener<Profile>() {
-            @Override
-            public void onObjectChanged(Profile obj) {
+    private OnObjectChangedListener<Profile> createOnProfileChangeListener(final ExpandableTextView expandableTextView,
+                                                                           final ImageView avatarImageView,
+                                                                           final String comment) {
+        return obj -> {
+            if (obj != null) {
                 String userName = obj.getUsername();
                 fillComment(userName, comment, expandableTextView);
 
