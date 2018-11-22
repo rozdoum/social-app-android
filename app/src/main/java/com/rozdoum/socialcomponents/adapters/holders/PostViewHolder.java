@@ -149,7 +149,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     private OnObjectChangedListener<Profile> createProfileChangeListener(final ImageView authorImageView) {
         return obj -> {
-            if (obj.getPhotoUrl() != null) {
+            if (obj != null && obj.getPhotoUrl() != null) {
                 if (!baseActivity.isFinishing() && !baseActivity.isDestroyed()) {
                     ImageUtil.loadImage(GlideApp.with(baseActivity), obj.getPhotoUrl(), authorImageView);
                 }
