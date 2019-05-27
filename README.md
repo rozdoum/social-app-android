@@ -14,6 +14,8 @@ The latest app version is available on [Google Play](https://play.google.com/sto
 
 Setup steps
 ===========
+ 0. Using python2 (environment) / npm install --save sharp
+
 
  1. First of all you need google-services.json. Create a Firebase project in the [Firebase console](https://console.firebase.google.com/), if you don't already have one. Go to your project and click ‘Add Firebase to your Android app’. Follow the setup steps. At the end, you'll download a google-services.json file which you should add to your project.
 
